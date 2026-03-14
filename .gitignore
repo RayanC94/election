@@ -1,0 +1,8 @@
+# Fichiers temporaires Excel
+~$*
+
+# Dossiers de configuration d'outils
+.claude/
+
+# Fichiers système Mac
+.DS_Store
