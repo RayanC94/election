@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -p \"Calcul fusion de liste proportionnelle avec prime.xlsx\" xl/worksheets/sheet1.xml)",
+      "Bash(unzip -p \"/Users/rayanyousfi/Downloads/election/Calcul fusion de liste proportionnelle avec prime.xlsx\" xl/sharedStrings.xml)",
+      "Bash(unzip -p \"/Users/rayanyousfi/Downloads/election/Calcul fusion de liste proportionnelle intégrale.xlsx\" xl/sharedStrings.xml)",
+      "Bash(python3 -c \":*)",
+      "Bash(pip3 install:*)"
+    ]
+  }
+}
