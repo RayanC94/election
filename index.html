@@ -198,6 +198,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
   <button class="tab active" onclick="switchTab(0)">1. Calculatrice Electorale</button>
   <button class="tab" onclick="switchTab(1)">2. Editeur de Liste & Parite</button>
   <button class="tab" onclick="switchTab(2)">3. Matrice de Negociation</button>
+  <button class="tab" onclick="switchTab(3)">4. Espace Politique</button>
 </div>
 
 <div class="content">
@@ -360,8 +361,27 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     </div>
     <div id="parityStatus" style="margin-bottom:4px;"></div>
     <div id="integrityBanner"></div>
+    <!-- Cumulative Filters -->
+    <div style="display:flex;gap:4px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-size:12px;font-weight:600;">Genre :</span>
+      <button class="btn btn-sm filter-btn" data-group="gender" data-val="F" onclick="toggleMergedFilter(this)" style="border:2px solid var(--rose);color:var(--rose);background:transparent;">F</button>
+      <button class="btn btn-sm filter-btn" data-group="gender" data-val="H" onclick="toggleMergedFilter(this)" style="border:2px solid var(--bleu-genre);color:var(--bleu-genre);background:transparent;">H</button>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 4px;"></span>
+      <span style="font-size:12px;font-weight:600;">Poste :</span>
+      <button class="btn btn-sm filter-btn" data-group="elig" data-val="maire" onclick="toggleMergedFilter(this)" style="border:2px solid var(--bleu);color:var(--bleu);background:transparent;">Maire</button>
+      <button class="btn btn-sm filter-btn" data-group="elig" data-val="adjoint" onclick="toggleMergedFilter(this)" style="border:2px solid var(--vert);color:var(--vert);background:transparent;">Adjoint</button>
+      <button class="btn btn-sm filter-btn" data-group="elig" data-val="delegue" onclick="toggleMergedFilter(this)" style="border:2px solid var(--orange);color:var(--orange);background:transparent;">Delegue</button>
+      <button class="btn btn-sm filter-btn" data-group="elig" data-val="simple" onclick="toggleMergedFilter(this)" style="border:2px solid var(--texte-light);color:var(--texte-light);background:transparent;">Conseiller</button>
+      <button class="btn btn-sm filter-btn" data-group="elig" data-val="suppleant" onclick="toggleMergedFilter(this)" style="border:2px solid #999;color:#999;background:transparent;">Suppleant</button>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 4px;"></span>
+      <span style="font-size:12px;font-weight:600;">Liste :</span>
+      <span id="filterListBtns"></span>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 4px;"></span>
+      <button class="btn btn-sm btn-outline" onclick="clearMergedFilters()" style="font-size:11px;">Reinitialiser</button>
+    </div>
+    <div id="activeFiltersSummary" style="font-size:11px;color:var(--texte-light);margin-bottom:6px;"></div>
     <div class="table-scroll" style="max-height:500px;">
-      <table><thead><tr><th>Pos.</th><th>Nom Prenom</th><th>Sexe</th><th>Origine</th><th>EPCI</th><th>Statut</th><th></th></tr></thead>
+      <table><thead><tr><th>Pos.</th><th>Nom Prenom</th><th>Sexe</th><th>Origine</th><th>Eligibilite</th><th>EPCI</th><th>Statut</th><th></th></tr></thead>
         <tbody id="mergedBody"></tbody>
       </table>
     </div>
@@ -433,15 +453,23 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
           L'indemnisation des conseillers delegues depend d'une delegation effective du maire et du respect de l'enveloppe indemnitaire globale. Il ne s'agit pas d'un droit automatique.
         </div>
 
-        <!-- Mayor allowance -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        <!-- Mayor & adjoint allowances: max (readonly) + actual (editable) -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
           <div>
-            <label style="font-size:12px;">Indemnite brute du maire (euros/mois)</label>
-            <input type="number" id="mayorAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" readonly>
+            <label style="font-size:11px;opacity:0.7;">Indemnite max maire (bareme)</label>
+            <input type="number" id="mayorAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
           </div>
           <div>
-            <label style="font-size:12px;">Indemnite max adjoint (euros/mois)</label>
-            <input type="number" id="adjointMaxAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" readonly>
+            <label style="font-size:11px;">Indemnite reelle maire (euros/mois)</label>
+            <input type="number" id="mayorActual" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
+          </div>
+          <div>
+            <label style="font-size:11px;opacity:0.7;">Indemnite max adjoint (bareme)</label>
+            <input type="number" id="adjointMaxAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
+          </div>
+          <div>
+            <label style="font-size:11px;">Indemnite reelle par adjoint (euros/mois)</label>
+            <input type="number" id="adjointActual" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
           </div>
         </div>
 
@@ -554,6 +582,87 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
   </div>
 </div>
 
+<!-- ==================== MODULE 4 ==================== -->
+<div class="module" id="module4">
+  <div class="card">
+    <h2>Espace de travail politique</h2>
+    <p style="font-size:12px;color:var(--texte-light);margin-bottom:12px;">Selectionnez une liste pour analyser et preparer votre strategie de negociation. Ajoutez des colonnes personnalisees, filtrez, triez, et simulez les postes.</p>
+
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;">Source :</label>
+        <select id="ws-source" onchange="wsLoadSource()" style="padding:6px 10px;border:1px solid var(--gris-border);border-radius:4px;min-width:200px;">
+          <option value="">— Choisir —</option>
+          <option value="merged">Liste fusionnee</option>
+          <option value="listA">Liste A</option>
+          <option value="listB">Liste B</option>
+        </select>
+      </div>
+      <div class="btn-group" style="margin:0;">
+        <button class="btn btn-sm btn-primary" onclick="wsAdd()">+ Candidat</button>
+        <button class="btn btn-sm btn-outline" onclick="wsAddColumn()">+ Colonne</button>
+        <button class="btn btn-sm btn-outline" onclick="wsAutoRoles()">Roles auto (par position)</button>
+        <button class="btn btn-sm btn-outline" onclick="wsExportCSV()">Exporter CSV</button>
+        <button class="btn btn-sm btn-outline" onclick="wsPrint()">Imprimer</button>
+      </div>
+    </div>
+
+    <!-- Workspace filters -->
+    <div style="display:flex;gap:4px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-size:12px;font-weight:600;">Filtres :</span>
+      <button class="btn btn-sm ws-filter" data-group="gender" data-val="F" onclick="wsToggleFilter(this)" style="border:2px solid var(--rose);color:var(--rose);background:transparent;">F</button>
+      <button class="btn btn-sm ws-filter" data-group="gender" data-val="H" onclick="wsToggleFilter(this)" style="border:2px solid var(--bleu-genre);color:var(--bleu-genre);background:transparent;">H</button>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
+      <button class="btn btn-sm ws-filter" data-group="role" data-val="maire" onclick="wsToggleFilter(this)" style="border:2px solid var(--bleu);color:var(--bleu);background:transparent;">Maire</button>
+      <button class="btn btn-sm ws-filter" data-group="role" data-val="adjoint" onclick="wsToggleFilter(this)" style="border:2px solid var(--vert);color:var(--vert);background:transparent;">Adj</button>
+      <button class="btn btn-sm ws-filter" data-group="role" data-val="delegue" onclick="wsToggleFilter(this)" style="border:2px solid var(--orange);color:var(--orange);background:transparent;">Del</button>
+      <button class="btn btn-sm ws-filter" data-group="role" data-val="simple" onclick="wsToggleFilter(this)" style="border:2px solid var(--texte-light);color:var(--texte-light);background:transparent;">Cons</button>
+      <button class="btn btn-sm ws-filter" data-group="role" data-val="suppleant" onclick="wsToggleFilter(this)" style="border:2px solid #999;color:#999;background:transparent;">Supp</button>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
+      <span id="ws-filter-origin-btns"></span>
+      <button class="btn btn-sm btn-outline" onclick="wsClearFilters()" style="font-size:11px;">Reinitialiser</button>
+      <span style="margin-left:auto;font-size:12px;font-weight:600;" id="ws-filter-count"></span>
+    </div>
+
+    <!-- Sort -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+      <span style="font-size:12px;font-weight:600;">Trier par :</span>
+      <select id="ws-sort" onchange="wsRender()" style="padding:4px 8px;border:1px solid var(--gris-border);border-radius:4px;">
+        <option value="position">Position</option>
+        <option value="name">Nom</option>
+        <option value="gender">Genre</option>
+        <option value="origin">Origine</option>
+        <option value="elig">Role</option>
+      </select>
+      <button class="btn btn-sm btn-outline" id="ws-sort-dir" onclick="wsToggleSortDir()" style="font-size:11px;">↑ Asc</button>
+    </div>
+
+    <!-- Simulation bar -->
+    <div class="card alert-blue" id="ws-simulation" style="display:none;">
+      <h3>Simulation de postes</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;" id="ws-sim-content"></div>
+    </div>
+
+    <!-- Main table -->
+    <div class="table-scroll" style="max-height:600px;">
+      <table id="ws-table">
+        <thead><tr id="ws-thead"></tr></thead>
+        <tbody id="ws-tbody"></tbody>
+      </table>
+    </div>
+    <div id="ws-stats" style="font-size:12px;margin-top:6px;"></div>
+  </div>
+
+  <!-- Scenario cards -->
+  <div class="card">
+    <h2>Scenarios de negociation</h2>
+    <p style="font-size:12px;color:var(--texte-light);margin-bottom:8px;">Comparez differentes hypotheses de repartition des postes pour votre liste.</p>
+    <div class="btn-group">
+      <button class="btn btn-sm btn-primary" onclick="wsAddScenario()">+ Scenario</button>
+    </div>
+    <div id="ws-scenarios" class="scenario-grid" style="margin-top:8px;"></div>
+  </div>
+</div>
 </div>
 
 <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="handleJSONImport(event)">
@@ -665,6 +774,7 @@ function switchTab(idx) {
     updateChecklist();
     renderClaimablePositions();
   }
+  if (idx === 3) { wsLoadSource(); }
 }
 
 // =====================================================================
@@ -697,9 +807,15 @@ function onPopulationChange() {
   const cs = COUNCIL_SIZES.find(c => pop >= c.min && pop <= c.max);
   if (cs) document.getElementById('totalSeats').value = cs.seats;
   const ma = MAYOR_ALLOWANCES.find(m => pop >= m.min && pop <= m.max);
-  if (ma) document.getElementById('mayorAllowance').value = ma.amount.toFixed(2);
+  if (ma) {
+    document.getElementById('mayorAllowance').value = ma.amount.toFixed(2);
+    document.getElementById('mayorActual').value = ma.amount.toFixed(2);
+  }
   const aa = ADJOINT_ALLOWANCES.find(a => pop >= a.min && pop <= a.max);
-  if (aa) document.getElementById('adjointMaxAllowance').value = aa.amount.toFixed(2);
+  if (aa) {
+    document.getElementById('adjointMaxAllowance').value = aa.amount.toFixed(2);
+    document.getElementById('adjointActual').value = aa.amount.toFixed(2);
+  }
   const maxAdj = cs ? Math.floor(cs.seats * 0.3) : 0;
   document.getElementById('maxAdjoints').value = maxAdj;
 
@@ -770,37 +886,50 @@ function allocateSeats(lists, totalSeats, primePercent, mode) {
 
   const result = {};
   eligible.forEach(l => result[l.name] = 0);
-  let primeSeats = 0, remainingSeats = totalSeats, leadList = null;
+  let leadList = null;
 
-  if (mode === 'avec_prime' && primePercent > 0) {
+  // Compute corrected scores integrating the prime (method used by official Excel tool)
+  // Uses scaled values (not tiny fractions) to avoid floating-point tie-breaking errors
+  // Winner: correctedScore = primeFrac × totalNorm + (1 - primeFrac) × score
+  // Others: correctedScore = (1 - primeFrac) × score
+  const totalNorm = eligible.reduce((s, l) => s + l.normalizedScore, 0);
+  const corrected = {};
+  if (mode === 'avec_prime' && primePercent > 0 && totalNorm > 0) {
     leadList = eligible.reduce((a, b) => a.normalizedScore > b.normalizedScore ? a : b);
-    primeSeats = Math.ceil(totalSeats * primePercent / 100);
-    result[leadList.name] = primeSeats;
-    remainingSeats = totalSeats - primeSeats;
+    const primeFrac = primePercent / 100;
+    for (const l of eligible) {
+      corrected[l.name] = (l.name === leadList.name)
+        ? primeFrac * totalNorm + (1 - primeFrac) * l.normalizedScore
+        : (1 - primeFrac) * l.normalizedScore;
+    }
+  } else {
+    for (const l of eligible) {
+      corrected[l.name] = l.normalizedScore;
+    }
   }
 
-  const allocated = {};
-  eligible.forEach(l => allocated[l.name] = 0);
-  const ordered = [];
-
-  for (let s = 0; s < remainingSeats; s++) {
+  // Single D'Hondt (highest average) on ALL seats with corrected scores
+  const fullOrdered = [];
+  for (let s = 0; s < totalSeats; s++) {
     let bestList = null, bestAvg = -1;
     for (const l of eligible) {
-      const avg = l.normalizedScore / (allocated[l.name] + 1);
-      if (avg > bestAvg || (avg === bestAvg && l.normalizedScore > (bestList ? bestList.normalizedScore : 0))) {
+      const avg = corrected[l.name] / (result[l.name] + 1);
+      if (avg > bestAvg || (avg === bestAvg && corrected[l.name] > (bestList ? corrected[bestList.name] : 0))) {
         bestAvg = avg; bestList = l;
       }
     }
-    if (bestList) { allocated[bestList.name]++; ordered.push({seat: s + 1, list: bestList.name}); }
+    if (bestList) {
+      result[bestList.name]++;
+      fullOrdered.push({position: s + 1, list: bestList.name, isPrime: false});
+    }
   }
 
-  for (const name in allocated) result[name] = (result[name] || 0) + allocated[name];
-
-  const fullOrdered = [];
-  if (leadList && primeSeats > 0) {
-    for (let i = 0; i < primeSeats; i++) fullOrdered.push({position: i + 1, list: leadList.name, isPrime: true});
+  // Compute primeSeats for display (seats the leader got beyond pure proportional)
+  let primeSeats = 0;
+  if (leadList && totalNorm > 0) {
+    const pureProp = Math.round(totalSeats * leadList.normalizedScore / totalNorm);
+    primeSeats = Math.max(0, result[leadList.name] - pureProp);
   }
-  ordered.forEach((o, i) => fullOrdered.push({position: primeSeats + i + 1, list: o.list, isPrime: false}));
 
   return {seats: result, ordered: fullOrdered, primeSeats};
 }
@@ -1273,18 +1402,104 @@ function validateMerge() {
   }
 }
 
+// Cumulative filter state: { gender: Set, elig: Set, origin: Set }
+const mergedFilters = { gender: new Set(), elig: new Set(), origin: new Set() };
+
+function toggleMergedFilter(btn) {
+  const group = btn.dataset.group;
+  const val = btn.dataset.val;
+  if (mergedFilters[group].has(val)) {
+    mergedFilters[group].delete(val);
+    btn.style.background = 'transparent';
+  } else {
+    mergedFilters[group].add(val);
+    const cs = getComputedStyle(document.documentElement);
+    btn.style.background = btn.style.borderColor;
+    btn.style.color = 'var(--blanc)';
+  }
+  updateFilterBtnStyles();
+  renderMergedList();
+}
+
+function updateFilterBtnStyles() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const active = mergedFilters[btn.dataset.group]?.has(btn.dataset.val);
+    if (active) { btn.style.color = 'var(--blanc)'; btn.style.background = btn.style.borderColor; }
+    else { btn.style.background = 'transparent'; btn.style.color = btn.style.borderColor; }
+  });
+  // Summary
+  const parts = [];
+  if (mergedFilters.gender.size) parts.push('Genre: ' + [...mergedFilters.gender].join(', '));
+  if (mergedFilters.elig.size) parts.push('Poste: ' + [...mergedFilters.elig].join(', '));
+  if (mergedFilters.origin.size) parts.push('Liste: ' + [...mergedFilters.origin].join(', '));
+  const el = document.getElementById('activeFiltersSummary');
+  if (el) el.textContent = parts.length ? 'Filtres actifs : ' + parts.join(' | ') : '';
+}
+
+function clearMergedFilters() {
+  mergedFilters.gender.clear(); mergedFilters.elig.clear(); mergedFilters.origin.clear();
+  updateFilterBtnStyles();
+  renderMergedList();
+}
+
+function buildListFilterBtns() {
+  const container = document.getElementById('filterListBtns');
+  if (!container) return;
+  container.innerHTML = '';
+  const origins = new Set(state.merged.map(c => c.origin).filter(Boolean));
+  const colors = ['#8B5CF6','#06B6D4','#F59E0B','#EC4899','#10B981'];
+  let ci = 0;
+  origins.forEach(name => {
+    const color = colors[ci++ % colors.length];
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm filter-btn';
+    btn.dataset.group = 'origin';
+    btn.dataset.val = name;
+    btn.onclick = () => toggleMergedFilter(btn);
+    btn.style.cssText = `border:2px solid ${color};color:${color};background:transparent;`;
+    btn.textContent = name;
+    container.appendChild(btn);
+  });
+}
+
+function passesFilters(c, elig) {
+  if (mergedFilters.gender.size && !mergedFilters.gender.has(c.gender)) return false;
+  if (mergedFilters.elig.size && !mergedFilters.elig.has(elig.type)) return false;
+  if (mergedFilters.origin.size && !mergedFilters.origin.has(c.origin)) return false;
+  return true;
+}
+
+function getPositionEligibility(position, totalSeats) {
+  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
+  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
+  if (position > totalSeats && totalSeats > 0) return {type: 'suppleant', label: 'Suppleant', color: '#999', bg: 'rgba(153,153,153,0.1)'};
+  if (position === 1) return {type: 'maire', label: 'Maire', color: 'var(--bleu)', bg: 'rgba(0,0,145,0.08)'};
+  if (nbAdj > 0 && position <= 1 + nbAdj) return {type: 'adjoint', label: 'Adjoint', color: 'var(--vert)', bg: 'rgba(24,117,60,0.08)'};
+  if (nbDel > 0 && position <= 1 + nbAdj + nbDel) return {type: 'delegue', label: 'Delegue', color: 'var(--orange)', bg: 'rgba(230,126,34,0.08)'};
+  return {type: 'simple', label: 'Conseiller', color: 'var(--texte-light)', bg: 'transparent'};
+}
+
 function renderMergedList() {
   const tbody = document.getElementById('mergedBody'); tbody.innerHTML = '';
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const flagZone = Math.ceil(totalSeats * 3 / 5);
-  const titulaires = state.merged.filter(m => m.isTitulaire !== false);
   const violations = checkParity(state.merged);
-  let fCount = 0, hCount = 0, epciCount = 0;
+  let fCount = 0, hCount = 0, epciCount = 0, filteredCount = 0;
+  const hasFilters = mergedFilters.gender.size || mergedFilters.elig.size || mergedFilters.origin.size;
+
+  // Build list filter buttons if needed
+  buildListFilterBtns();
 
   state.merged.forEach((c, i) => {
     if (c.gender === 'F') fCount++; else hCount++;
     if (c.epci) epciCount++;
+    const elig = getPositionEligibility(c.position, totalSeats);
+
+    // Cumulative filter: AND between groups, OR within group
+    if (!passesFilters(c, elig)) return;
+    filteredCount++;
+
     const isViolation = violations.positions.includes(i);
     const inZone = (c.position <= flagZone);
     const epciOk = !c.epci || inZone;
@@ -1316,11 +1531,14 @@ function renderMergedList() {
     else if (isViolation) statusHtml = '<span class="status-error">Parite!</span>';
     else statusHtml = '<span class="status-ok">OK</span>';
 
+    const eligHtml = `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:${elig.color};background:${elig.bg};border:1px solid ${elig.color};">${elig.label}</span>`;
+
     tr.innerHTML = `<td>${c.position}</td>
       <td><input type="text" value="${esc(c.name)}" style="width:100%;min-width:120px;" onchange="editMergedCandidate(${i},'name',this.value)"></td>
       <td><select onchange="editMergedCandidate(${i},'gender',this.value)" style="width:50px;">
         <option value="F" ${c.gender==='F'?'selected':''}>F</option><option value="H" ${c.gender==='H'?'selected':''}>H</option></select></td>
       <td>${esc(c.origin || '')}</td>
+      <td>${eligHtml}</td>
       <td>${c.epci ? (epciOk ? '<span class="status-ok">OK</span>' : '<span class="status-error">Hors zone!</span>') : '<input type="checkbox" onchange="editMergedCandidate('+i+',\'epci\',this.checked)">'}</td>
       <td>${statusHtml}</td>
       <td><button class="btn btn-sm btn-danger" onclick="removeMergedCandidate(${i})">x</button></td>`;
@@ -1329,7 +1547,12 @@ function renderMergedList() {
 
   const titCount = state.merged.filter(m => m.isTitulaire !== false).length;
   const supCount = state.merged.filter(m => m.isTitulaire === false).length;
-  document.getElementById('mergedStats').innerHTML = `${state.merged.length} total | ${titCount} titulaires | ${supCount} suppleant(s) | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount} | EPCI: ${epciCount}`;
+  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
+  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
+  let statsHtml = `${state.merged.length} total | ${titCount} titulaires | ${supCount} suppleant(s) | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount} | EPCI: ${epciCount}`;
+  if (hasFilters) statsHtml += ` | <em>Filtre : ${filteredCount} affiche(s)</em>`;
+  if (nbAdj > 0 || nbDel > 0) statsHtml += `<br><span style="font-size:11px;opacity:0.7;">Postes : 1 maire + ${nbAdj} adjoint(s) + ${nbDel} delegue(s) + ${Math.max(0, totalSeats - 1 - nbAdj - nbDel)} simple(s)</span>`;
+  document.getElementById('mergedStats').innerHTML = statsHtml;
 
   const diagDiv = document.getElementById('parityDiag');
   const detailsDiv = document.getElementById('parityDetails');
@@ -1432,30 +1655,41 @@ function onAdjointsChange() {
 // =====================================================================
 function calcAllowances() {
   const pop = parseInt(document.getElementById('cityPop').value) || 0;
-  const mayorAllow = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const mayorMax = parseFloat(document.getElementById('mayorAllowance').value) || 0;
+  const adjMax = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const mayorActual = parseFloat(document.getElementById('mayorActual').value) || 0;
+  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
   const nbAdjDesignes = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
   const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   const nbCons = Math.max(0, totalSeats - 1 - nbAdjDesignes - nbDel);
 
+  // Clamp actual values to max
+  if (mayorActual > mayorMax && mayorMax > 0) document.getElementById('mayorActual').value = mayorMax.toFixed(2);
+  if (adjActualPer > adjMax && adjMax > 0) document.getElementById('adjointActual').value = adjMax.toFixed(2);
+  const clampedMayor = Math.min(mayorActual, mayorMax || mayorActual);
+  const clampedAdj = Math.min(adjActualPer, adjMax || adjActualPer);
+
   // DGCL formula: envelope = mayor max + sum of adjoint max for each designated adjoint with delegation
-  const enveloppeGlobale = mayorAllow + (nbAdjDesignes * adjMaxAllow);
+  const enveloppeGlobale = mayorMax + (nbAdjDesignes * adjMax);
 
   // Actual distribution (what we plan to spend)
-  const adjActual = nbAdjDesignes * adjMaxAllow; // default to max, user can adjust
+  const adjActualTotal = nbAdjDesignes * clampedAdj;
   const delActual = nbDel * delAllow;
-  const totalDistributed = mayorAllow + adjActual + delActual;
+  const totalDistributed = clampedMayor + adjActualTotal + delActual;
   const pctUsed = enveloppeGlobale > 0 ? (totalDistributed / enveloppeGlobale * 100) : 0;
+  const remaining = enveloppeGlobale - totalDistributed;
 
   // Envelope detail
   const detailDiv = document.getElementById('enveloppeDetail');
   detailDiv.innerHTML = `
     <div style="font-size:12px;line-height:1.8;">
       <strong>Plafond global :</strong> ${enveloppeGlobale.toFixed(2)} euros/mois<br>
-      = Maire (${mayorAllow.toFixed(2)} euros) + ${nbAdjDesignes} adjoint(s) x ${adjMaxAllow.toFixed(2)} euros<br>
-      <strong>Distribue :</strong> ${totalDistributed.toFixed(2)} euros/mois (${pctUsed.toFixed(0)}% de l'enveloppe)
+      = Maire max (${mayorMax.toFixed(2)} euros) + ${nbAdjDesignes} adjoint(s) x ${adjMax.toFixed(2)} euros<br>
+      <strong>Distribue :</strong> ${totalDistributed.toFixed(2)} euros/mois (${pctUsed.toFixed(0)}% de l'enveloppe)<br>
+      = Maire (${clampedMayor.toFixed(2)}) + ${nbAdjDesignes} adj x ${clampedAdj.toFixed(2)} (${adjActualTotal.toFixed(2)}) + ${nbDel} del x ${delAllow.toFixed(2)} (${delActual.toFixed(2)})<br>
+      <strong>${remaining >= 0 ? 'Marge restante' : 'Depassement'} :</strong> <span style="color:${remaining >= 0 ? 'var(--vert)' : 'var(--rouge)'};">${Math.abs(remaining).toFixed(2)} euros/mois</span>
     </div>`;
 
   // Gauge
@@ -1487,7 +1721,7 @@ function calcAllowances() {
       <div><p style="font-size:11px;opacity:0.7;">Simples conseillers</p><p><strong>${nbCons}</strong></p></div>
     </div>
     <div style="margin-top:8px;font-size:11px;color:var(--texte-light);">
-      Maire: ${mayorAllow.toFixed(0)}e | ${nbAdjDesignes} adj: ${adjActual.toFixed(0)}e | ${nbDel} del: ${delActual.toFixed(0)}e
+      Maire: ${clampedMayor.toFixed(0)}e | ${nbAdjDesignes} adj: ${adjActualTotal.toFixed(0)}e | ${nbDel} del: ${delActual.toFixed(0)}e
     </div>`;
 
   renderPositionDistribution();
@@ -1654,7 +1888,8 @@ function renderClaimablePositions() {
     const delPol = Math.round(nbDel * ratio);
 
     // Estimated allowance
-    const estAllowance = (adjPol * adjMaxAllow) + (delPol * delAllow);
+    const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || adjMaxAllow;
+    const estAllowance = (adjPol * adjActualPer) + (delPol * delAllow);
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -1679,12 +1914,14 @@ function updateChecklist() {
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
 
   // Envelope check
-  const mayorAllow = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const mayorMax = parseFloat(document.getElementById('mayorAllowance').value) || 0;
+  const adjMax = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const mayorActual = parseFloat(document.getElementById('mayorActual').value) || 0;
+  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
   const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-  const envelope = mayorAllow + (nbAdj * adjMaxAllow);
-  const distributed = mayorAllow + (nbAdj * adjMaxAllow) + (nbDel * delAllow);
+  const envelope = mayorMax + (nbAdj * adjMax);
+  const distributed = Math.min(mayorActual, mayorMax || mayorActual) + (nbAdj * Math.min(adjActualPer, adjMax || adjActualPer)) + (nbDel * delAllow);
 
   const checks = [
     { label: 'Taille du conseil conforme a la population', ok: pop === 0 || (COUNCIL_SIZES.find(c => pop >= c.min && pop <= c.max)?.seats === totalSeats) },
@@ -1709,8 +1946,7 @@ function updateChecklist() {
 // =====================================================================
 function generateNegotiationSummary() {
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const mayorAllow = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
   const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const cityName = document.getElementById('cityName').value || '[Commune]';
@@ -1731,7 +1967,7 @@ function generateNegotiationSummary() {
 
     text += `> ${name} (${pct}% des voix)\n`;
     text += `  -> ${seats} siege(s) au conseil municipal (${(seats/totalSeats*100).toFixed(1)}%)\n`;
-    if (dist.adjAdj > 0) text += `  -> ${dist.adjAdj} poste(s) d'adjoint(e) (indemnite max : ${adjMaxAllow.toFixed(0)}e/mois chacun)\n`;
+    if (dist.adjAdj > 0) text += `  -> ${dist.adjAdj} poste(s) d'adjoint(e) (indemnite : ${adjActualPer.toFixed(0)}e/mois chacun)\n`;
     if (dist.delAdj > 0) text += `  -> ${dist.delAdj} poste(s) de conseiller(ere) delegue(e) (indemnite : ${delAllow.toFixed(0)}e/mois chacun)\n`;
     const simples = seats - (dist.adjAdj||0) - (dist.delAdj||0);
     if (simples > 0) text += `  -> ${simples} conseiller(ere)(s) simple(s)\n`;
@@ -1799,10 +2035,16 @@ function saveState() {
       isPLM: document.getElementById('isPLM').checked,
       nbAdjointsDesignes: document.getElementById('nbAdjointsDesignes').value,
       nbAdjointsNegocies: document.getElementById('nbAdjointsNegocies').value,
+      mayorActual: document.getElementById('mayorActual').value,
+      adjointActual: document.getElementById('adjointActual').value,
       nbDelegues: document.getElementById('nbDelegues').value,
       delegueAllowance: document.getElementById('delegueAllowance').value,
       listAName: document.getElementById('listAName').value,
       listBName: document.getElementById('listBName').value,
+      wsData: wsState.data,
+      wsCustomCols: wsState.customCols,
+      wsCustomData: wsState.customData,
+      wsScenarios: wsState.scenarios,
     }));
   } catch (e) {}
 }
@@ -1824,6 +2066,7 @@ function loadState() {
       });
       const fields = {cityName:'cityName',cityPop:'cityPop',totalSeats:'totalSeats',epciSeats:'epciSeats',
         nbAdjointsDesignes:'nbAdjointsDesignes',nbAdjointsNegocies:'nbAdjointsNegocies',
+        mayorActual:'mayorActual',adjointActual:'adjointActual',
         nbDelegues:'nbDelegues',delegueAllowance:'delegueAllowance',
         listAName:'listAName',listBName:'listBName'};
       for (const k in fields) { if (s[k] !== undefined && s[k] !== null) { const el = document.getElementById(fields[k]); if (el) el.value = s[k]; } }
@@ -1840,6 +2083,14 @@ function loadState() {
       });
       // Trigger population display
       if (s.cityPop) onPopulationChange();
+      // Restore actual allowances AFTER onPopulationChange (which sets them to max)
+      if (s.mayorActual !== undefined) document.getElementById('mayorActual').value = s.mayorActual;
+      if (s.adjointActual !== undefined) document.getElementById('adjointActual').value = s.adjointActual;
+      // Restore workspace state
+      if (s.wsData) wsState.data = s.wsData;
+      if (s.wsCustomCols) wsState.customCols = s.wsCustomCols;
+      if (s.wsCustomData) wsState.customData = s.wsCustomData;
+      if (s.wsScenarios) { wsState.scenarios = s.wsScenarios; wsRenderScenarios(); }
     }
   } catch (e) { console.error('Load state error:', e); }
 }
@@ -1890,6 +2141,399 @@ function exportCSV() {
 function esc(str) {
   if (!str) return '';
   const div = document.createElement('div'); div.textContent = str; return div.innerHTML;
+}
+
+// =====================================================================
+// MODULE 4: ESPACE DE TRAVAIL POLITIQUE
+// =====================================================================
+const wsState = {
+  data: [],           // working copy: each has {id, name, gender, origin, epci, role, position, isTitulaire}
+  customCols: [],     // [{id, label, type:'text'|'select'|'checkbox'|'number', options?:[]}]
+  customData: {},     // { candidateId: { colId: value } }
+  filters: { gender: new Set(), role: new Set(), origin: new Set() },
+  sortCol: 'position',
+  sortAsc: true,
+  scenarios: [],      // [{name, adj, del, notes}]
+};
+
+function wsLoadSource() {
+  const src = document.getElementById('ws-source').value;
+  if (!src) { wsState.data = []; wsRender(); return; }
+  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+  let candidates = [];
+  if (src === 'merged') candidates = state.merged;
+  else if (src === 'listA') candidates = (state.listA.candidates || []).map((c, i) => ({...c, position: i + 1, origin: state.listA.name || 'Liste A', isTitulaire: true}));
+  else if (src === 'listB') candidates = (state.listB.candidates || []).map((c, i) => ({...c, position: i + 1, origin: state.listB.name || 'Liste B', isTitulaire: true}));
+  // Deep copy + assign default role from position
+  wsState.data = candidates.filter(c => c.name && c.name.trim()).map(c => {
+    const copy = {...c};
+    if (!copy.id) copy.id = 'ws_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    if (!copy.role) {
+      const elig = getPositionEligibility(copy.position, totalSeats);
+      copy.role = elig.type; // maire, adjoint, delegue, simple, suppleant
+    }
+    return copy;
+  });
+  wsBuildOriginBtns();
+  wsRender();
+  wsRenderSimulation();
+}
+
+function wsBuildOriginBtns() {
+  const container = document.getElementById('ws-filter-origin-btns');
+  if (!container) return;
+  container.innerHTML = '';
+  const origins = [...new Set(wsState.data.map(c => c.origin).filter(Boolean))];
+  const colors = ['#8B5CF6','#06B6D4','#F59E0B','#EC4899','#10B981'];
+  origins.forEach((name, ci) => {
+    const color = colors[ci % colors.length];
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm ws-filter';
+    btn.dataset.group = 'origin'; btn.dataset.val = name;
+    btn.onclick = () => wsToggleFilter(btn);
+    btn.style.cssText = `border:2px solid ${color};color:${color};background:transparent;font-size:11px;`;
+    btn.textContent = name;
+    container.appendChild(btn);
+  });
+}
+
+function wsToggleFilter(btn) {
+  const group = btn.dataset.group, val = btn.dataset.val;
+  if (wsState.filters[group].has(val)) {
+    wsState.filters[group].delete(val);
+    btn.style.background = 'transparent'; btn.style.color = btn.style.borderColor;
+  } else {
+    wsState.filters[group].add(val);
+    btn.style.background = btn.style.borderColor; btn.style.color = 'var(--blanc)';
+  }
+  wsRender();
+}
+
+function wsClearFilters() {
+  wsState.filters.gender.clear(); wsState.filters.role.clear(); wsState.filters.origin.clear();
+  document.querySelectorAll('.ws-filter').forEach(btn => {
+    btn.style.background = 'transparent'; btn.style.color = btn.style.borderColor;
+  });
+  wsRender();
+}
+
+function wsToggleSortDir() {
+  wsState.sortAsc = !wsState.sortAsc;
+  document.getElementById('ws-sort-dir').textContent = wsState.sortAsc ? '↑ Asc' : '↓ Desc';
+  wsRender();
+}
+
+function wsAddColumn() {
+  const label = prompt('Nom de la colonne :');
+  if (!label) return;
+  const type = prompt('Type (text / select / checkbox / number) :', 'text') || 'text';
+  let options = [];
+  if (type === 'select') {
+    const raw = prompt('Options separees par des virgules :', 'Oui,Non,A voir');
+    options = raw ? raw.split(',').map(s => s.trim()) : [];
+  }
+  const id = 'col_' + Date.now();
+  wsState.customCols.push({id, label, type, options});
+  wsRender();
+  saveState();
+}
+
+function wsRemoveColumn(colId) {
+  wsState.customCols = wsState.customCols.filter(c => c.id !== colId);
+  delete wsState.customData[colId];
+  wsRender();
+  saveState();
+}
+
+function wsSetCustom(candidateId, colId, value) {
+  if (!wsState.customData[candidateId]) wsState.customData[candidateId] = {};
+  wsState.customData[candidateId][colId] = value;
+  saveState();
+}
+
+const ROLE_STYLES = {
+  maire:     {label:'Maire',     color:'var(--bleu)',       bg:'rgba(0,0,145,0.08)'},
+  adjoint:   {label:'Adjoint',   color:'var(--vert)',       bg:'rgba(24,117,60,0.08)'},
+  delegue:   {label:'Delegue',   color:'var(--orange)',     bg:'rgba(230,126,34,0.08)'},
+  simple:    {label:'Conseiller',color:'var(--texte-light)',bg:'transparent'},
+  suppleant: {label:'Suppleant', color:'#999',              bg:'rgba(153,153,153,0.1)'},
+};
+
+function wsEdit(idx, field, value) {
+  if (!wsState.data[idx]) return;
+  wsState.data[idx][field] = value;
+  if (field === 'role') { wsRender(); wsRenderSimulation(); }
+  saveState();
+}
+
+function wsMove(idx, dir) {
+  const target = idx + dir;
+  if (target < 0 || target >= wsState.data.length) return;
+  const tmp = wsState.data[idx];
+  wsState.data[idx] = wsState.data[target];
+  wsState.data[target] = tmp;
+  // Reassign positions
+  wsState.data.forEach((c, i) => c.position = i + 1);
+  wsRender(); wsRenderSimulation(); saveState();
+}
+
+function wsRemove(idx) {
+  wsState.data.splice(idx, 1);
+  wsState.data.forEach((c, i) => c.position = i + 1);
+  wsRender(); wsRenderSimulation(); saveState();
+}
+
+function wsAdd() {
+  const name = prompt('Nom du candidat :');
+  if (!name) return;
+  const gender = prompt('Genre (F/H) :', 'F') === 'H' ? 'H' : 'F';
+  wsState.data.push({
+    id: 'ws_' + Date.now(), name, gender, origin: '', epci: false,
+    role: 'simple', position: wsState.data.length + 1, isTitulaire: true,
+  });
+  wsRender(); wsRenderSimulation(); saveState();
+}
+
+function wsDuplicate(idx) {
+  const src = wsState.data[idx];
+  if (!src) return;
+  const copy = {...src, id: 'ws_' + Date.now(), position: wsState.data.length + 1};
+  wsState.data.push(copy);
+  wsState.data.forEach((c, i) => c.position = i + 1);
+  wsRender(); wsRenderSimulation(); saveState();
+}
+
+function wsRender() {
+  const thead = document.getElementById('ws-thead');
+  const tbody = document.getElementById('ws-tbody');
+  thead.innerHTML = ''; tbody.innerHTML = '';
+
+  // Header
+  let thHtml = '<th style="width:40px;">Pos.</th><th>Nom Prenom</th><th>Genre</th><th>Origine</th><th>Role</th><th>EPCI</th>';
+  wsState.customCols.forEach(col => {
+    thHtml += `<th>${esc(col.label)} <button onclick="wsRemoveColumn('${col.id}')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:10px;" title="Supprimer">✕</button></th>`;
+  });
+  thHtml += '<th style="width:90px;"></th>';
+  thead.innerHTML = thHtml;
+
+  // Filter
+  let rows = wsState.data.map((c, i) => ({...c, _idx: i}));
+  const f = wsState.filters;
+  rows = rows.filter(c => {
+    if (f.gender.size && !f.gender.has(c.gender)) return false;
+    if (f.role.size && !f.role.has(c.role || 'simple')) return false;
+    if (f.origin.size && !f.origin.has(c.origin)) return false;
+    return true;
+  });
+
+  // Sort
+  const sortKey = document.getElementById('ws-sort')?.value || 'position';
+  rows.sort((a, b) => {
+    let va, vb;
+    if (sortKey === 'position') { va = a.position; vb = b.position; }
+    else if (sortKey === 'name') { va = (a.name || '').toLowerCase(); vb = (b.name || '').toLowerCase(); }
+    else if (sortKey === 'gender') { va = a.gender; vb = b.gender; }
+    else if (sortKey === 'origin') { va = a.origin || ''; vb = b.origin || ''; }
+    else if (sortKey === 'elig') { va = a.role || 'simple'; vb = b.role || 'simple'; }
+    else { va = a.position; vb = b.position; }
+    let cmp = va < vb ? -1 : va > vb ? 1 : 0;
+    return wsState.sortAsc ? cmp : -cmp;
+  });
+
+  // Stats
+  let cF = 0, cH = 0, cMaire = 0, cAdj = 0, cDel = 0, cSimple = 0, cSupp = 0;
+
+  rows.forEach(c => {
+    const i = c._idx; // real index in wsState.data
+    if (c.gender === 'F') cF++; else cH++;
+    const role = c.role || 'simple';
+    if (role === 'maire') cMaire++; else if (role === 'adjoint') cAdj++;
+    else if (role === 'delegue') cDel++; else if (role === 'suppleant') cSupp++; else cSimple++;
+
+    const rs = ROLE_STYLES[role] || ROLE_STYLES.simple;
+    const tr = document.createElement('tr');
+    if (role === 'suppleant') tr.classList.add('suppliant-row');
+
+    // Drag and drop
+    tr.draggable = true;
+    tr.ondragstart = (e) => { e.dataTransfer.setData('text', 'ws:' + i); tr.classList.add('dragging'); };
+    tr.ondragend = () => tr.classList.remove('dragging');
+    tr.ondragover = (e) => { e.preventDefault(); tr.classList.add('drag-over'); };
+    tr.ondragleave = () => tr.classList.remove('drag-over');
+    tr.ondrop = (e) => {
+      e.preventDefault(); tr.classList.remove('drag-over');
+      const data = e.dataTransfer.getData('text');
+      if (data.startsWith('ws:')) {
+        const srcIdx = parseInt(data.split(':')[1]);
+        if (srcIdx === i) return;
+        const item = wsState.data.splice(srcIdx, 1)[0];
+        const destIdx = srcIdx < i ? i : i;
+        wsState.data.splice(destIdx, 0, item);
+        wsState.data.forEach((m, idx) => m.position = idx + 1);
+        wsRender(); wsRenderSimulation(); saveState();
+      }
+    };
+
+    // Role select
+    const roleOpts = ['maire','adjoint','delegue','simple','suppleant'].map(r =>
+      `<option value="${r}" ${role===r?'selected':''}>${ROLE_STYLES[r].label}</option>`
+    ).join('');
+
+    let html = `<td style="font-weight:600;">${c.position}</td>
+      <td><input type="text" value="${esc(c.name)}" style="width:100%;min-width:100px;padding:2px 4px;border:1px solid var(--gris-border);border-radius:3px;" onchange="wsEdit(${i},'name',this.value)"></td>
+      <td><select onchange="wsEdit(${i},'gender',this.value)" style="width:50px;padding:2px;border:1px solid var(--gris-border);border-radius:3px;">
+        <option value="F" ${c.gender==='F'?'selected':''}>F</option><option value="H" ${c.gender==='H'?'selected':''}>H</option></select></td>
+      <td><input type="text" value="${esc(c.origin||'')}" style="width:100%;min-width:60px;padding:2px 4px;border:1px solid var(--gris-border);border-radius:3px;font-size:11px;" onchange="wsEdit(${i},'origin',this.value)"></td>
+      <td><select onchange="wsEdit(${i},'role',this.value)" style="padding:2px 4px;border:2px solid ${rs.color};border-radius:6px;background:${rs.bg};color:${rs.color};font-weight:600;font-size:11px;">
+        ${roleOpts}</select></td>
+      <td style="text-align:center;"><input type="checkbox" ${c.epci?'checked':''} onchange="wsEdit(${i},'epci',this.checked)"></td>`;
+
+    // Custom columns
+    const cId = c.id || ('pos_' + c.position);
+    wsState.customCols.forEach(col => {
+      const val = wsState.customData[cId]?.[col.id] ?? '';
+      if (col.type === 'checkbox') {
+        html += `<td style="text-align:center;"><input type="checkbox" ${val ? 'checked' : ''} onchange="wsSetCustom('${cId}','${col.id}',this.checked)"></td>`;
+      } else if (col.type === 'select') {
+        let opts = col.options.map(o => `<option value="${esc(o)}" ${val===o?'selected':''}>${esc(o)}</option>`).join('');
+        html += `<td><select onchange="wsSetCustom('${cId}','${col.id}',this.value)" style="width:100%;padding:2px 4px;border:1px solid var(--gris-border);border-radius:3px;font-size:12px;"><option value="">—</option>${opts}</select></td>`;
+      } else if (col.type === 'number') {
+        html += `<td><input type="number" value="${val}" onchange="wsSetCustom('${cId}','${col.id}',this.value)" style="width:60px;padding:2px 4px;border:1px solid var(--gris-border);border-radius:3px;font-size:12px;"></td>`;
+      } else {
+        html += `<td><input type="text" value="${esc(val)}" onchange="wsSetCustom('${cId}','${col.id}',this.value)" style="width:100%;min-width:80px;padding:2px 4px;border:1px solid var(--gris-border);border-radius:3px;font-size:12px;"></td>`;
+      }
+    });
+
+    // Action buttons
+    html += `<td style="white-space:nowrap;">
+      <button onclick="wsMove(${i},-1)" class="btn btn-sm btn-outline" title="Monter" style="padding:2px 5px;">↑</button>
+      <button onclick="wsMove(${i},1)" class="btn btn-sm btn-outline" title="Descendre" style="padding:2px 5px;">↓</button>
+      <button onclick="wsRemove(${i})" class="btn btn-sm btn-danger" title="Supprimer" style="padding:2px 5px;">✕</button></td>`;
+
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+
+  // Filter count
+  const fcEl = document.getElementById('ws-filter-count');
+  if (fcEl) fcEl.textContent = rows.length + '/' + wsState.data.length + ' affiche(s)';
+
+  // Stats
+  const statsEl = document.getElementById('ws-stats');
+  if (statsEl) {
+    statsEl.innerHTML = `<span class="badge-f">F</span> ${cF} | <span class="badge-h">H</span> ${cH} | <span style="color:var(--bleu);font-weight:600;">${cMaire} maire</span> | <span style="color:var(--vert);font-weight:600;">${cAdj} adj</span> | <span style="color:var(--orange);font-weight:600;">${cDel} del</span> | ${cSimple} cons | ${cSupp} supp`;
+  }
+}
+
+function wsRenderSimulation() {
+  const simDiv = document.getElementById('ws-simulation');
+  const simContent = document.getElementById('ws-sim-content');
+  if (!simDiv || !simContent) return;
+  if (wsState.data.length === 0) { simDiv.style.display = 'none'; return; }
+  simDiv.style.display = 'block';
+
+  // Count roles per origin
+  const byOrigin = {};
+  wsState.data.forEach(c => {
+    const o = c.origin || '?';
+    if (!byOrigin[o]) byOrigin[o] = {total: 0, maire: 0, adjoint: 0, delegue: 0, simple: 0, suppleant: 0};
+    byOrigin[o].total++;
+    byOrigin[o][c.role || 'simple']++;
+  });
+
+  const adjPer = parseFloat(document.getElementById('adjointActual')?.value) || 0;
+  const delPer = parseFloat(document.getElementById('delegueAllowance')?.value) || 0;
+
+  let html = '';
+  for (const origin in byOrigin) {
+    const b = byOrigin[origin];
+    const cost = b.adjoint * adjPer + b.delegue * delPer;
+    html += `<div class="card" style="padding:10px;margin:0;">
+      <strong>${esc(origin)}</strong> <span style="font-size:11px;opacity:0.6;">(${b.total})</span><br>
+      <span style="font-size:12px;line-height:1.8;">
+        ${b.maire ? '<span style="color:var(--bleu);font-weight:600;">1 Maire</span><br>' : ''}
+        <span style="color:var(--vert);font-weight:600;">${b.adjoint} Adjoint(s)</span> |
+        <span style="color:var(--orange);font-weight:600;">${b.delegue} Delegue(s)</span><br>
+        ${b.simple} Conseiller(s)${b.suppleant ? ' | ' + b.suppleant + ' Supp' : ''}<br>
+        <strong>Cout : ${cost.toFixed(0)} e/mois</strong>
+      </span>
+    </div>`;
+  }
+  simContent.innerHTML = html;
+}
+
+function wsAutoRoles() {
+  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+  wsState.data.forEach(c => {
+    const elig = getPositionEligibility(c.position, totalSeats);
+    c.role = elig.type;
+  });
+  wsRender(); wsRenderSimulation(); saveState();
+}
+
+function wsExportCSV() {
+  if (wsState.data.length === 0) return alert('Aucune donnee a exporter.');
+  const cols = ['Position', 'Nom', 'Genre', 'Origine', 'Role', 'EPCI'];
+  wsState.customCols.forEach(c => cols.push(c.label));
+  let csv = cols.join(';') + '\n';
+  wsState.data.forEach(c => {
+    const rs = ROLE_STYLES[c.role || 'simple'] || ROLE_STYLES.simple;
+    const cId = c.id || ('pos_' + c.position);
+    let row = [c.position, c.name || '', c.gender || '', c.origin || '', rs.label, c.epci ? 'Oui' : ''];
+    wsState.customCols.forEach(col => row.push(wsState.customData[cId]?.[col.id] ?? ''));
+    csv += row.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';') + '\n';
+  });
+  const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'espace_politique_' + (document.getElementById('ws-source').value || 'export') + '.csv';
+  a.click();
+}
+
+function wsPrint() {
+  window.print();
+}
+
+function wsAddScenario() {
+  const name = prompt('Nom du scenario :', 'Hypothese ' + (wsState.scenarios.length + 1));
+  if (!name) return;
+  const adj = parseInt(prompt('Nb adjoints pour notre groupe :', '3')) || 0;
+  const del = parseInt(prompt('Nb delegues pour notre groupe :', '2')) || 0;
+  const notes = prompt('Notes :', '') || '';
+  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
+  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
+  wsState.scenarios.push({name, adj, del, notes, cost: adj * adjActualPer + del * delAllow});
+  wsRenderScenarios();
+  saveState();
+}
+
+function wsRemoveScenario(idx) {
+  wsState.scenarios.splice(idx, 1);
+  wsRenderScenarios();
+  saveState();
+}
+
+function wsRenderScenarios() {
+  const container = document.getElementById('ws-scenarios');
+  if (!container) return;
+  container.innerHTML = '';
+  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
+  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
+
+  wsState.scenarios.forEach((sc, idx) => {
+    const cost = sc.adj * adjActualPer + sc.del * delAllow;
+    container.innerHTML += `<div class="scenario-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong>${esc(sc.name)}</strong>
+        <button class="btn btn-sm btn-danger" onclick="wsRemoveScenario(${idx})">x</button>
+      </div>
+      <div style="margin-top:8px;font-size:12px;line-height:1.8;">
+        <span style="color:var(--vert);font-weight:600;">${sc.adj} adjoint(s)</span> x ${adjActualPer.toFixed(0)}e = ${(sc.adj * adjActualPer).toFixed(0)}e/mois<br>
+        <span style="color:var(--orange);font-weight:600;">${sc.del} delegue(s)</span> x ${delAllow.toFixed(0)}e = ${(sc.del * delAllow).toFixed(0)}e/mois<br>
+        <strong>Cout total : ${cost.toFixed(0)} e/mois (${(cost * 12).toFixed(0)} e/an)</strong>
+        ${sc.notes ? '<br><em style="opacity:0.7;">' + esc(sc.notes) + '</em>' : ''}
+      </div>
+    </div>`;
+  });
 }
 
 // =====================================================================
