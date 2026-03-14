@@ -28,7 +28,6 @@ input, select { font-family: inherit; font-size: 13px; }
 h2 { font-size: 1.3em; color: var(--bleu); margin-bottom: 12px; }
 h3 { font-size: 1.1em; color: var(--bleu); margin-bottom: 8px; }
 
-/* Header */
 .header { background: var(--bleu); color: var(--blanc); padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .header .logo { font-weight: 700; font-size: 1.2em; white-space: nowrap; }
 .header .logo span { color: var(--rouge); }
@@ -39,46 +38,40 @@ h3 { font-size: 1.1em; color: var(--bleu); margin-bottom: 8px; }
 .header-config .field { display: flex; flex-direction: column; gap: 2px; }
 .header-config input[type="number"] { width: 80px; }
 .header-config input[type="checkbox"] { width: auto; }
-.header-actions { display: flex; gap: 6px; }
+.header-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .header-actions button { padding: 6px 12px; border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--blanc); font-size: 12px; }
 .header-actions button:hover { background: rgba(255,255,255,0.25); }
 
-/* Timer */
 .timer-bar { background: var(--rouge); color: var(--blanc); text-align: center; padding: 4px; font-size: 12px; font-weight: 600; display: none; }
 .timer-bar.active { display: block; }
 
-/* Tabs */
-.tabs { display: flex; background: var(--blanc); border-bottom: 2px solid var(--bleu); padding: 0 20px; }
+.tabs { display: flex; background: var(--blanc); border-bottom: 2px solid var(--bleu); padding: 0 20px; flex-wrap: wrap; }
 .tab { padding: 12px 20px; border: none; background: none; font-size: 14px; font-weight: 600; color: var(--texte-light); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
 .tab:hover { color: var(--bleu); }
 .tab.active { color: var(--bleu); border-bottom-color: var(--bleu); }
 
-/* Content */
 .content { padding: 20px; max-width: 1400px; margin: 0 auto; }
 .module { display: none; }
 .module.active { display: block; }
 
-/* Cards */
 .card { background: var(--blanc); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
 .card.alert-red { border-left: 4px solid var(--rouge); }
 .card.alert-green { border-left: 4px solid var(--vert); }
 .card.alert-orange { border-left: 4px solid var(--orange); }
+.card.alert-blue { border-left: 4px solid var(--bleu); }
 
-/* Grid layouts */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-/* Tables */
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { background: var(--bleu); color: var(--blanc); padding: 8px 10px; text-align: left; font-weight: 600; position: sticky; top: 0; }
+th { background: var(--bleu); color: var(--blanc); padding: 8px 10px; text-align: left; font-weight: 600; position: sticky; top: 0; z-index: 1; }
 td { padding: 6px 10px; border-bottom: 1px solid var(--gris-border); }
 tr:nth-child(even) { background: #f9f9f9; }
 tr:hover { background: #eef2ff; }
 td input, td select { width: 100%; padding: 4px 6px; border: 1px solid var(--gris-border); border-radius: 4px; }
 td input[type="checkbox"] { width: auto; }
 
-/* Buttons */
 .btn { padding: 8px 16px; border-radius: 4px; border: none; font-weight: 600; transition: all 0.2s; }
 .btn-primary { background: var(--bleu); color: var(--blanc); }
 .btn-primary:hover { background: var(--bleu-clair); }
@@ -89,60 +82,72 @@ td input[type="checkbox"] { width: auto; }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
 .btn-group { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
 
-/* Gender badges */
 .badge-f { display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 50%; background: var(--rose); color: var(--blanc); font-size: 11px; font-weight: 700; }
 .badge-h { display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 50%; background: var(--bleu-genre); color: var(--blanc); font-size: 11px; font-weight: 700; }
 
-/* Status indicators */
 .status-ok { color: var(--vert); font-weight: 600; }
 .status-warn { color: var(--orange); font-weight: 600; }
 .status-error { color: var(--rouge); font-weight: 600; }
 
-/* Chart container */
 .chart-container { position: relative; height: 60px; background: #f0f0f0; border-radius: 4px; overflow: hidden; margin: 8px 0; }
 .chart-bar { height: 100%; display: inline-block; transition: width 0.3s; position: relative; }
 .chart-bar span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: 700; color: var(--blanc); text-shadow: 0 1px 2px rgba(0,0,0,0.5); white-space: nowrap; }
 
-/* EPCI zone highlight */
 .epci-zone { background: rgba(106,106,244,0.08) !important; }
 .parity-error { background: rgba(225,0,15,0.08) !important; }
+.suppliant-row { background: rgba(230,126,34,0.08) !important; font-style: italic; }
 
-/* Drag and drop */
 tr.dragging { opacity: 0.5; }
 tr.drag-over { border-top: 2px solid var(--bleu); }
 
-/* Pie chart */
-.pie-container { width: 200px; height: 200px; margin: 10px auto; }
-
-/* Compliance checklist */
 .checklist { list-style: none; }
 .checklist li { padding: 6px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
-.check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
 .check-ok { background: var(--vert); color: var(--blanc); }
 .check-fail { background: var(--rouge); color: var(--blanc); }
 
-/* Scenario comparison */
 .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
 .scenario-card { border: 2px solid var(--gris-border); border-radius: var(--radius); padding: 12px; }
-.scenario-card.highlight { border-color: var(--bleu); }
 
-/* Negotiation summary */
 .nego-summary { background: #f0f4ff; border: 1px solid var(--bleu-clair); border-radius: var(--radius); padding: 16px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
 
-/* Scrollable table wrapper */
 .table-scroll { overflow-x: auto; max-height: 500px; overflow-y: auto; }
 
-/* Mode toggle */
 .mode-toggle { display: flex; border: 2px solid var(--bleu); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
 .mode-toggle button { flex: 1; padding: 8px 12px; border: none; background: var(--blanc); color: var(--bleu); font-weight: 600; }
 .mode-toggle button.active { background: var(--bleu); color: var(--blanc); }
 
-/* Time load indicators */
 .load-light { color: var(--vert); }
 .load-medium { color: var(--orange); }
 .load-heavy { color: var(--rouge); }
 
-/* Print styles */
+/* Gauge bar */
+.gauge { height: 24px; background: #e0e0e0; border-radius: 12px; overflow: hidden; margin: 8px 0; position: relative; }
+.gauge-fill { height: 100%; border-radius: 12px; transition: width 0.3s, background 0.3s; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--blanc); }
+.gauge-ok { background: var(--vert); }
+.gauge-warn { background: var(--orange); }
+.gauge-over { background: var(--rouge); }
+
+/* Legal alert box */
+.legal-alert { background: #FFF8E1; border: 1px solid #FFD54F; border-radius: var(--radius); padding: 12px; margin: 8px 0; font-size: 12px; line-height: 1.6; }
+.legal-alert strong { color: var(--rouge); }
+
+/* Guide details */
+details.guide { background: #f0f4ff; border: 1px solid var(--bleu-clair); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; }
+details.guide summary { cursor: pointer; font-weight: 600; color: var(--bleu); font-size: 14px; }
+details.guide .step { margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--bleu-clair); }
+details.guide .step strong { display: block; margin-bottom: 2px; }
+
+/* Ecart coloring */
+.ecart-zero { color: var(--vert); }
+.ecart-small { color: var(--orange); }
+.ecart-big { color: var(--rouge); font-weight: 700; }
+
+/* Integrity banner */
+.integrity-banner { padding: 10px; border-radius: var(--radius); margin: 8px 0; font-size: 13px; }
+.integrity-ok { background: #E8F5E9; border: 1px solid var(--vert); color: var(--vert); }
+.integrity-error { background: #FFEBEE; border: 1px solid var(--rouge); color: var(--rouge); }
+
 @media print {
   .header, .tabs, .btn, .btn-group, .header-actions, .timer-bar { display: none !important; }
   .module { display: block !important; page-break-before: always; }
@@ -166,11 +171,11 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
       <input type="number" id="cityPop" placeholder="Habitants" oninput="onPopulationChange()">
     </div>
     <div class="field">
-      <label>Sièges conseil</label>
+      <label>Sieges conseil</label>
       <input type="number" id="totalSeats" oninput="onSeatsChange()">
     </div>
     <div class="field">
-      <label>Sièges EPCI</label>
+      <label>Sieges EPCI</label>
       <input type="number" id="epciSeats" value="0" oninput="saveState()">
     </div>
     <div class="field" style="flex-direction:row;align-items:center;gap:4px;margin-top:14px;">
@@ -179,58 +184,51 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
     </div>
   </div>
   <div class="header-actions">
-    <button onclick="startTimer()">Lancer Timer 36h</button>
-    <button onclick="exportJSON()">Exporter JSON</button>
-    <button onclick="importJSON()">Importer JSON</button>
+    <button onclick="startTimer()">Timer 36h</button>
+    <button onclick="exportJSON()">Export JSON</button>
+    <button onclick="importJSON()">Import JSON</button>
     <button onclick="exportCSV()">Export CSV</button>
-    <button onclick="window.print()">Imprimer/PDF</button>
+    <button onclick="window.print()">Imprimer</button>
   </div>
 </div>
 
-<!-- TIMER BAR -->
 <div class="timer-bar" id="timerBar">Temps restant : --:--:--</div>
 
-<!-- TABS -->
 <div class="tabs">
-  <button class="tab active" onclick="switchTab(0)">1. Calculatrice Électorale</button>
-  <button class="tab" onclick="switchTab(1)">2. Éditeur de Liste & Parité</button>
-  <button class="tab" onclick="switchTab(2)">3. Matrice de Négociation</button>
+  <button class="tab active" onclick="switchTab(0)">1. Calculatrice Electorale</button>
+  <button class="tab" onclick="switchTab(1)">2. Editeur de Liste & Parite</button>
+  <button class="tab" onclick="switchTab(2)">3. Matrice de Negociation</button>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
 
 <!-- ==================== MODULE 1 ==================== -->
 <div class="module active" id="module1">
   <div class="grid-2">
-    <!-- Left: Input -->
     <div>
       <div class="card">
         <h2>Configuration du calcul</h2>
         <div class="mode-toggle">
           <button class="active" onclick="setMode('avec_prime', this)">Avec prime majoritaire</button>
-          <button onclick="setMode('integrale', this)">Proportionnelle intégrale</button>
+          <button onclick="setMode('integrale', this)">Proportionnelle integrale</button>
         </div>
         <div id="primeConfig" style="margin-bottom:12px;">
           <label>Prime majoritaire : <strong id="primeLabel">50%</strong></label>
           <input type="range" id="primeSlider" min="0" max="50" value="50" style="width:100%;" oninput="onPrimeChange()">
         </div>
         <div style="margin-bottom:12px;">
-          <label>Sexe tête de liste du 2d tour : </label>
+          <label>Sexe tete de liste du 2d tour : </label>
           <select id="headGender" onchange="recalculate()">
             <option value="F">Femme</option>
             <option value="H">Homme</option>
           </select>
         </div>
       </div>
-
       <div class="card">
         <h2>Listes du 1er tour</h2>
         <div class="table-scroll">
-          <table id="listsTable">
-            <thead>
-              <tr><th>#</th><th>Nom de la liste</th><th>Score 1er tour</th><th>Type</th><th>%</th><th></th></tr>
-            </thead>
+          <table>
+            <thead><tr><th>#</th><th>Nom de la liste</th><th>Score 1er tour</th><th>Type</th><th>%</th><th></th></tr></thead>
             <tbody id="listsBody"></tbody>
           </table>
         </div>
@@ -240,57 +238,45 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
         </div>
         <p style="font-size:11px;color:var(--texte-light);margin-top:6px;">Seuils : 10% pour se maintenir, 5% pour fusionner</p>
       </div>
-
-      <!-- Min score calculator -->
       <div class="card">
-        <h3>Score minimum pour +1 siège</h3>
+        <h3>Score minimum pour +1 siege</h3>
         <div class="table-scroll">
-          <table id="minScoreTable">
-            <thead><tr><th>Liste</th><th>Sièges actuels</th><th>Score pour +1</th><th>Score pour +2</th></tr></thead>
+          <table><thead><tr><th>Liste</th><th>Sieges actuels</th><th>Score pour +1</th><th>Score pour +2</th></tr></thead>
             <tbody id="minScoreBody"></tbody>
           </table>
         </div>
       </div>
-
-      <!-- Loss simulator -->
       <div class="card">
         <h3>Simulateur de perte (opposition)</h3>
         <div style="margin-bottom:8px;">
-          <label>Score projeté du vainqueur au 2nd tour (%)</label>
+          <label>Score projete du vainqueur au 2nd tour (%)</label>
           <input type="number" id="lossWinnerScore" value="55" min="0" max="100" step="0.1" style="width:100px;" oninput="simulateLoss()">
         </div>
         <div id="lossResult" class="card alert-orange" style="display:none;"></div>
       </div>
     </div>
-
-    <!-- Right: Results -->
     <div>
       <div class="card">
-        <h2>Répartition des sièges</h2>
+        <h2>Repartition des sieges</h2>
         <div class="chart-container" id="seatChart"></div>
         <div class="table-scroll">
-          <table>
-            <thead><tr><th>Liste</th><th>Sièges municipaux</th><th>% du conseil</th></tr></thead>
+          <table><thead><tr><th>Liste</th><th>Sieges municipaux</th><th>% du conseil</th></tr></thead>
             <tbody id="summaryBody"></tbody>
           </table>
         </div>
       </div>
-
       <div class="card">
-        <h3>Liste ordonnée - Conseil Municipal</h3>
+        <h3>Liste ordonnee - Conseil Municipal</h3>
         <div class="table-scroll" style="max-height:400px;">
-          <table>
-            <thead><tr><th>Pos.</th><th>Liste d'origine</th><th>Sexe requis</th><th>Zone EPCI</th></tr></thead>
+          <table><thead><tr><th>Pos.</th><th>Liste d'origine</th><th>Sexe requis</th><th>Zone EPCI</th></tr></thead>
             <tbody id="orderedMunicipal"></tbody>
           </table>
         </div>
       </div>
-
-      <!-- Scenarios -->
       <div class="card">
-        <h3>Comparaison de scénarios</h3>
+        <h3>Comparaison de scenarios</h3>
         <div class="btn-group">
-          <button class="btn btn-outline btn-sm" onclick="saveScenario()">Sauvegarder ce scénario</button>
+          <button class="btn btn-outline btn-sm" onclick="saveScenario()">Sauvegarder ce scenario</button>
           <button class="btn btn-sm btn-danger" onclick="clearScenarios()">Effacer tous</button>
         </div>
         <div class="scenario-grid" id="scenarioGrid"></div>
@@ -302,24 +288,20 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
 <!-- ==================== MODULE 2 ==================== -->
 <div class="module" id="module2">
   <div class="grid-3">
-    <!-- List A -->
     <div class="card">
-      <h2>Liste A (hôte)</h2>
+      <h2>Liste A (hote)</h2>
       <input type="text" id="listAName" placeholder="Nom de la liste A" style="width:100%;padding:6px;margin-bottom:8px;border:1px solid var(--gris-border);border-radius:4px;" oninput="saveState()">
       <div class="btn-group">
         <button class="btn btn-outline btn-sm" onclick="importCSV('A')">Importer CSV</button>
         <button class="btn btn-primary btn-sm" onclick="addCandidate('A')">+ Candidat</button>
       </div>
       <div class="table-scroll" style="max-height:400px;">
-        <table>
-          <thead><tr><th>#</th><th>Nom Prénom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
+        <table><thead><tr><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
           <tbody id="listABody"></tbody>
         </table>
       </div>
       <div id="listAStats" style="font-size:12px;margin-top:6px;"></div>
     </div>
-
-    <!-- List B -->
     <div class="card">
       <h2>Liste B (fusion)</h2>
       <input type="text" id="listBName" placeholder="Nom de la liste B" style="width:100%;padding:6px;margin-bottom:8px;border:1px solid var(--gris-border);border-radius:4px;" oninput="saveState()">
@@ -328,35 +310,31 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
         <button class="btn btn-primary btn-sm" onclick="addCandidate('B')">+ Candidat</button>
       </div>
       <div class="table-scroll" style="max-height:400px;">
-        <table>
-          <thead><tr><th>#</th><th>Nom Prénom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
+        <table><thead><tr><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
           <tbody id="listBBody"></tbody>
         </table>
       </div>
       <div id="listBStats" style="font-size:12px;margin-top:6px;"></div>
     </div>
-
-    <!-- Merged -->
     <div class="card">
-      <h2>Liste fusionnée</h2>
+      <h2>Liste fusionnee</h2>
       <div class="btn-group">
         <button class="btn btn-primary btn-sm" onclick="mergeLists()">Fusionner (auto)</button>
-        <button class="btn btn-outline btn-sm" onclick="autoFixParity()">Auto-corriger parité</button>
+        <button class="btn btn-outline btn-sm" onclick="autoFixParity()">Auto-corriger parite</button>
+        <button class="btn btn-outline btn-sm" onclick="validateMerge()">Valider la fusion</button>
       </div>
-      <div id="parityStatus" style="margin-bottom:8px;"></div>
+      <div id="parityStatus" style="margin-bottom:4px;"></div>
+      <div id="integrityBanner"></div>
       <div class="table-scroll" style="max-height:400px;">
-        <table>
-          <thead><tr><th>Pos.</th><th>Nom Prénom</th><th>Sexe</th><th>Origine</th><th>EPCI</th><th>Statut</th></tr></thead>
+        <table><thead><tr><th>Pos.</th><th>Nom Prenom</th><th>Sexe</th><th>Origine</th><th>EPCI</th><th>Statut</th><th></th></tr></thead>
           <tbody id="mergedBody"></tbody>
         </table>
       </div>
       <div id="mergedStats" style="font-size:12px;margin-top:6px;"></div>
     </div>
   </div>
-
-  <!-- Parity diagnostic -->
   <div class="card" id="parityDiag" style="display:none;">
-    <h3>Diagnostic de parité</h3>
+    <h3>Diagnostic de parite</h3>
     <div id="parityDetails"></div>
   </div>
 </div>
@@ -365,99 +343,185 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
 <div class="module" id="module3">
   <div class="grid-2">
     <div>
+      <!-- Guide -->
+      <details class="guide card">
+        <summary>Comment ca marche ? (Guide d'utilisation)</summary>
+        <div class="step">
+          <strong>Etape 1 — Configurer la commune</strong>
+          Renseignez la population dans l'en-tete. L'outil calcule automatiquement l'effectif du conseil, le plafond d'adjoints, et l'indemnite max du maire (bareme CGCT).
+        </div>
+        <div class="step">
+          <strong>Etape 2 — Definir les postes</strong>
+          Indiquez le nombre d'adjoints effectivement designes (ceux avec une delegation du maire). Ce nombre determine l'enveloppe globale. Ajoutez aussi les conseillers delegues.
+        </div>
+        <div class="step">
+          <strong>Etape 3 — Comprendre l'enveloppe</strong>
+          Enveloppe = indemnite max du maire + somme des indemnites max de chaque adjoint avec delegation. C'est un plafond. Le maire peut prendre moins que le max. Les adjoints peuvent etre en-dessous du bareme. L'economie peut etre redistribuee aux delegues. Dans les communes &lt; 100 000 hab, des conseillers sans delegation peuvent percevoir jusqu'a 6% de l'indice brut terminal si le conseil le decide.
+        </div>
+        <div class="step">
+          <strong>Etape 4 — Simuler la repartition</strong>
+          Ajustez les montants de chaque categorie. La jauge indique en temps reel si vous restez dans l'enveloppe legale (vert = OK, rouge = depassement).
+        </div>
+        <div class="step">
+          <strong>Etape 5 — Repartir entre groupes</strong>
+          Dans "Repartition des postes par liste", la proportion theorique est auto-calculee. Ajustez manuellement. L'ecart theorique/ajuste est affiche pour transparence.
+        </div>
+        <div class="legal-alert" style="margin-top:8px;">
+          <strong>Points de vigilance juridiques :</strong><br>
+          - Seuls les adjoints avec delegation effective comptent dans le calcul de l'enveloppe<br>
+          - Un adjoint de quartier sans delegation n'ouvre pas droit aux memes indemnites<br>
+          - L'enveloppe ne peut pas etre depassee, meme si le conseil le vote<br>
+          - Les conseillers delegues ne sont indemnises que s'ils ont recu une delegation effective du maire
+        </div>
+      </details>
+
       <!-- Allowance calculator -->
       <div class="card">
         <h2>Enveloppe indemnitaire</h2>
+
+        <!-- Composition politique auto-calculée -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;background:#f8f9fa;padding:10px;border-radius:6px;">
+          <div>
+            <label style="font-size:11px;opacity:0.7;">Effectif legal du conseil</label>
+            <div style="font-size:18px;font-weight:700;color:var(--bleu);" id="dispCouncilSize">—</div>
+          </div>
+          <div>
+            <label style="font-size:11px;opacity:0.7;">Plafond legal adjoints (30%)</label>
+            <div style="font-size:18px;font-weight:700;color:var(--bleu);" id="dispMaxAdjoints">—</div>
+          </div>
+          <div>
+            <label style="font-size:11px;opacity:0.7;">Delegues envisageables</label>
+            <div style="font-size:18px;font-weight:700;color:var(--orange);" id="dispDeleguesEst">—</div>
+          </div>
+        </div>
+
+        <div class="legal-alert" id="dgclWarning" style="display:none;">
+          L'indemnisation des conseillers delegues depend d'une delegation effective du maire et du respect de l'enveloppe indemnitaire globale. Il ne s'agit pas d'un droit automatique.
+        </div>
+
+        <!-- Mayor allowance -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <div>
-            <label style="font-size:12px;">Indemnité brute du maire (€/mois)</label>
+            <label style="font-size:12px;">Indemnite brute du maire (euros/mois)</label>
             <input type="number" id="mayorAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" readonly>
           </div>
           <div>
-            <label style="font-size:12px;">Nb max adjoints (30% conseil)</label>
-            <input type="number" id="maxAdjoints" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" readonly>
+            <label style="font-size:12px;">Indemnite max adjoint (euros/mois)</label>
+            <input type="number" id="adjointMaxAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" readonly>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+
+        <!-- 4 niveaux d'adjoints -->
+        <h3>Gestion des adjoints</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
           <div>
-            <label style="font-size:12px;">% indemnité adjoint / maire</label>
-            <input type="number" id="adjointPct" value="40" min="0" max="100" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
+            <label style="font-size:11px;">Plafond legal (30%)</label>
+            <input type="number" id="maxAdjoints" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
           </div>
           <div>
-            <label style="font-size:12px;">Nb adjoints effectifs</label>
-            <input type="number" id="nbAdjoints" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
+            <label style="font-size:11px;">Effectivement designes</label>
+            <input type="number" id="nbAdjointsDesignes" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="onAdjointsChange()">
           </div>
           <div>
-            <label style="font-size:12px;">Nb conseillers délégués</label>
+            <label style="font-size:11px;">Postes negocies</label>
+            <input type="number" id="nbAdjointsNegocies" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="onAdjointsChange()">
+          </div>
+          <div>
+            <label style="font-size:11px;">Avec delegation effective</label>
+            <input type="number" id="nbAdjointsDelegation" value="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
+          </div>
+        </div>
+        <div id="adjointAlerts"></div>
+
+        <div class="legal-alert">
+          <strong>Attention :</strong> Un adjoint de quartier ne beneficie pas des memes effets indemnitaires qu'un adjoint avec delegation effective. La DGCL rappelle qu'un adjoint ne peut etre regarde comme exercant effectivement ses fonctions que s'il a recu une delegation.
+        </div>
+
+        <!-- Other positions -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
+          <div>
+            <label style="font-size:12px;">Nb conseillers delegues</label>
             <input type="number" id="nbDelegues" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
           </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <div>
-            <label style="font-size:12px;">Indemnité délégué (€/mois)</label>
+            <label style="font-size:12px;">Indemnite par delegue (euros/mois)</label>
             <input type="number" id="delegueAllowance" value="750" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
           </div>
-          <div>
-            <label style="font-size:12px;">Indemnité simple conseiller (€/mois)</label>
-            <input type="number" id="conseillerAllowance" value="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
-          </div>
         </div>
-        <div id="allowanceSummary" class="card alert-green"></div>
+
+        <!-- Envelope calculation -->
+        <h3>Calcul de l'enveloppe (formule DGCL)</h3>
+        <div id="enveloppeDetail" style="margin:8px 0;"></div>
+        <div class="gauge" id="enveloppeGauge"><div class="gauge-fill gauge-ok" id="enveloppeGaugeFill" style="width:0%;">0%</div></div>
+        <div id="enveloppeAlerts"></div>
+        <div id="allowanceSummary" class="card alert-green" style="margin-top:8px;"></div>
       </div>
 
       <!-- Position distribution by list -->
       <div class="card">
-        <h2>Répartition des postes par liste</h2>
+        <h2>Repartition des postes par liste</h2>
         <div class="btn-group">
           <button class="btn btn-outline btn-sm" onclick="autoDistributePositions()">Distribution proportionnelle auto</button>
         </div>
         <div class="table-scroll">
           <table>
-            <thead><tr><th>Liste</th><th>Sièges</th><th>Adjoints</th><th>Délégués</th><th>Simples conseillers</th></tr></thead>
+            <thead><tr><th>Liste</th><th>Sieges</th><th>Adj. theorique</th><th>Adj. ajuste</th><th>Ecart</th><th>Del. theorique</th><th>Del. ajuste</th><th>Ecart</th><th>Simples</th></tr></thead>
             <tbody id="posDistBody"></tbody>
           </table>
         </div>
-        <div id="posDistWarning" style="font-size:12px;margin-top:6px;"></div>
+        <div id="posDistTotals" style="font-size:12px;margin-top:6px;"></div>
+        <div id="posDistWarning" style="font-size:12px;margin-top:4px;"></div>
       </div>
     </div>
 
     <div>
       <!-- Delegation matrix -->
       <div class="card">
-        <h2>Attribution des délégations</h2>
+        <h2>Attribution des delegations</h2>
         <div class="table-scroll" style="max-height:500px;">
           <table>
-            <thead><tr><th>Délégation</th><th>Type</th><th>Charge</th><th>h/sem</th><th>Attribué à</th><th>Détachement</th></tr></thead>
+            <thead><tr><th>Delegation</th><th>Type poste</th><th>Charge</th><th>h/sem</th><th>Attribue a</th><th>Detachement</th></tr></thead>
             <tbody id="delegationBody"></tbody>
           </table>
         </div>
         <div class="btn-group">
-          <button class="btn btn-outline btn-sm" onclick="addCustomDelegation()">+ Délégation personnalisée</button>
+          <button class="btn btn-outline btn-sm" onclick="addCustomDelegation()">+ Delegation personnalisee</button>
+        </div>
+      </div>
+
+      <!-- Postes revendicables par groupe -->
+      <div class="card">
+        <h2>Postes revendicables par groupe</h2>
+        <p style="font-size:11px;color:var(--texte-light);margin-bottom:8px;">Simulation indicative basee sur le poids electoral. Ne constitue pas un droit legal automatique.</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Groupe</th><th>Poids electoral</th><th colspan="2">Droit legal</th><th colspan="2">Simulation politique</th><th>Indemnisable est.</th></tr></thead>
+            <tbody id="claimableBody"></tbody>
+          </table>
         </div>
       </div>
 
       <!-- Legal compliance -->
       <div class="card">
-        <h3>Conformité légale</h3>
+        <h3>Conformite legale</h3>
         <ul class="checklist" id="checklist"></ul>
       </div>
 
       <!-- Negotiation summary -->
       <div class="card">
-        <h2>Synthèse de négociation</h2>
+        <h2>Synthese de negociation</h2>
         <div class="btn-group">
-          <button class="btn btn-primary btn-sm" onclick="generateNegotiationSummary()">Générer la synthèse</button>
+          <button class="btn btn-primary btn-sm" onclick="generateNegotiationSummary()">Generer la synthese</button>
           <button class="btn btn-outline btn-sm" onclick="copyNegotiationSummary()">Copier</button>
         </div>
-        <div class="nego-summary" id="negoSummary">Cliquez sur "Générer la synthèse" pour créer le récapitulatif de négociation.</div>
+        <div class="nego-summary" id="negoSummary">Cliquez sur "Generer la synthese" pour creer le recapitulatif.</div>
       </div>
     </div>
   </div>
 </div>
 
-</div><!-- /content -->
+</div>
 
-<!-- Hidden file input for JSON import -->
 <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="handleJSONImport(event)">
 <input type="file" id="csvFileInput" accept=".csv,.txt" style="display:none;">
 
@@ -482,26 +546,34 @@ const MAYOR_ALLOWANCES = [
   {min:50000,max:99999,amount:4278.46},{min:100000,max:Infinity,amount:5639.63}
 ];
 
+// CGCT L.2123-24 — Indemnites max des adjoints par strate
+const ADJOINT_ALLOWANCES = [
+  {min:0,max:499,amount:260.46},{min:500,max:999,amount:456.78},
+  {min:1000,max:3499,amount:648.25},{min:3500,max:9999,amount:856.67},
+  {min:10000,max:19999,amount:1011.24},{min:20000,max:49999,amount:1400.18},
+  {min:50000,max:99999,amount:1711.38},{min:100000,max:Infinity,amount:2255.85}
+];
+
 const DELEGATION_CATALOG = [
-  {id:'urbanisme',label:'Urbanisme et Aménagement',timeLoad:'heavy',hoursPerWeek:15,needsDetachment:true},
+  {id:'urbanisme',label:'Urbanisme et Amenagement',timeLoad:'heavy',hoursPerWeek:15,needsDetachment:true},
   {id:'finances',label:'Finances et Budget',timeLoad:'heavy',hoursPerWeek:12,needsDetachment:true},
   {id:'rh',label:'Ressources Humaines',timeLoad:'heavy',hoursPerWeek:15,needsDetachment:true},
-  {id:'education',label:'Éducation et Petite Enfance',timeLoad:'heavy',hoursPerWeek:12,needsDetachment:true},
-  {id:'social',label:'Action Sociale et Solidarités',timeLoad:'medium',hoursPerWeek:8,needsDetachment:false},
+  {id:'education',label:'Education et Petite Enfance',timeLoad:'heavy',hoursPerWeek:12,needsDetachment:true},
+  {id:'social',label:'Action Sociale et Solidarites',timeLoad:'medium',hoursPerWeek:8,needsDetachment:false},
   {id:'culture',label:'Culture et Patrimoine',timeLoad:'medium',hoursPerWeek:8,needsDetachment:false},
   {id:'sports',label:'Sports et Vie Associative',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
-  {id:'securite',label:'Sécurité et Prévention',timeLoad:'medium',hoursPerWeek:8,needsDetachment:false},
-  {id:'environnement',label:'Environnement et Transition Écologique',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
-  {id:'numerique',label:'Numérique et Innovation',timeLoad:'light',hoursPerWeek:4,needsDetachment:false},
+  {id:'securite',label:'Securite et Prevention',timeLoad:'medium',hoursPerWeek:8,needsDetachment:false},
+  {id:'environnement',label:'Environnement et Transition Ecologique',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
+  {id:'numerique',label:'Numerique et Innovation',timeLoad:'light',hoursPerWeek:4,needsDetachment:false},
   {id:'communication',label:'Communication',timeLoad:'light',hoursPerWeek:4,needsDetachment:false},
   {id:'jumelages',label:'Relations Internationales et Jumelages',timeLoad:'light',hoursPerWeek:2,needsDetachment:false},
-  {id:'aines',label:'Aînés et Seniors',timeLoad:'light',hoursPerWeek:3,needsDetachment:false},
-  {id:'quartiers',label:'Démocratie Participative et Quartiers',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
-  {id:'proprete',label:'Propreté et Cadre de Vie',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
-  {id:'transports',label:'Transports et Mobilités',timeLoad:'medium',hoursPerWeek:5,needsDetachment:false},
+  {id:'aines',label:'Aines et Seniors',timeLoad:'light',hoursPerWeek:3,needsDetachment:false},
+  {id:'quartiers',label:'Democratie Participative et Quartiers',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
+  {id:'proprete',label:'Proprete et Cadre de Vie',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
+  {id:'transports',label:'Transports et Mobilites',timeLoad:'medium',hoursPerWeek:5,needsDetachment:false},
   {id:'logement',label:'Logement et Habitat',timeLoad:'medium',hoursPerWeek:7,needsDetachment:false},
   {id:'commerce',label:'Commerce et Artisanat',timeLoad:'light',hoursPerWeek:4,needsDetachment:false},
-  {id:'etat_civil',label:'État Civil et Élections',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
+  {id:'etat_civil',label:'Etat Civil et Elections',timeLoad:'medium',hoursPerWeek:6,needsDetachment:false},
 ];
 
 const LIST_COLORS = ['#000091','#E1000F','#18753C','#E67E22','#8E44AD','#2980B9','#D35400',
@@ -510,6 +582,7 @@ const LIST_COLORS = ['#000091','#E1000F','#18753C','#E67E22','#8E44AD','#2980B9'
 // =====================================================================
 // APP STATE
 // =====================================================================
+let nextCandidateId = 1;
 let state = {
   mode: 'avec_prime',
   primePercent: 50,
@@ -520,25 +593,29 @@ let state = {
   listA: {name:'',candidates:[]},
   listB: {name:'',candidates:[]},
   merged: [],
-  delegationAssignments: {},
+  mergeValidated: false,
+  delegationAssignments: {}, // { delegId: { candidateId:'', type:'adjoint'|'delegue' } }
   positionDist: {},
   timerEnd: null,
 };
 
+function genId() { return 'c_' + (nextCandidateId++) + '_' + Date.now(); }
+
 // =====================================================================
-// INITIALIZATION
+// INIT
 // =====================================================================
 function init() {
   loadState();
   renderListsTable();
-  renderDelegationTable();
   recalculate();
   renderCandidateList('A');
   renderCandidateList('B');
   renderMergedList();
+  renderDelegationTable();
   calcAllowances();
   updateChecklist();
   renderScenarios();
+  renderClaimablePositions();
   if (state.timerEnd) startTimerDisplay();
 }
 
@@ -548,7 +625,12 @@ function init() {
 function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   document.querySelectorAll('.module').forEach((m,i) => m.classList.toggle('active', i===idx));
-  if (idx === 2) { calcAllowances(); updateChecklist(); }
+  if (idx === 2) {
+    renderDelegationTable();
+    calcAllowances();
+    updateChecklist();
+    renderClaimablePositions();
+  }
 }
 
 // =====================================================================
@@ -559,30 +641,21 @@ function setMode(mode, btn) {
   document.querySelectorAll('.mode-toggle button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('primeConfig').style.display = mode === 'avec_prime' ? 'block' : 'none';
-  recalculate();
-  saveState();
+  recalculate(); saveState();
 }
 
 function onPrimeChange() {
   state.primePercent = parseInt(document.getElementById('primeSlider').value);
   document.getElementById('primeLabel').textContent = state.primePercent + '%';
-  recalculate();
-  saveState();
+  recalculate(); saveState();
 }
 
 function onPLMChange() {
   const isPLM = document.getElementById('isPLM').checked;
-  if (isPLM) {
-    document.getElementById('primeSlider').value = 25;
-    state.primePercent = 25;
-    document.getElementById('primeLabel').textContent = '25%';
-  } else {
-    document.getElementById('primeSlider').value = 50;
-    state.primePercent = 50;
-    document.getElementById('primeLabel').textContent = '50%';
-  }
-  recalculate();
-  saveState();
+  document.getElementById('primeSlider').value = isPLM ? 25 : 50;
+  state.primePercent = isPLM ? 25 : 50;
+  document.getElementById('primeLabel').textContent = state.primePercent + '%';
+  recalculate(); saveState();
 }
 
 function onPopulationChange() {
@@ -591,17 +664,23 @@ function onPopulationChange() {
   if (cs) document.getElementById('totalSeats').value = cs.seats;
   const ma = MAYOR_ALLOWANCES.find(m => pop >= m.min && pop <= m.max);
   if (ma) document.getElementById('mayorAllowance').value = ma.amount.toFixed(2);
+  const aa = ADJOINT_ALLOWANCES.find(a => pop >= a.min && pop <= a.max);
+  if (aa) document.getElementById('adjointMaxAllowance').value = aa.amount.toFixed(2);
   const maxAdj = cs ? Math.floor(cs.seats * 0.3) : 0;
   document.getElementById('maxAdjoints').value = maxAdj;
-  recalculate();
-  calcAllowances();
-  saveState();
+
+  // Display composition
+  document.getElementById('dispCouncilSize').textContent = cs ? cs.seats : '—';
+  document.getElementById('dispMaxAdjoints').textContent = maxAdj;
+  // Delegues envisageables: estimate as remaining majority seats minus adjoints
+  const delegEst = cs ? Math.max(0, Math.floor(cs.seats * 0.15)) : 0;
+  document.getElementById('dispDeleguesEst').textContent = '~' + delegEst;
+  document.getElementById('dgclWarning').style.display = pop > 0 ? 'block' : 'none';
+
+  recalculate(); calcAllowances(); saveState();
 }
 
-function onSeatsChange() {
-  recalculate();
-  saveState();
-}
+function onSeatsChange() { recalculate(); saveState(); }
 
 // =====================================================================
 // MODULE 1: LISTS TABLE
@@ -609,10 +688,10 @@ function onSeatsChange() {
 function renderListsTable() {
   const tbody = document.getElementById('listsBody');
   tbody.innerHTML = '';
+  const totalScore = state.lists.reduce((s, x) => s + (parseFloat(x.score) || 0), 0);
   state.lists.forEach((l, i) => {
-    const tr = document.createElement('tr');
-    const totalScore = state.lists.reduce((s, x) => s + (parseFloat(x.score) || 0), 0);
     const pct = totalScore > 0 ? ((parseFloat(l.score)||0) / totalScore * 100).toFixed(2) : '0.00';
+    const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i+1}</td>
       <td><input type="text" value="${esc(l.name)}" onchange="state.lists[${i}].name=this.value;recalculate();saveState();"></td>
@@ -622,8 +701,7 @@ function renderListsTable() {
         <option value="pct" ${l.type==='pct'?'selected':''}>%</option>
       </select></td>
       <td>${pct}%</td>
-      <td><button class="btn btn-sm btn-danger" onclick="removeList(${i})">×</button></td>
-    `;
+      <td><button class="btn btn-sm btn-danger" onclick="removeList(${i})">x</button></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -631,27 +709,21 @@ function renderListsTable() {
 function addList() {
   if (state.lists.length >= 17) return alert('Maximum 17 listes');
   state.lists.push({name: 'Liste ' + (state.lists.length+1), score: 0, type: 'votes'});
-  renderListsTable();
-  saveState();
+  renderListsTable(); saveState();
 }
 
 function removeList(i) {
   if (state.lists.length <= 2) return alert('Minimum 2 listes requises');
   state.lists.splice(i, 1);
-  renderListsTable();
-  recalculate();
-  saveState();
+  renderListsTable(); recalculate(); saveState();
 }
 
 // =====================================================================
 // MODULE 1: D'HONDT ALGORITHM
 // =====================================================================
 function normalizeScores(lists) {
-  // Check if inputs are percentages or votes
   const allPct = lists.every(l => l.type === 'pct');
-  if (allPct) {
-    return lists.map(l => ({...l, normalizedScore: parseFloat(l.score) || 0}));
-  }
+  if (allPct) return lists.map(l => ({...l, normalizedScore: parseFloat(l.score) || 0}));
   const total = lists.reduce((s, l) => s + (parseFloat(l.score) || 0), 0);
   if (total === 0) return lists.map(l => ({...l, normalizedScore: 0}));
   return lists.map(l => ({...l, normalizedScore: ((parseFloat(l.score)||0) / total) * 100}));
@@ -664,55 +736,37 @@ function allocateSeats(lists, totalSeats, primePercent, mode) {
 
   const result = {};
   eligible.forEach(l => result[l.name] = 0);
-
-  let primeSeats = 0;
-  let remainingSeats = totalSeats;
-  let leadList = null;
+  let primeSeats = 0, remainingSeats = totalSeats, leadList = null;
 
   if (mode === 'avec_prime' && primePercent > 0) {
-    // Find lead list (highest score)
     leadList = eligible.reduce((a, b) => a.normalizedScore > b.normalizedScore ? a : b);
     primeSeats = Math.ceil(totalSeats * primePercent / 100);
     result[leadList.name] = primeSeats;
     remainingSeats = totalSeats - primeSeats;
   }
 
-  // D'Hondt for remaining seats
   const allocated = {};
   eligible.forEach(l => allocated[l.name] = 0);
   const ordered = [];
 
   for (let s = 0; s < remainingSeats; s++) {
-    let bestList = null;
-    let bestAvg = -1;
+    let bestList = null, bestAvg = -1;
     for (const l of eligible) {
       const avg = l.normalizedScore / (allocated[l.name] + 1);
       if (avg > bestAvg || (avg === bestAvg && l.normalizedScore > (bestList ? bestList.normalizedScore : 0))) {
-        bestAvg = avg;
-        bestList = l;
+        bestAvg = avg; bestList = l;
       }
     }
-    if (bestList) {
-      allocated[bestList.name]++;
-      ordered.push({seat: s + 1, list: bestList.name});
-    }
+    if (bestList) { allocated[bestList.name]++; ordered.push({seat: s + 1, list: bestList.name}); }
   }
 
-  // Combine prime + proportional
-  for (const name in allocated) {
-    result[name] = (result[name] || 0) + allocated[name];
-  }
+  for (const name in allocated) result[name] = (result[name] || 0) + allocated[name];
 
-  // Build full ordered list: prime seats first (lead list), then D'Hondt order
   const fullOrdered = [];
   if (leadList && primeSeats > 0) {
-    for (let i = 0; i < primeSeats; i++) {
-      fullOrdered.push({position: i + 1, list: leadList.name, isPrime: true});
-    }
+    for (let i = 0; i < primeSeats; i++) fullOrdered.push({position: i + 1, list: leadList.name, isPrime: true});
   }
-  ordered.forEach((o, i) => {
-    fullOrdered.push({position: primeSeats + i + 1, list: o.list, isPrime: false});
-  });
+  ordered.forEach((o, i) => fullOrdered.push({position: primeSeats + i + 1, list: o.list, isPrime: false}));
 
   return {seats: result, ordered: fullOrdered, primeSeats};
 }
@@ -721,10 +775,8 @@ function recalculate() {
   state.headGender = document.getElementById('headGender').value;
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   const prime = state.mode === 'avec_prime' ? state.primePercent : 0;
-
   const result = allocateSeats(state.lists, totalSeats, prime, state.mode);
   state.results = result;
-
   renderListsTable();
   renderSummary(result, totalSeats);
   renderSeatChart(result, totalSeats);
@@ -742,11 +794,10 @@ function renderSummary(result, totalSeats) {
   tbody.innerHTML = '';
   let total = 0;
   for (const name in result.seats) {
-    const seats = result.seats[name];
-    total += seats;
+    const seats = result.seats[name]; total += seats;
     const pct = totalSeats > 0 ? (seats / totalSeats * 100).toFixed(1) : '0.0';
-    const tr = document.createElement('tr');
     const colorIdx = state.lists.findIndex(l => l.name === name);
+    const tr = document.createElement('tr');
     tr.innerHTML = `<td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${LIST_COLORS[colorIdx % LIST_COLORS.length]};margin-right:6px;"></span>${esc(name)}</td><td><strong>${seats}</strong></td><td>${pct}%</td>`;
     tbody.appendChild(tr);
   }
@@ -758,188 +809,102 @@ function renderSummary(result, totalSeats) {
 }
 
 function renderSeatChart(result, totalSeats) {
-  const container = document.getElementById('seatChart');
-  container.innerHTML = '';
+  const c = document.getElementById('seatChart'); c.innerHTML = '';
   if (totalSeats <= 0) return;
   for (const name in result.seats) {
-    const seats = result.seats[name];
-    if (seats <= 0) continue;
+    const seats = result.seats[name]; if (seats <= 0) continue;
     const pct = (seats / totalSeats * 100);
     const colorIdx = state.lists.findIndex(l => l.name === name);
     const bar = document.createElement('div');
-    bar.className = 'chart-bar';
-    bar.style.width = pct + '%';
+    bar.className = 'chart-bar'; bar.style.width = pct + '%';
     bar.style.background = LIST_COLORS[colorIdx % LIST_COLORS.length];
-    bar.innerHTML = `<span>${seats}</span>`;
-    bar.title = `${name}: ${seats} sièges (${pct.toFixed(1)}%)`;
-    container.appendChild(bar);
+    bar.innerHTML = `<span>${seats}</span>`; bar.title = `${name}: ${seats} sieges (${pct.toFixed(1)}%)`;
+    c.appendChild(bar);
   }
 }
 
 function renderOrderedList(result, totalSeats) {
-  const tbody = document.getElementById('orderedMunicipal');
-  tbody.innerHTML = '';
+  const tbody = document.getElementById('orderedMunicipal'); tbody.innerHTML = '';
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const flagZone = Math.ceil(totalSeats * 3 / 5);
-
   result.ordered.forEach((o, i) => {
     const gender = ((i % 2 === 0) ? state.headGender : (state.headGender === 'F' ? 'H' : 'F'));
     const inZone = (o.position <= flagZone);
     const tr = document.createElement('tr');
     if (inZone && epciSeats > 0) tr.classList.add('epci-zone');
     const colorIdx = state.lists.findIndex(l => l.name === o.list);
-    tr.innerHTML = `
-      <td>${o.position}</td>
+    tr.innerHTML = `<td>${o.position}</td>
       <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${LIST_COLORS[colorIdx % LIST_COLORS.length]};margin-right:6px;"></span>${esc(o.list)}${o.isPrime ? ' <em style="font-size:11px;opacity:0.6;">(prime)</em>' : ''}</td>
       <td><span class="badge-${gender.toLowerCase()}">${gender}</span></td>
-      <td>${inZone && epciSeats > 0 ? '<span class="status-ok">Zone fléchage</span>' : ''}</td>
-    `;
+      <td>${inZone && epciSeats > 0 ? '<span class="status-ok">Zone flechage</span>' : ''}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// =====================================================================
-// MODULE 1: MIN SCORE CALCULATOR
-// =====================================================================
 function calcMinScores(totalSeats, primePercent) {
-  const tbody = document.getElementById('minScoreBody');
-  tbody.innerHTML = '';
-
+  const tbody = document.getElementById('minScoreBody'); tbody.innerHTML = '';
   state.lists.forEach((list, idx) => {
     const currentResult = allocateSeats(state.lists, totalSeats, primePercent, state.mode);
     const currentSeats = currentResult.seats[list.name] || 0;
-
-    // Binary search for +1 seat
     const minFor1 = findMinScore(idx, totalSeats, primePercent, currentSeats + 1);
     const minFor2 = findMinScore(idx, totalSeats, primePercent, currentSeats + 2);
-
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${esc(list.name)}</td>
-      <td><strong>${currentSeats}</strong></td>
+    tr.innerHTML = `<td>${esc(list.name)}</td><td><strong>${currentSeats}</strong></td>
       <td>${minFor1 !== null ? minFor1.toFixed(2) + '%' : 'N/A'}</td>
-      <td>${minFor2 !== null ? minFor2.toFixed(2) + '%' : 'N/A'}</td>
-    `;
+      <td>${minFor2 !== null ? minFor2.toFixed(2) + '%' : 'N/A'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
 function findMinScore(listIdx, totalSeats, primePercent, targetSeats) {
-  const testLists = state.lists.map((l, i) => ({...l}));
-  const originalScore = parseFloat(testLists[listIdx].score) || 0;
-  let low = originalScore;
-  let high = 100;
-  let found = null;
-
-  // Force percentage mode for search
   const normalized = normalizeScores(state.lists);
-  low = normalized[listIdx] ? normalized[listIdx].normalizedScore : 0;
-
+  let low = normalized[listIdx] ? normalized[listIdx].normalizedScore : 0;
+  let high = 100, found = null;
   for (let iter = 0; iter < 50; iter++) {
     const mid = (low + high) / 2;
-    const searchLists = normalized.map((l, i) => ({
-      ...l,
-      score: i === listIdx ? mid : l.normalizedScore,
-      type: 'pct'
-    }));
+    const searchLists = normalized.map((l, i) => ({...l, score: i === listIdx ? mid : l.normalizedScore, type: 'pct'}));
     const result = allocateSeats(searchLists, totalSeats, primePercent, state.mode);
-    const seats = result.seats[testLists[listIdx].name] || 0;
-    if (seats >= targetSeats) {
-      found = mid;
-      high = mid;
-    } else {
-      low = mid;
-    }
+    const seats = result.seats[state.lists[listIdx].name] || 0;
+    if (seats >= targetSeats) { found = mid; high = mid; } else { low = mid; }
   }
   return found;
 }
 
-// =====================================================================
-// MODULE 1: LOSS SIMULATOR
-// =====================================================================
 function simulateLoss() {
   const winnerScore = parseFloat(document.getElementById('lossWinnerScore').value) || 0;
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const resultDiv = document.getElementById('lossResult');
-
-  if (winnerScore <= 0 || totalSeats <= 0) { resultDiv.style.display = 'none'; return; }
-
-  // Simulate: winner gets prime, rest distributed proportionally
-  const primeSeats = Math.ceil(totalSeats * 50 / 100);
-  const remainingSeats = totalSeats - primeSeats;
-  const ourTotalScore = state.lists.reduce((s, l) => s + (parseFloat(l.score) || 0), 0);
-
-  if (ourTotalScore <= 0) { resultDiv.style.display = 'none'; return; }
-
-  // Our merged score as percentage
-  const normalized = normalizeScores(state.lists);
-  const ourBestScore = Math.max(...normalized.map(l => l.normalizedScore));
-  const ourScore = 100 - winnerScore; // simplified: all non-winner share
-
-  // D'Hondt for remaining seats between winner and our coalition
-  const simLists = [
-    {name: 'Vainqueur', score: winnerScore, type: 'pct'},
-    {name: 'Notre coalition', score: ourScore, type: 'pct'}
-  ];
+  const div = document.getElementById('lossResult');
+  if (winnerScore <= 0 || totalSeats <= 0) { div.style.display = 'none'; return; }
+  const ourScore = 100 - winnerScore;
+  const simLists = [{name:'Vainqueur',score:winnerScore,type:'pct'},{name:'Notre coalition',score:ourScore,type:'pct'}];
   const simResult = allocateSeats(simLists, totalSeats, 50, 'avec_prime');
   const oppSeats = simResult.seats['Notre coalition'] || 0;
-  const pctCouncil = totalSeats > 0 ? (oppSeats / totalSeats * 100).toFixed(1) : 0;
-
-  let alertClass = 'alert-red';
-  let analysis = 'Poids faible en opposition';
-  if (pctCouncil >= 33) { alertClass = 'alert-green'; analysis = 'Minorité de blocage potentielle (>33%)'; }
-  else if (pctCouncil >= 20) { alertClass = 'alert-orange'; analysis = 'Opposition significative'; }
-
-  resultDiv.className = 'card ' + alertClass;
-  resultDiv.style.display = 'block';
-  resultDiv.innerHTML = `
-    <strong>En cas de défaite face à un vainqueur à ${winnerScore}% :</strong><br>
-    Sièges en opposition : <strong>${oppSeats}</strong> sur ${totalSeats} (${pctCouncil}%)<br>
-    <em>${analysis}</em>
-  `;
+  const pctCouncil = (oppSeats / totalSeats * 100).toFixed(1);
+  let cls = 'alert-red', msg = 'Poids faible en opposition';
+  if (pctCouncil >= 33) { cls = 'alert-green'; msg = 'Minorite de blocage potentielle (>33%)'; }
+  else if (pctCouncil >= 20) { cls = 'alert-orange'; msg = 'Opposition significative'; }
+  div.className = 'card ' + cls; div.style.display = 'block';
+  div.innerHTML = `<strong>En cas de defaite face a un vainqueur a ${winnerScore}% :</strong><br>
+    Sieges en opposition : <strong>${oppSeats}</strong> sur ${totalSeats} (${pctCouncil}%)<br><em>${msg}</em>`;
 }
 
-// =====================================================================
-// MODULE 1: SCENARIOS
-// =====================================================================
 function saveScenario() {
-  const label = prompt('Nom du scénario :');
-  if (!label) return;
+  const label = prompt('Nom du scenario :'); if (!label) return;
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  state.scenarios.push({
-    label,
-    mode: state.mode,
-    prime: state.primePercent,
-    lists: JSON.parse(JSON.stringify(state.lists)),
-    seats: {...state.results.seats},
-    totalSeats
-  });
+  state.scenarios.push({label, mode: state.mode, prime: state.primePercent, lists: JSON.parse(JSON.stringify(state.lists)), seats: {...state.results.seats}, totalSeats});
   if (state.scenarios.length > 4) state.scenarios.shift();
-  renderScenarios();
-  saveState();
+  renderScenarios(); saveState();
 }
-
-function clearScenarios() {
-  state.scenarios = [];
-  renderScenarios();
-  saveState();
-}
-
+function clearScenarios() { state.scenarios = []; renderScenarios(); saveState(); }
 function renderScenarios() {
-  const grid = document.getElementById('scenarioGrid');
-  grid.innerHTML = '';
-  state.scenarios.forEach((sc, i) => {
-    const div = document.createElement('div');
-    div.className = 'scenario-card';
+  const grid = document.getElementById('scenarioGrid'); grid.innerHTML = '';
+  state.scenarios.forEach(sc => {
+    const div = document.createElement('div'); div.className = 'scenario-card';
     let rows = '';
-    for (const name in sc.seats) {
-      rows += `<tr><td>${esc(name)}</td><td><strong>${sc.seats[name]}</strong></td></tr>`;
-    }
-    div.innerHTML = `
-      <h3 style="font-size:13px;margin-bottom:6px;">${esc(sc.label)}</h3>
-      <p style="font-size:11px;color:var(--texte-light);">${sc.mode === 'avec_prime' ? 'Prime ' + sc.prime + '%' : 'Intégrale'} | ${sc.totalSeats} sièges</p>
-      <table style="margin-top:6px;"><tbody>${rows}</tbody></table>
-    `;
+    for (const name in sc.seats) rows += `<tr><td>${esc(name)}</td><td><strong>${sc.seats[name]}</strong></td></tr>`;
+    div.innerHTML = `<h3 style="font-size:13px;margin-bottom:6px;">${esc(sc.label)}</h3>
+      <p style="font-size:11px;color:var(--texte-light);">${sc.mode === 'avec_prime' ? 'Prime ' + sc.prime + '%' : 'Integrale'} | ${sc.totalSeats} sieges</p>
+      <table style="margin-top:6px;"><tbody>${rows}</tbody></table>`;
     grid.appendChild(div);
   });
 }
@@ -949,16 +914,14 @@ function renderScenarios() {
 // =====================================================================
 function addCandidate(list) {
   const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
-  arr.push({name: '', gender: 'F', epci: false});
-  renderCandidateList(list);
-  saveState();
+  arr.push({id: genId(), name: '', gender: 'F', epci: false});
+  renderCandidateList(list); saveState();
 }
 
 function removeCandidate(list, idx) {
   const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
   arr.splice(idx, 1);
-  renderCandidateList(list);
-  saveState();
+  renderCandidateList(list); saveState();
 }
 
 function renderCandidateList(list) {
@@ -967,62 +930,54 @@ function renderCandidateList(list) {
   tbody.innerHTML = '';
   let fCount = 0, hCount = 0;
   arr.forEach((c, i) => {
+    if (!c.id) c.id = genId();
     if (c.gender === 'F') fCount++; else hCount++;
     const tr = document.createElement('tr');
     tr.draggable = true;
-    tr.dataset.idx = i;
-    tr.dataset.list = list;
     tr.ondragstart = (e) => { e.dataTransfer.setData('text', list + ':' + i); tr.classList.add('dragging'); };
     tr.ondragend = () => tr.classList.remove('dragging');
     tr.ondragover = (e) => { e.preventDefault(); tr.classList.add('drag-over'); };
     tr.ondragleave = () => tr.classList.remove('drag-over');
     tr.ondrop = (e) => {
-      e.preventDefault();
-      tr.classList.remove('drag-over');
+      e.preventDefault(); tr.classList.remove('drag-over');
       const [srcList, srcIdx] = e.dataTransfer.getData('text').split(':');
       if (srcList === list) {
         const item = arr.splice(parseInt(srcIdx), 1)[0];
         arr.splice(i, 0, item);
-        renderCandidateList(list);
-        saveState();
+        renderCandidateList(list); saveState();
       }
     };
-    tr.innerHTML = `
-      <td>${i+1}</td>
-      <td><input type="text" value="${esc(c.name)}" placeholder="Nom Prénom" onchange="updateCandidate('${list}',${i},'name',this.value)"></td>
+    tr.innerHTML = `<td>${i+1}</td>
+      <td><input type="text" value="${esc(c.name)}" placeholder="Nom Prenom" onchange="updateCandidate('${list}',${i},'name',this.value)"></td>
       <td><select onchange="updateCandidate('${list}',${i},'gender',this.value)">
-        <option value="F" ${c.gender==='F'?'selected':''}>F</option>
-        <option value="H" ${c.gender==='H'?'selected':''}>H</option>
-      </select></td>
+        <option value="F" ${c.gender==='F'?'selected':''}>F</option><option value="H" ${c.gender==='H'?'selected':''}>H</option></select></td>
       <td><input type="checkbox" ${c.epci?'checked':''} onchange="updateCandidate('${list}',${i},'epci',this.checked)"></td>
-      <td><button class="btn btn-sm btn-danger" onclick="removeCandidate('${list}',${i})">×</button></td>
-    `;
+      <td><button class="btn btn-sm btn-danger" onclick="removeCandidate('${list}',${i})">x</button></td>`;
     tbody.appendChild(tr);
   });
-  document.getElementById('list' + list + 'Stats').innerHTML = `${arr.length} candidat·es | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount}`;
+  document.getElementById('list' + list + 'Stats').innerHTML = `${arr.length} candidat(es) | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount}`;
 }
 
 function updateCandidate(list, idx, field, value) {
   const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
   arr[idx][field] = value;
-  renderCandidateList(list);
-  saveState();
+  renderCandidateList(list); saveState();
 }
 
 function importCSV(list) {
   const input = document.getElementById('csvFileInput');
   input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       const lines = ev.target.result.split('\n').filter(l => l.trim());
       const candidates = [];
       lines.forEach((line, i) => {
-        if (i === 0 && (line.toLowerCase().includes('nom') || line.toLowerCase().includes('name'))) return; // skip header
+        if (i === 0 && (line.toLowerCase().includes('nom') || line.toLowerCase().includes('name'))) return;
         const parts = line.split(/[;,\t]/);
         if (parts.length >= 2) {
           candidates.push({
+            id: genId(),
             name: (parts[0] + ' ' + (parts[1] || '')).trim(),
             gender: (parts[2] || 'F').trim().toUpperCase().startsWith('H') ? 'H' : 'F',
             epci: (parts[3] || '').trim() === '1' || (parts[3] || '').toLowerCase().trim() === 'oui'
@@ -1031,104 +986,168 @@ function importCSV(list) {
       });
       if (list === 'A') state.listA.candidates = candidates;
       else state.listB.candidates = candidates;
-      renderCandidateList(list);
-      saveState();
+      renderCandidateList(list); saveState();
     };
-    reader.readAsText(file);
-    input.value = '';
+    reader.readAsText(file); input.value = '';
   };
   input.click();
 }
 
 // =====================================================================
-// MODULE 2: MERGE & PARITY
+// MODULE 2: MERGE — REWRITTEN TO PRESERVE ALL CANDIDATES
 // =====================================================================
 function mergeLists() {
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  if (state.listA.candidates.length === 0 && state.listB.candidates.length === 0) {
-    return alert('Ajoutez des candidats dans les listes A et B avant de fusionner.');
-  }
+  const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
+  const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
+  const totalCandidates = allA.length + allB.length;
 
-  // Use D'Hondt result to determine how many candidates from each list per position
+  if (totalCandidates === 0) return alert('Ajoutez des candidats dans les listes A et B avant de fusionner.');
+
   const listAName = document.getElementById('listAName').value || 'Liste A';
   const listBName = document.getElementById('listBName').value || 'Liste B';
 
-  // Find matching lists from Module 1
+  // Determine ratio from Module 1
   const listAMatch = state.lists.find(l => l.name === listAName);
   const listBMatch = state.lists.find(l => l.name === listBName);
-
-  let ratioA = 0.5, ratioB = 0.5;
+  let ratioA = 0.5;
   if (listAMatch && listBMatch) {
-    const scoreA = parseFloat(listAMatch.score) || 0;
-    const scoreB = parseFloat(listBMatch.score) || 0;
-    const total = scoreA + scoreB;
-    if (total > 0) { ratioA = scoreA / total; ratioB = scoreB / total; }
+    const sA = parseFloat(listAMatch.score) || 0, sB = parseFloat(listBMatch.score) || 0;
+    const tot = sA + sB;
+    if (tot > 0) ratioA = sA / tot;
   }
 
+  // Prepare pools — each candidate gets tagged with origin, keeping original order
+  const poolA = allA.map(c => ({...c, origin: listAName, used: false}));
+  const poolB = allB.map(c => ({...c, origin: listBName, used: false}));
+
+  // Phase 1: Build ordered list for totalSeats positions with parity
   const merged = [];
-  let idxA = 0, idxB = 0;
-  const targetGenders = [];
-  for (let i = 0; i < totalSeats; i++) {
-    targetGenders.push(i % 2 === 0 ? state.headGender : (state.headGender === 'F' ? 'H' : 'F'));
-  }
+  const slotsToFill = Math.max(totalSeats, totalCandidates);
 
-  // Interleave based on ratio, respecting parity
-  const aPool = {F: [], H: []};
-  const bPool = {F: [], H: []};
-  state.listA.candidates.forEach(c => aPool[c.gender].push({...c, origin: listAName}));
-  state.listB.candidates.forEach(c => bPool[c.gender].push({...c, origin: listBName}));
+  for (let pos = 0; pos < slotsToFill; pos++) {
+    const needGender = pos % 2 === 0 ? state.headGender : (state.headGender === 'F' ? 'H' : 'F');
+    const isTitulaire = pos < totalSeats;
 
-  const aIdxF = {v:0}, aIdxH = {v:0}, bIdxF = {v:0}, bIdxH = {v:0};
-
-  for (let pos = 0; pos < totalSeats; pos++) {
-    const needGender = targetGenders[pos];
-    // Decide which list to pull from based on proportional share
-    const aDone = (merged.filter(m => m.origin === listAName).length);
-    const bDone = (merged.filter(m => m.origin === listBName).length);
+    // How many from A should we have by now?
+    const aDone = merged.filter(m => m.origin === listAName).length;
     const aTarget = Math.round(ratioA * (pos + 1));
     const preferA = aDone < aTarget;
 
     let candidate = null;
+
+    // Try preferred pool first with correct gender, then fallback pool, then any gender
     if (preferA) {
-      candidate = pullCandidate(aPool, needGender, aIdxF, aIdxH, listAName);
-      if (!candidate) candidate = pullCandidate(bPool, needGender, bIdxF, bIdxH, listBName);
+      candidate = pickFromPool(poolA, needGender) || pickFromPool(poolB, needGender) || pickFromPool(poolA, null) || pickFromPool(poolB, null);
     } else {
-      candidate = pullCandidate(bPool, needGender, bIdxF, bIdxH, listBName);
-      if (!candidate) candidate = pullCandidate(aPool, needGender, aIdxF, aIdxH, listAName);
+      candidate = pickFromPool(poolB, needGender) || pickFromPool(poolA, needGender) || pickFromPool(poolB, null) || pickFromPool(poolA, null);
     }
 
     if (candidate) {
-      merged.push({...candidate, position: pos + 1, targetGender: needGender});
-    } else {
-      merged.push({name: '(vacant)', gender: needGender, origin: '?', epci: false, position: pos + 1, targetGender: needGender});
+      candidate.used = true;
+      merged.push({
+        id: candidate.id, name: candidate.name, gender: candidate.gender,
+        origin: candidate.origin, epci: candidate.epci,
+        position: pos + 1, isTitulaire: isTitulaire
+      });
     }
   }
 
+  // Phase 2: Append any remaining unused candidates as suppleants
+  const allPool = [...poolA, ...poolB];
+  const usedIds = new Set(merged.map(m => m.id));
+  allPool.forEach(c => {
+    if (!usedIds.has(c.id)) {
+      merged.push({
+        id: c.id, name: c.name, gender: c.gender,
+        origin: c.origin, epci: c.epci,
+        position: merged.length + 1, isTitulaire: false
+      });
+    }
+  });
+
   state.merged = merged;
+  state.mergeValidated = false;
+
+  // Integrity check
+  checkMergeIntegrity(allA.length, allB.length, listAName, listBName);
   renderMergedList();
+  renderDelegationTable();
   saveState();
 }
 
-function pullCandidate(pool, gender, idxF, idxH, origin) {
-  if (gender === 'F' && idxF.v < pool.F.length) {
-    const c = pool.F[idxF.v];
-    idxF.v++;
-    return c;
-  }
-  if (gender === 'H' && idxH.v < pool.H.length) {
-    const c = pool.H[idxH.v];
-    idxH.v++;
-    return c;
+function pickFromPool(pool, gender) {
+  for (let i = 0; i < pool.length; i++) {
+    if (!pool[i].used && (gender === null || pool[i].gender === gender)) {
+      return pool[i];
+    }
   }
   return null;
 }
 
+function checkMergeIntegrity(countA, countB, nameA, nameB) {
+  const banner = document.getElementById('integrityBanner');
+  const totalExpected = countA + countB;
+  const totalMerged = state.merged.length;
+  const mergedFromA = state.merged.filter(m => m.origin === nameA).length;
+  const mergedFromB = state.merged.filter(m => m.origin === nameB).length;
+
+  // Check for duplicates
+  const names = state.merged.map(m => m.name.toLowerCase().trim());
+  const dupes = names.filter((n, i) => n && names.indexOf(n) !== i);
+
+  let html = '';
+  if (totalMerged === totalExpected && dupes.length === 0) {
+    html = `<div class="integrity-banner integrity-ok">Integrite OK : ${totalMerged} candidat(es) (${mergedFromA} de ${esc(nameA)}, ${mergedFromB} de ${esc(nameB)}). Tous les candidats sont presents.</div>`;
+  } else {
+    html = `<div class="integrity-banner integrity-error">`;
+    if (totalMerged !== totalExpected) {
+      const missing = totalExpected - totalMerged;
+      html += `ATTENTION : ${missing} candidat(s) manquant(s) ! Attendu: ${totalExpected}, obtenu: ${totalMerged}.<br>`;
+      // Find missing
+      const allOriginal = [...state.listA.candidates, ...state.listB.candidates].filter(c => c.name && c.name.trim());
+      const mergedIds = new Set(state.merged.map(m => m.id));
+      const missingList = allOriginal.filter(c => !mergedIds.has(c.id));
+      if (missingList.length > 0) {
+        html += 'Manquants : ' + missingList.map(c => esc(c.name)).join(', ') + '<br>';
+      }
+    }
+    if (dupes.length > 0) {
+      html += `Doublons detectes : ${[...new Set(dupes)].join(', ')}`;
+    }
+    html += `</div>`;
+  }
+  banner.innerHTML = html;
+}
+
+function validateMerge() {
+  if (state.merged.length === 0) return alert('Fusionnez d\'abord les listes.');
+  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+  const titulaires = state.merged.filter(m => m.isTitulaire).length;
+  const suppleants = state.merged.filter(m => !m.isTitulaire).length;
+  const violations = checkParity(state.merged.filter(m => m.isTitulaire));
+
+  let msg = `Validation de la fusion :\n\n`;
+  msg += `- Titulaires : ${titulaires} / ${totalSeats} sieges\n`;
+  msg += `- Suppleants : ${suppleants}\n`;
+  msg += `- Total : ${state.merged.length}\n`;
+  msg += `- Violations de parite : ${violations.count}\n\n`;
+  msg += violations.count > 0 ? 'ATTENTION : des violations de parite persistent !' : 'Parite respectee.';
+  msg += '\n\nValider cette fusion ?';
+
+  if (confirm(msg)) {
+    state.mergeValidated = true;
+    saveState();
+    alert('Fusion validee.');
+  }
+}
+
 function renderMergedList() {
-  const tbody = document.getElementById('mergedBody');
-  tbody.innerHTML = '';
+  const tbody = document.getElementById('mergedBody'); tbody.innerHTML = '';
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const flagZone = Math.ceil(totalSeats * 3 / 5);
+  const titulaires = state.merged.filter(m => m.isTitulaire !== false);
   const violations = checkParity(state.merged);
   let fCount = 0, hCount = 0, epciCount = 0;
 
@@ -1138,65 +1157,76 @@ function renderMergedList() {
     const isViolation = violations.positions.includes(i);
     const inZone = (c.position <= flagZone);
     const epciOk = !c.epci || inZone;
+    const isSuppleant = c.isTitulaire === false;
     const tr = document.createElement('tr');
     if (isViolation) tr.classList.add('parity-error');
-    if (inZone && epciSeats > 0) tr.classList.add('epci-zone');
+    if (inZone && epciSeats > 0 && !isSuppleant) tr.classList.add('epci-zone');
+    if (isSuppleant) tr.classList.add('suppliant-row');
 
-    // Drag and drop for merged list
     tr.draggable = true;
-    tr.dataset.idx = i;
     tr.ondragstart = (e) => { e.dataTransfer.setData('text', 'merged:' + i); tr.classList.add('dragging'); };
     tr.ondragend = () => tr.classList.remove('dragging');
     tr.ondragover = (e) => { e.preventDefault(); tr.classList.add('drag-over'); };
     tr.ondragleave = () => tr.classList.remove('drag-over');
     tr.ondrop = (e) => {
-      e.preventDefault();
-      tr.classList.remove('drag-over');
+      e.preventDefault(); tr.classList.remove('drag-over');
       const data = e.dataTransfer.getData('text');
       if (data.startsWith('merged:')) {
         const srcIdx = parseInt(data.split(':')[1]);
         const item = state.merged.splice(srcIdx, 1)[0];
         state.merged.splice(i, 0, item);
-        state.merged.forEach((m, idx) => m.position = idx + 1);
-        renderMergedList();
-        saveState();
+        state.merged.forEach((m, idx) => { m.position = idx + 1; m.isTitulaire = idx < totalSeats; });
+        renderMergedList(); saveState();
       }
     };
 
-    tr.innerHTML = `
-      <td>${c.position}</td>
-      <td>${esc(c.name)}</td>
-      <td><span class="badge-${c.gender.toLowerCase()}">${c.gender}</span></td>
+    let statusHtml = '';
+    if (isSuppleant) statusHtml = '<span class="status-warn">Suppleant</span>';
+    else if (isViolation) statusHtml = '<span class="status-error">Parite!</span>';
+    else statusHtml = '<span class="status-ok">OK</span>';
+
+    tr.innerHTML = `<td>${c.position}</td>
+      <td><input type="text" value="${esc(c.name)}" style="width:100%;min-width:120px;" onchange="editMergedCandidate(${i},'name',this.value)"></td>
+      <td><select onchange="editMergedCandidate(${i},'gender',this.value)" style="width:50px;">
+        <option value="F" ${c.gender==='F'?'selected':''}>F</option><option value="H" ${c.gender==='H'?'selected':''}>H</option></select></td>
       <td>${esc(c.origin || '')}</td>
-      <td>${c.epci ? (epciOk ? '<span class="status-ok">OK</span>' : '<span class="status-error">Hors zone!</span>') : ''}</td>
-      <td>${isViolation ? '<span class="status-error">Parité!</span>' : '<span class="status-ok">OK</span>'}</td>
-    `;
+      <td>${c.epci ? (epciOk ? '<span class="status-ok">OK</span>' : '<span class="status-error">Hors zone!</span>') : '<input type="checkbox" onchange="editMergedCandidate('+i+',\'epci\',this.checked)">'}</td>
+      <td>${statusHtml}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="removeMergedCandidate(${i})">x</button></td>`;
     tbody.appendChild(tr);
   });
 
-  document.getElementById('mergedStats').innerHTML = `${state.merged.length} candidat·es | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount} | EPCI: ${epciCount}`;
+  const titCount = state.merged.filter(m => m.isTitulaire !== false).length;
+  const supCount = state.merged.filter(m => m.isTitulaire === false).length;
+  document.getElementById('mergedStats').innerHTML = `${state.merged.length} total | ${titCount} titulaires | ${supCount} suppleant(s) | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount} | EPCI: ${epciCount}`;
 
-  // Parity diagnostic
   const diagDiv = document.getElementById('parityDiag');
   const detailsDiv = document.getElementById('parityDetails');
   const statusDiv = document.getElementById('parityStatus');
 
   if (violations.count > 0) {
     diagDiv.style.display = 'block';
-    statusDiv.innerHTML = `<span class="status-error">${violations.count} violation(s) de parité détectée(s)</span>`;
+    statusDiv.innerHTML = `<span class="status-error">${violations.count} violation(s) de parite</span>`;
     let html = '<ul>';
-    violations.details.forEach(v => {
-      html += `<li class="status-error">Position ${v.pos}: ${esc(v.name1)} (${v.g1}) suivi de ${esc(v.name2)} (${v.g2})</li>`;
-    });
+    violations.details.forEach(v => html += `<li class="status-error">Position ${v.pos}: ${esc(v.name1)} (${v.g1}) suivi de ${esc(v.name2)} (${v.g2})</li>`);
     html += '</ul>';
     detailsDiv.innerHTML = html;
   } else if (state.merged.length > 0) {
     diagDiv.style.display = 'none';
-    statusDiv.innerHTML = '<span class="status-ok">Parité respectée</span>';
-  } else {
-    diagDiv.style.display = 'none';
-    statusDiv.innerHTML = '';
-  }
+    statusDiv.innerHTML = '<span class="status-ok">Parite respectee</span>';
+  } else { diagDiv.style.display = 'none'; statusDiv.innerHTML = ''; }
+}
+
+function editMergedCandidate(idx, field, value) {
+  state.merged[idx][field] = value;
+  renderMergedList(); renderDelegationTable(); saveState();
+}
+
+function removeMergedCandidate(idx) {
+  state.merged.splice(idx, 1);
+  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+  state.merged.forEach((m, i) => { m.position = i + 1; m.isTitulaire = i < totalSeats; });
+  renderMergedList(); renderDelegationTable(); saveState();
 }
 
 function checkParity(list) {
@@ -1204,15 +1234,8 @@ function checkParity(list) {
   for (let i = 0; i < list.length - 1; i++) {
     if (list[i].gender === list[i+1].gender) {
       violations.count++;
-      violations.positions.push(i);
-      violations.positions.push(i+1);
-      violations.details.push({
-        pos: i + 1,
-        name1: list[i].name,
-        g1: list[i].gender,
-        name2: list[i+1].name,
-        g2: list[i+1].gender
-      });
+      violations.positions.push(i); violations.positions.push(i+1);
+      violations.details.push({pos: i + 1, name1: list[i].name, g1: list[i].gender, name2: list[i+1].name, g2: list[i+1].gender});
     }
   }
   violations.positions = [...new Set(violations.positions)];
@@ -1221,218 +1244,326 @@ function checkParity(list) {
 
 function autoFixParity() {
   if (state.merged.length === 0) return;
-  // Greedy fix: for each violation, swap with nearest opposite-gender candidate
-  let fixed = true;
-  for (let iter = 0; iter < 100 && fixed; iter++) {
-    fixed = false;
+  for (let iter = 0; iter < 200; iter++) {
+    let swapped = false;
     for (let i = 0; i < state.merged.length - 1; i++) {
       if (state.merged[i].gender === state.merged[i+1].gender) {
-        // Find nearest candidate of opposite gender after i+1
         const needGender = state.merged[i].gender === 'F' ? 'H' : 'F';
-        let swapIdx = -1;
         for (let j = i + 2; j < state.merged.length; j++) {
-          if (state.merged[j].gender === needGender) { swapIdx = j; break; }
+          if (state.merged[j].gender === needGender) {
+            [state.merged[i+1], state.merged[j]] = [state.merged[j], state.merged[i+1]];
+            state.merged.forEach((m, idx) => m.position = idx + 1);
+            swapped = true; break;
+          }
         }
-        if (swapIdx >= 0) {
-          const tmp = state.merged[i+1];
-          state.merged[i+1] = state.merged[swapIdx];
-          state.merged[swapIdx] = tmp;
-          state.merged.forEach((m, idx) => m.position = idx + 1);
-          fixed = true;
-          break;
-        }
+        if (swapped) break;
       }
     }
+    if (!swapped) break;
   }
-  renderMergedList();
+  renderMergedList(); saveState();
+}
+
+// =====================================================================
+// MODULE 3: ADJOINTS MANAGEMENT
+// =====================================================================
+function onAdjointsChange() {
+  const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
+  const designes = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
+  const negocies = parseInt(document.getElementById('nbAdjointsNegocies').value) || 0;
+  const alerts = document.getElementById('adjointAlerts');
+  let html = '';
+
+  if (designes > maxAdj) {
+    html += `<div class="card alert-orange" style="padding:8px;margin:4px 0;font-size:12px;">
+      <strong>Depassement du plafond legal :</strong> ${designes} adjoints designes > ${maxAdj} plafond (30%). Cette configuration depasse le cadre legal strict des adjoints au sens du CGCT.</div>`;
+  }
+  if (negocies > 0 && negocies > designes) {
+    html += `<div class="card alert-blue" style="padding:8px;margin:4px 0;font-size:12px;">
+      <strong>Simulation politique elargie :</strong> ${negocies} postes negocies (vs ${designes} designes). Les postes supplementaires relevent de la negociation politique, pas du droit legal.</div>`;
+  }
+  alerts.innerHTML = html;
+
+  // Count adjoints with effective delegation from delegation module
+  let adjWithDelegation = 0;
+  for (const dId in state.delegationAssignments) {
+    const a = state.delegationAssignments[dId];
+    if (a && a.candidateId && a.type === 'adjoint') adjWithDelegation++;
+  }
+  document.getElementById('nbAdjointsDelegation').value = adjWithDelegation;
+
+  calcAllowances();
   saveState();
 }
 
 // =====================================================================
-// MODULE 3: ALLOWANCES
+// MODULE 3: ALLOWANCES (DGCL FORMULA)
 // =====================================================================
 function calcAllowances() {
+  const pop = parseInt(document.getElementById('cityPop').value) || 0;
   const mayorAllow = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjPct = parseFloat(document.getElementById('adjointPct').value) || 0;
-  const nbAdj = parseInt(document.getElementById('nbAdjoints').value) || 0;
+  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const nbAdjDesignes = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
   const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-  const consAllow = parseFloat(document.getElementById('conseillerAllowance').value) || 0;
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const nbCons = Math.max(0, totalSeats - 1 - nbAdj - nbDel); // -1 for mayor
+  const nbCons = Math.max(0, totalSeats - 1 - nbAdjDesignes - nbDel);
 
-  const adjAllow = mayorAllow * adjPct / 100;
-  const totalMonthly = mayorAllow + (nbAdj * adjAllow) + (nbDel * delAllow) + (nbCons * consAllow);
-  const totalAnnual = totalMonthly * 12;
+  // DGCL formula: envelope = mayor max + sum of adjoint max for each designated adjoint with delegation
+  const enveloppeGlobale = mayorAllow + (nbAdjDesignes * adjMaxAllow);
 
+  // Actual distribution (what we plan to spend)
+  const adjActual = nbAdjDesignes * adjMaxAllow; // default to max, user can adjust
+  const delActual = nbDel * delAllow;
+  const totalDistributed = mayorAllow + adjActual + delActual;
+  const pctUsed = enveloppeGlobale > 0 ? (totalDistributed / enveloppeGlobale * 100) : 0;
+
+  // Envelope detail
+  const detailDiv = document.getElementById('enveloppeDetail');
+  detailDiv.innerHTML = `
+    <div style="font-size:12px;line-height:1.8;">
+      <strong>Plafond global :</strong> ${enveloppeGlobale.toFixed(2)} euros/mois<br>
+      = Maire (${mayorAllow.toFixed(2)} euros) + ${nbAdjDesignes} adjoint(s) x ${adjMaxAllow.toFixed(2)} euros<br>
+      <strong>Distribue :</strong> ${totalDistributed.toFixed(2)} euros/mois (${pctUsed.toFixed(0)}% de l'enveloppe)
+    </div>`;
+
+  // Gauge
+  const gaugeFill = document.getElementById('enveloppeGaugeFill');
+  const pctDisplay = Math.min(pctUsed, 100);
+  gaugeFill.style.width = pctDisplay + '%';
+  gaugeFill.textContent = pctUsed.toFixed(0) + '%';
+  gaugeFill.className = 'gauge-fill ' + (pctUsed > 100 ? 'gauge-over' : pctUsed > 85 ? 'gauge-warn' : 'gauge-ok');
+
+  // Alerts
+  const alertsDiv = document.getElementById('enveloppeAlerts');
+  let alertHtml = '';
+  if (totalDistributed > enveloppeGlobale) {
+    alertHtml += `<div class="card alert-red" style="padding:8px;margin:4px 0;font-size:12px;">
+      <strong>Enveloppe depassee de ${(totalDistributed - enveloppeGlobale).toFixed(2)} euros !</strong> La repartition proposee excede le plafond legal.</div>`;
+  }
+  if (pop >= 100000) {
+    alertHtml += `<div class="card alert-orange" style="padding:8px;margin:4px 0;font-size:12px;">
+      Commune > 100 000 hab : les conseillers municipaux sans delegation ne peuvent pas etre indemnises sur l'enveloppe globale.</div>`;
+  }
+  alertsDiv.innerHTML = alertHtml;
+
+  // Summary
   const summary = document.getElementById('allowanceSummary');
   summary.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div>
-        <p style="font-size:12px;opacity:0.7;">Indemnité adjoint</p>
-        <p><strong>${adjAllow.toFixed(2)} €/mois</strong></p>
-      </div>
-      <div>
-        <p style="font-size:12px;opacity:0.7;">Simples conseillers</p>
-        <p><strong>${nbCons}</strong></p>
-      </div>
-      <div>
-        <p style="font-size:12px;opacity:0.7;">Coût mensuel total</p>
-        <p><strong>${totalMonthly.toFixed(2)} €</strong></p>
-      </div>
-      <div>
-        <p style="font-size:12px;opacity:0.7;">Coût annuel total</p>
-        <p><strong>${totalAnnual.toFixed(2)} €</strong></p>
-      </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><p style="font-size:11px;opacity:0.7;">Cout mensuel total</p><p><strong>${totalDistributed.toFixed(2)} euros</strong></p></div>
+      <div><p style="font-size:11px;opacity:0.7;">Cout annuel total</p><p><strong>${(totalDistributed * 12).toFixed(2)} euros</strong></p></div>
+      <div><p style="font-size:11px;opacity:0.7;">Simples conseillers</p><p><strong>${nbCons}</strong></p></div>
     </div>
     <div style="margin-top:8px;font-size:11px;color:var(--texte-light);">
-      Maire: ${mayorAllow.toFixed(2)}€ | ${nbAdj} adjoint(s): ${(nbAdj*adjAllow).toFixed(2)}€ | ${nbDel} délégué(s): ${(nbDel*delAllow).toFixed(2)}€ | ${nbCons} conseiller(s): ${(nbCons*consAllow).toFixed(2)}€
-    </div>
-  `;
+      Maire: ${mayorAllow.toFixed(0)}e | ${nbAdjDesignes} adj: ${adjActual.toFixed(0)}e | ${nbDel} del: ${delActual.toFixed(0)}e
+    </div>`;
 
   renderPositionDistribution();
   saveState();
 }
 
+// =====================================================================
+// MODULE 3: POSITION DISTRIBUTION — TRIPLE DISPLAY
+// =====================================================================
 function renderPositionDistribution() {
-  const tbody = document.getElementById('posDistBody');
-  tbody.innerHTML = '';
-  const nbAdj = parseInt(document.getElementById('nbAdjoints').value) || 0;
+  const tbody = document.getElementById('posDistBody'); tbody.innerHTML = '';
+  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
 
   if (!state.results.seats || Object.keys(state.results.seats).length === 0) return;
-
   const totalSeats = Object.values(state.results.seats).reduce((a, b) => a + b, 0);
+
+  let totalAdjTheo = 0, totalAdjAdj = 0, totalDelTheo = 0, totalDelAdj = 0, totalSimple = 0;
 
   for (const name in state.results.seats) {
     const seats = state.results.seats[name];
     const ratio = totalSeats > 0 ? seats / totalSeats : 0;
-    const adjProp = Math.round(nbAdj * ratio);
-    const delProp = Math.round(nbDel * ratio);
-    const consProp = seats - adjProp - delProp;
+    const adjTheo = Math.round(nbAdj * ratio);
+    const delTheo = Math.round(nbDel * ratio);
 
-    // Store for negotiation summary
+    // Get adjusted values from state or default to theoretical
     if (!state.positionDist[name]) state.positionDist[name] = {};
-    state.positionDist[name] = {adj: adjProp, del: delProp, cons: Math.max(0, consProp)};
+    const dist = state.positionDist[name];
+    if (dist.adjAdj === undefined) dist.adjAdj = adjTheo;
+    if (dist.delAdj === undefined) dist.delAdj = delTheo;
+
+    const adjEcart = dist.adjAdj - adjTheo;
+    const delEcart = dist.delAdj - delTheo;
+    const simpleCount = Math.max(0, seats - dist.adjAdj - dist.delAdj);
+
+    totalAdjTheo += adjTheo; totalAdjAdj += dist.adjAdj;
+    totalDelTheo += delTheo; totalDelAdj += dist.delAdj;
+    totalSimple += simpleCount;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(name)}</td>
       <td><strong>${seats}</strong></td>
-      <td><input type="number" value="${adjProp}" min="0" style="width:60px;" onchange="state.positionDist['${esc(name)}'].adj=parseInt(this.value)||0;saveState();"></td>
-      <td><input type="number" value="${delProp}" min="0" style="width:60px;" onchange="state.positionDist['${esc(name)}'].del=parseInt(this.value)||0;saveState();"></td>
-      <td><input type="number" value="${Math.max(0, consProp)}" min="0" style="width:60px;" onchange="state.positionDist['${esc(name)}'].cons=parseInt(this.value)||0;saveState();"></td>
-    `;
+      <td style="text-align:center;opacity:0.6;">${adjTheo}</td>
+      <td><input type="number" value="${dist.adjAdj}" min="0" style="width:50px;" onchange="state.positionDist['${esc(name)}'].adjAdj=parseInt(this.value)||0;renderPositionDistribution();saveState();"></td>
+      <td class="${ecartClass(adjEcart)}" style="text-align:center;">${adjEcart > 0 ? '+' : ''}${adjEcart}</td>
+      <td style="text-align:center;opacity:0.6;">${delTheo}</td>
+      <td><input type="number" value="${dist.delAdj}" min="0" style="width:50px;" onchange="state.positionDist['${esc(name)}'].delAdj=parseInt(this.value)||0;renderPositionDistribution();saveState();"></td>
+      <td class="${ecartClass(delEcart)}" style="text-align:center;">${delEcart > 0 ? '+' : ''}${delEcart}</td>
+      <td style="text-align:center;">${simpleCount}</td>`;
     tbody.appendChild(tr);
   }
 
-  // Warning
+  // Totals row
+  const trTot = document.createElement('tr');
+  trTot.innerHTML = `<td><strong>TOTAL</strong></td><td><strong>${totalSeats}</strong></td>
+    <td style="text-align:center;opacity:0.6;">${totalAdjTheo}</td><td style="text-align:center;"><strong>${totalAdjAdj}</strong></td><td></td>
+    <td style="text-align:center;opacity:0.6;">${totalDelTheo}</td><td style="text-align:center;"><strong>${totalDelAdj}</strong></td><td></td>
+    <td style="text-align:center;"><strong>${totalSimple}</strong></td>`;
+  tbody.appendChild(trTot);
+
+  document.getElementById('posDistTotals').innerHTML = `Total ajuste : ${totalAdjAdj} adj + ${totalDelAdj} del + ${totalSimple} simples = ${totalAdjAdj + totalDelAdj + totalSimple}`;
+
   const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
-  const totalAdj = Object.values(state.positionDist).reduce((s, p) => s + (p.adj || 0), 0);
   const warn = document.getElementById('posDistWarning');
-  if (totalAdj > maxAdj) {
-    warn.innerHTML = `<span class="status-error">Attention : ${totalAdj} adjoints dépasse le plafond de ${maxAdj} (30% du conseil)</span>`;
-  } else {
-    warn.innerHTML = '';
-  }
+  if (totalAdjAdj > maxAdj) {
+    warn.innerHTML = `<span class="status-error">Attention : ${totalAdjAdj} adjoints depasse le plafond de ${maxAdj} (30% du conseil)</span>`;
+  } else { warn.innerHTML = ''; }
+}
+
+function ecartClass(e) {
+  if (e === 0) return 'ecart-zero';
+  if (Math.abs(e) === 1) return 'ecart-small';
+  return 'ecart-big';
 }
 
 function autoDistributePositions() {
-  const nbAdj = parseInt(document.getElementById('nbAdjoints').value) || 0;
-  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
   state.positionDist = {};
   renderPositionDistribution();
 }
 
 // =====================================================================
-// MODULE 3: DELEGATIONS
+// MODULE 3: DELEGATIONS — FIXED
 // =====================================================================
 function renderDelegationTable() {
-  const tbody = document.getElementById('delegationBody');
-  tbody.innerHTML = '';
+  const tbody = document.getElementById('delegationBody'); tbody.innerHTML = '';
 
-  // Build candidate options from merged list
-  let candidateOptions = '<option value="">—</option>';
-  state.merged.forEach(c => {
-    if (c.name && c.name !== '(vacant)') {
-      candidateOptions += `<option value="${esc(c.name)}">${esc(c.name)} (${c.origin || '?'})</option>`;
-    }
-  });
+  // Build candidate options with unique IDs
+  const candidates = state.merged.filter(c => c.name && c.name !== '(vacant)');
 
   DELEGATION_CATALOG.forEach(d => {
     const loadClass = d.timeLoad === 'heavy' ? 'load-heavy' : (d.timeLoad === 'medium' ? 'load-medium' : 'load-light');
-    const loadLabel = d.timeLoad === 'heavy' ? 'Lourde' : (d.timeLoad === 'medium' ? 'Moyenne' : 'Légère');
-    const assigned = state.delegationAssignments[d.id] || '';
+    const loadLabel = d.timeLoad === 'heavy' ? 'Lourde' : (d.timeLoad === 'medium' ? 'Moyenne' : 'Legere');
+    const assignment = state.delegationAssignments[d.id] || {};
+    const assignedId = assignment.candidateId || '';
+    const assignedType = assignment.type || 'adjoint';
+
+    // Build select options dynamically
+    let opts = '<option value="">--</option>';
+    candidates.forEach(c => {
+      const sel = c.id === assignedId ? ' selected' : '';
+      opts += `<option value="${esc(c.id)}"${sel}>${esc(c.name)} (${esc(c.origin || '?')})</option>`;
+    });
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${d.label}</td>
-      <td><select disabled style="width:80px;"><option>Adjoint</option><option>Délégué</option></select></td>
+      <td><select onchange="updateDelegation('${d.id}','type',this.value)" style="width:90px;">
+        <option value="adjoint" ${assignedType==='adjoint'?'selected':''}>Adjoint</option>
+        <option value="delegue" ${assignedType==='delegue'?'selected':''}>Delegue</option>
+      </select></td>
       <td><span class="${loadClass}">${loadLabel}</span></td>
       <td>${d.hoursPerWeek}h</td>
-      <td><select onchange="state.delegationAssignments['${d.id}']=this.value;saveState();" style="width:150px;">
-        ${candidateOptions.replace(`value="${esc(assigned)}"`, `value="${esc(assigned)}" selected`)}
-      </select></td>
-      <td>${d.needsDetachment ? '<span class="status-warn">Recommandé</span>' : '<span class="status-ok">Non requis</span>'}</td>
-    `;
+      <td><select onchange="updateDelegation('${d.id}','candidateId',this.value)" style="width:180px;">${opts}</select></td>
+      <td>${d.needsDetachment ? '<span class="status-warn">Recommande</span>' : '<span class="status-ok">Non requis</span>'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
+function updateDelegation(delId, field, value) {
+  if (!state.delegationAssignments[delId]) state.delegationAssignments[delId] = {candidateId: '', type: 'adjoint'};
+  state.delegationAssignments[delId][field] = value;
+  // Clean up empty assignments
+  if (!state.delegationAssignments[delId].candidateId) delete state.delegationAssignments[delId];
+  onAdjointsChange(); // recounts delegation-based adjoints
+  saveState();
+}
+
 function addCustomDelegation() {
-  const label = prompt('Nom de la délégation :');
-  if (!label) return;
-  const hours = parseInt(prompt('Heures par semaine estimées :', '4')) || 4;
+  const label = prompt('Nom de la delegation :'); if (!label) return;
+  const hours = parseInt(prompt('Heures par semaine estimees :', '4')) || 4;
   DELEGATION_CATALOG.push({
-    id: 'custom_' + Date.now(),
-    label: label,
-    timeLoad: hours > 10 ? 'heavy' : (hours > 5 ? 'medium' : 'light'),
-    hoursPerWeek: hours,
-    needsDetachment: hours > 10
+    id: 'custom_' + Date.now(), label, timeLoad: hours > 10 ? 'heavy' : (hours > 5 ? 'medium' : 'light'),
+    hoursPerWeek: hours, needsDetachment: hours > 10
   });
   renderDelegationTable();
+}
+
+// =====================================================================
+// MODULE 3: CLAIMABLE POSITIONS
+// =====================================================================
+function renderClaimablePositions() {
+  const tbody = document.getElementById('claimableBody'); tbody.innerHTML = '';
+  if (!state.results.seats || Object.keys(state.results.seats).length === 0) return;
+
+  const totalSeats = Object.values(state.results.seats).reduce((a, b) => a + b, 0);
+  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
+  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
+  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
+  const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
+
+  for (const name in state.results.seats) {
+    const seats = state.results.seats[name];
+    const ratio = totalSeats > 0 ? seats / totalSeats : 0;
+    const pctLabel = (ratio * 100).toFixed(1) + '%';
+
+    // Legal: max adjoints this group can have = min(proportional share, legal max)
+    const adjLegal = Math.min(Math.round(maxAdj * ratio), maxAdj);
+    const delLegal = Math.round(nbDel * ratio);
+
+    // Political simulation: proportional to electoral weight
+    const adjPol = Math.round(nbAdj * ratio);
+    const delPol = Math.round(nbDel * ratio);
+
+    // Estimated allowance
+    const estAllowance = (adjPol * adjMaxAllow) + (delPol * delAllow);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${esc(name)}</strong></td>
+      <td>${pctLabel}</td>
+      <td>${adjLegal} adj.</td><td>${delLegal} del.</td>
+      <td>${adjPol} adj.</td><td>${delPol} del.</td>
+      <td><strong>${estAllowance.toFixed(0)} e/mois</strong></td>`;
+    tbody.appendChild(tr);
+  }
 }
 
 // =====================================================================
 // MODULE 3: LEGAL CHECKLIST
 // =====================================================================
 function updateChecklist() {
-  const ul = document.getElementById('checklist');
-  ul.innerHTML = '';
+  const ul = document.getElementById('checklist'); ul.innerHTML = '';
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   const pop = parseInt(document.getElementById('cityPop').value) || 0;
-  const nbAdj = parseInt(document.getElementById('nbAdjoints').value) || 0;
+  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
   const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
 
+  // Envelope check
+  const mayorAllow = parseFloat(document.getElementById('mayorAllowance').value) || 0;
+  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
+  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
+  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
+  const envelope = mayorAllow + (nbAdj * adjMaxAllow);
+  const distributed = mayorAllow + (nbAdj * adjMaxAllow) + (nbDel * delAllow);
+
   const checks = [
-    {
-      label: 'Taille du conseil conforme à la population',
-      ok: pop === 0 || (COUNCIL_SIZES.find(c => pop >= c.min && pop <= c.max)?.seats === totalSeats)
-    },
-    {
-      label: 'Parité respectée sur la liste fusionnée',
-      ok: state.merged.length === 0 || checkParity(state.merged).count === 0
-    },
-    {
-      label: 'Plafond adjoints (≤ 30% du conseil)',
-      ok: nbAdj <= maxAdj || maxAdj === 0
-    },
-    {
-      label: 'Prime majoritaire correcte',
-      ok: state.mode === 'integrale' || (document.getElementById('isPLM').checked ? state.primePercent === 25 : state.primePercent === 50)
-    },
-    {
-      label: 'Fléchage EPCI dans les 3/5 premiers',
-      ok: (() => {
-        if (epciSeats === 0 || state.merged.length === 0) return true;
-        const flagZone = Math.ceil(totalSeats * 3 / 5);
-        return state.merged.filter(c => c.epci && c.position > flagZone).length === 0;
-      })()
-    },
-    {
-      label: 'Au moins 2 listes pour une fusion',
-      ok: state.lists.filter(l => (parseFloat(l.score) || 0) > 0).length >= 2
-    }
+    { label: 'Taille du conseil conforme a la population', ok: pop === 0 || (COUNCIL_SIZES.find(c => pop >= c.min && pop <= c.max)?.seats === totalSeats) },
+    { label: 'Parite respectee sur la liste fusionnee', ok: state.merged.length === 0 || checkParity(state.merged).count === 0 },
+    { label: 'Plafond adjoints (30% du conseil)', ok: nbAdj <= maxAdj || maxAdj === 0 },
+    { label: 'Prime majoritaire correcte', ok: state.mode === 'integrale' || (document.getElementById('isPLM').checked ? state.primePercent === 25 : state.primePercent === 50) },
+    { label: 'Flechage EPCI dans les 3/5 premiers', ok: (() => { if (epciSeats === 0 || state.merged.length === 0) return true; const z = Math.ceil(totalSeats*3/5); return state.merged.filter(c => c.epci && c.position > z).length === 0; })() },
+    { label: 'Au moins 2 listes pour une fusion', ok: state.lists.filter(l => (parseFloat(l.score)||0) > 0).length >= 2 },
+    { label: 'Enveloppe indemnitaire respectee', ok: distributed <= envelope || envelope === 0 },
+    { label: 'Integrite de la liste fusionnee', ok: state.merged.length === 0 || state.mergeValidated || (() => { const a = state.listA.candidates.filter(c=>c.name&&c.name.trim()).length; const b = state.listB.candidates.filter(c=>c.name&&c.name.trim()).length; return state.merged.length >= a + b; })() }
   ];
 
   checks.forEach(c => {
@@ -1448,16 +1579,15 @@ function updateChecklist() {
 function generateNegotiationSummary() {
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   const mayorAllow = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjPct = parseFloat(document.getElementById('adjointPct').value) || 0;
-  const adjAllow = mayorAllow * adjPct / 100;
+  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
   const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const cityName = document.getElementById('cityName').value || '[Commune]';
 
-  let text = `SYNTHÈSE DE NÉGOCIATION — ${cityName}\n`;
-  text += `${'═'.repeat(50)}\n\n`;
-  text += `Conseil municipal : ${totalSeats} sièges\n`;
-  if (epciSeats > 0) text += `Conseil communautaire (EPCI) : ${epciSeats} sièges\n`;
+  let text = `SYNTHESE DE NEGOCIATION — ${cityName}\n`;
+  text += `${'='.repeat(50)}\n\n`;
+  text += `Conseil municipal : ${totalSeats} sieges\n`;
+  if (epciSeats > 0) text += `Conseil communautaire (EPCI) : ${epciSeats} sieges\n`;
   text += `\n`;
 
   const normalized = normalizeScores(state.lists);
@@ -1466,73 +1596,59 @@ function generateNegotiationSummary() {
     const seats = state.results.seats[name];
     const nl = normalized.find(l => l.name === name);
     const pct = nl ? nl.normalizedScore.toFixed(1) : '?';
-    const dist = state.positionDist[name] || {adj: 0, del: 0, cons: 0};
+    const dist = state.positionDist[name] || {adjAdj: 0, delAdj: 0};
 
-    text += `▸ ${name} (${pct}% des voix)\n`;
-    text += `  → ${seats} siège(s) au conseil municipal (${(seats/totalSeats*100).toFixed(1)}%)\n`;
-    if (dist.adj > 0) text += `  → ${dist.adj} poste(s) d'adjoint·e (indemnité : ${adjAllow.toFixed(0)}€/mois chacun)\n`;
-    if (dist.del > 0) text += `  → ${dist.del} poste(s) de conseiller·ère délégué·e (indemnité : ${delAllow.toFixed(0)}€/mois chacun)\n`;
-    if (dist.cons > 0) text += `  → ${dist.cons} conseiller·ère(s) simple(s)\n`;
+    text += `> ${name} (${pct}% des voix)\n`;
+    text += `  -> ${seats} siege(s) au conseil municipal (${(seats/totalSeats*100).toFixed(1)}%)\n`;
+    if (dist.adjAdj > 0) text += `  -> ${dist.adjAdj} poste(s) d'adjoint(e) (indemnite max : ${adjMaxAllow.toFixed(0)}e/mois chacun)\n`;
+    if (dist.delAdj > 0) text += `  -> ${dist.delAdj} poste(s) de conseiller(ere) delegue(e) (indemnite : ${delAllow.toFixed(0)}e/mois chacun)\n`;
+    const simples = seats - (dist.adjAdj||0) - (dist.delAdj||0);
+    if (simples > 0) text += `  -> ${simples} conseiller(ere)(s) simple(s)\n`;
 
-    // Delegations assigned
+    // Delegations assigned to this group
     const delegations = [];
     for (const dId in state.delegationAssignments) {
-      const assigned = state.delegationAssignments[dId];
-      if (assigned) {
-        const mc = state.merged.find(m => m.name === assigned && m.origin === name);
+      const a = state.delegationAssignments[dId];
+      if (a && a.candidateId) {
+        const mc = state.merged.find(m => m.id === a.candidateId && m.origin === name);
         if (mc) {
           const del = DELEGATION_CATALOG.find(d => d.id === dId);
           if (del) delegations.push(del.label);
         }
       }
     }
-    if (delegations.length > 0) {
-      text += `  → Délégations : ${delegations.join(', ')}\n`;
-    }
+    if (delegations.length > 0) text += `  -> Delegations : ${delegations.join(', ')}\n`;
 
-    const monthlyEnvelope = (dist.adj * adjAllow) + (dist.del * delAllow);
-    if (monthlyEnvelope > 0) {
-      text += `  → Enveloppe indemnitaire mensuelle : ${monthlyEnvelope.toFixed(0)}€\n`;
-    }
+    const monthlyEnvelope = ((dist.adjAdj||0) * adjMaxAllow) + ((dist.delAdj||0) * delAllow);
+    if (monthlyEnvelope > 0) text += `  -> Enveloppe indemnitaire mensuelle : ${monthlyEnvelope.toFixed(0)}e\n`;
     text += `\n`;
   }
 
-  text += `${'─'.repeat(50)}\n`;
-  text += `Généré le ${new Date().toLocaleDateString('fr-FR')} par OAD Fusions Municipales 2026\n`;
-
+  text += `${'-'.repeat(50)}\n`;
+  text += `Genere le ${new Date().toLocaleDateString('fr-FR')} par OAD Fusions Municipales 2026\n`;
   document.getElementById('negoSummary').textContent = text;
 }
 
 function copyNegotiationSummary() {
-  const text = document.getElementById('negoSummary').textContent;
-  navigator.clipboard.writeText(text).then(() => alert('Synthèse copiée dans le presse-papiers'));
+  navigator.clipboard.writeText(document.getElementById('negoSummary').textContent)
+    .then(() => alert('Synthese copiee dans le presse-papiers'));
 }
 
 // =====================================================================
 // TIMER
 // =====================================================================
 let timerInterval = null;
-
 function startTimer() {
   state.timerEnd = Date.now() + 36 * 60 * 60 * 1000;
-  saveState();
-  startTimerDisplay();
+  saveState(); startTimerDisplay();
 }
-
 function startTimerDisplay() {
-  const bar = document.getElementById('timerBar');
-  bar.classList.add('active');
+  const bar = document.getElementById('timerBar'); bar.classList.add('active');
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    const remaining = state.timerEnd - Date.now();
-    if (remaining <= 0) {
-      bar.textContent = 'TEMPS ÉCOULÉ — Fenêtre de négociation terminée';
-      clearInterval(timerInterval);
-      return;
-    }
-    const h = Math.floor(remaining / 3600000);
-    const m = Math.floor((remaining % 3600000) / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
+    const r = state.timerEnd - Date.now();
+    if (r <= 0) { bar.textContent = 'TEMPS ECOULE — Fenetre de negociation terminee'; clearInterval(timerInterval); return; }
+    const h = Math.floor(r / 3600000), m = Math.floor((r % 3600000) / 60000), s = Math.floor((r % 60000) / 1000);
     bar.textContent = `Temps restant : ${h}h ${String(m).padStart(2,'0')}min ${String(s).padStart(2,'0')}s`;
   }, 1000);
 }
@@ -1544,17 +1660,16 @@ function saveState() {
   state.headGender = document.getElementById('headGender')?.value || 'F';
   try {
     localStorage.setItem('oad_fusion_state', JSON.stringify({
-      ...state,
+      ...state, nextCandidateId,
       cityName: document.getElementById('cityName').value,
       cityPop: document.getElementById('cityPop').value,
       totalSeats: document.getElementById('totalSeats').value,
       epciSeats: document.getElementById('epciSeats').value,
       isPLM: document.getElementById('isPLM').checked,
-      nbAdjoints: document.getElementById('nbAdjoints').value,
+      nbAdjointsDesignes: document.getElementById('nbAdjointsDesignes').value,
+      nbAdjointsNegocies: document.getElementById('nbAdjointsNegocies').value,
       nbDelegues: document.getElementById('nbDelegues').value,
-      adjointPct: document.getElementById('adjointPct').value,
       delegueAllowance: document.getElementById('delegueAllowance').value,
-      conseillerAllowance: document.getElementById('conseillerAllowance').value,
       listAName: document.getElementById('listAName').value,
       listBName: document.getElementById('listBName').value,
     }));
@@ -1566,44 +1681,36 @@ function loadState() {
     const saved = localStorage.getItem('oad_fusion_state');
     if (saved) {
       const s = JSON.parse(saved);
+      if (s.nextCandidateId) nextCandidateId = s.nextCandidateId;
       Object.assign(state, {
-        mode: s.mode || 'avec_prime',
-        primePercent: s.primePercent || 50,
-        headGender: s.headGender || 'F',
-        lists: s.lists || state.lists,
-        scenarios: s.scenarios || [],
-        listA: s.listA || state.listA,
-        listB: s.listB || state.listB,
-        merged: s.merged || [],
+        mode: s.mode || 'avec_prime', primePercent: s.primePercent || 50,
+        headGender: s.headGender || 'F', lists: s.lists || state.lists,
+        scenarios: s.scenarios || [], listA: s.listA || state.listA,
+        listB: s.listB || state.listB, merged: s.merged || [],
+        mergeValidated: s.mergeValidated || false,
         delegationAssignments: s.delegationAssignments || {},
-        positionDist: s.positionDist || {},
-        timerEnd: s.timerEnd || null,
+        positionDist: s.positionDist || {}, timerEnd: s.timerEnd || null,
       });
-      if (s.cityName) document.getElementById('cityName').value = s.cityName;
-      if (s.cityPop) document.getElementById('cityPop').value = s.cityPop;
-      if (s.totalSeats) document.getElementById('totalSeats').value = s.totalSeats;
-      if (s.epciSeats) document.getElementById('epciSeats').value = s.epciSeats;
+      const fields = {cityName:'cityName',cityPop:'cityPop',totalSeats:'totalSeats',epciSeats:'epciSeats',
+        nbAdjointsDesignes:'nbAdjointsDesignes',nbAdjointsNegocies:'nbAdjointsNegocies',
+        nbDelegues:'nbDelegues',delegueAllowance:'delegueAllowance',
+        listAName:'listAName',listBName:'listBName'};
+      for (const k in fields) { if (s[k] !== undefined && s[k] !== null) { const el = document.getElementById(fields[k]); if (el) el.value = s[k]; } }
       if (s.isPLM) document.getElementById('isPLM').checked = s.isPLM;
-      if (s.nbAdjoints) document.getElementById('nbAdjoints').value = s.nbAdjoints;
-      if (s.nbDelegues) document.getElementById('nbDelegues').value = s.nbDelegues;
-      if (s.adjointPct) document.getElementById('adjointPct').value = s.adjointPct;
-      if (s.delegueAllowance) document.getElementById('delegueAllowance').value = s.delegueAllowance;
-      if (s.conseillerAllowance) document.getElementById('conseillerAllowance').value = s.conseillerAllowance;
-      if (s.listAName) document.getElementById('listAName').value = s.listAName;
-      if (s.listBName) document.getElementById('listBName').value = s.listBName;
       document.getElementById('headGender').value = state.headGender;
       document.getElementById('primeSlider').value = state.primePercent;
       document.getElementById('primeLabel').textContent = state.primePercent + '%';
       document.getElementById('primeConfig').style.display = state.mode === 'avec_prime' ? 'block' : 'none';
-      // Update mode toggle buttons
       document.querySelectorAll('.mode-toggle button').forEach(b => {
         b.classList.toggle('active',
           (state.mode === 'avec_prime' && b.textContent.includes('prime')) ||
-          (state.mode === 'integrale' && b.textContent.includes('intégrale'))
+          (state.mode === 'integrale' && b.textContent.includes('integrale'))
         );
       });
+      // Trigger population display
+      if (s.cityPop) onPopulationChange();
     }
-  } catch (e) {}
+  } catch (e) { console.error('Load state error:', e); }
 }
 
 // =====================================================================
@@ -1611,57 +1718,37 @@ function loadState() {
 // =====================================================================
 function exportJSON() {
   saveState();
-  const data = localStorage.getItem('oad_fusion_state') || '{}';
-  const blob = new Blob([data], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const blob = new Blob([localStorage.getItem('oad_fusion_state') || '{}'], {type: 'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'oad_fusion_' + (document.getElementById('cityName').value || 'session') + '.json';
   a.click();
 }
-
-function importJSON() {
-  document.getElementById('jsonFileInput').click();
-}
-
+function importJSON() { document.getElementById('jsonFileInput').click(); }
 function handleJSONImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      localStorage.setItem('oad_fusion_state', e.target.result);
-      location.reload();
-    } catch (err) { alert('Fichier invalide'); }
-  };
+  reader.onload = (e) => { try { localStorage.setItem('oad_fusion_state', e.target.result); location.reload(); } catch (err) { alert('Fichier invalide'); } };
   reader.readAsText(file);
 }
 
 function exportCSV() {
-  let csv = 'Répartition des sièges\n';
-  csv += 'Liste;Sièges;Pourcentage\n';
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+  let csv = 'Repartition des sieges\nListe;Sieges;Pourcentage\n';
   for (const name in state.results.seats) {
     const seats = state.results.seats[name];
     csv += `${name};${seats};${(seats/totalSeats*100).toFixed(1)}%\n`;
   }
-  csv += '\nListe ordonnée du conseil municipal\n';
-  csv += 'Position;Liste;Sexe\n';
+  csv += '\nListe ordonnee du conseil municipal\nPosition;Liste;Sexe\n';
   state.results.ordered.forEach((o, i) => {
     const gender = ((i % 2 === 0) ? state.headGender : (state.headGender === 'F' ? 'H' : 'F'));
     csv += `${o.position};${o.list};${gender}\n`;
   });
-
   if (state.merged.length > 0) {
-    csv += '\nListe fusionnée\n';
-    csv += 'Position;Nom;Sexe;Origine;EPCI\n';
-    state.merged.forEach(c => {
-      csv += `${c.position};${c.name};${c.gender};${c.origin || ''};${c.epci ? 'Oui' : 'Non'}\n`;
-    });
+    csv += '\nListe fusionnee\nPosition;Nom;Sexe;Origine;EPCI;Titulaire\n';
+    state.merged.forEach(c => csv += `${c.position};${c.name};${c.gender};${c.origin || ''};${c.epci ? 'Oui' : 'Non'};${c.isTitulaire !== false ? 'Oui' : 'Suppleant'}\n`);
   }
-
   const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'oad_fusion_' + (document.getElementById('cityName').value || 'export') + '.csv';
   a.click();
 }
@@ -1671,9 +1758,7 @@ function exportCSV() {
 // =====================================================================
 function esc(str) {
   if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+  const div = document.createElement('div'); div.textContent = str; return div.innerHTML;
 }
 
 // =====================================================================
