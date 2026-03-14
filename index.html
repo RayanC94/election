@@ -287,7 +287,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 
 <!-- ==================== MODULE 2 ==================== -->
 <div class="module" id="module2">
-  <div class="grid-3">
+  <div class="grid-2">
     <div class="card">
       <h2>Liste A (hote)</h2>
       <input type="text" id="listAName" placeholder="Nom de la liste A" style="width:100%;padding:6px;margin-bottom:8px;border:1px solid var(--gris-border);border-radius:4px;" oninput="saveState()">
@@ -295,7 +295,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         <button class="btn btn-outline btn-sm" onclick="importCSV('A')">Importer CSV</button>
         <button class="btn btn-primary btn-sm" onclick="addCandidate('A')">+ Candidat</button>
       </div>
-      <div class="table-scroll" style="max-height:400px;">
+      <div class="table-scroll" style="max-height:350px;">
         <table><thead><tr><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
           <tbody id="listABody"></tbody>
         </table>
@@ -309,29 +309,63 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         <button class="btn btn-outline btn-sm" onclick="importCSV('B')">Importer CSV</button>
         <button class="btn btn-primary btn-sm" onclick="addCandidate('B')">+ Candidat</button>
       </div>
-      <div class="table-scroll" style="max-height:400px;">
+      <div class="table-scroll" style="max-height:350px;">
         <table><thead><tr><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
           <tbody id="listBBody"></tbody>
         </table>
       </div>
       <div id="listBStats" style="font-size:12px;margin-top:6px;"></div>
     </div>
-    <div class="card">
-      <h2>Liste fusionnee</h2>
-      <div class="btn-group">
-        <button class="btn btn-primary btn-sm" onclick="mergeLists()">Fusionner (auto)</button>
-        <button class="btn btn-outline btn-sm" onclick="autoFixParity()">Auto-corriger parite</button>
-        <button class="btn btn-outline btn-sm" onclick="validateMerge()">Valider la fusion</button>
-      </div>
-      <div id="parityStatus" style="margin-bottom:4px;"></div>
-      <div id="integrityBanner"></div>
-      <div class="table-scroll" style="max-height:400px;">
-        <table><thead><tr><th>Pos.</th><th>Nom Prenom</th><th>Sexe</th><th>Origine</th><th>EPCI</th><th>Statut</th><th></th></tr></thead>
-          <tbody id="mergedBody"></tbody>
-        </table>
-      </div>
-      <div id="mergedStats" style="font-size:12px;margin-top:6px;"></div>
+  </div>
+
+  <!-- Selection panel for manual merge -->
+  <div class="card" id="selectionPanel" style="display:none;">
+    <h2>Selection des candidats pour la fusion</h2>
+    <p style="font-size:12px;color:var(--texte-light);margin-bottom:8px;">Cochez les candidats a inclure dans la liste fusionnee. Decochez ceux que vous ne souhaitez pas retenir.</p>
+    <div class="btn-group">
+      <button class="btn btn-sm btn-outline" onclick="selectAllCandidates(true)">Tout selectionner</button>
+      <button class="btn btn-sm btn-outline" onclick="selectAllCandidates(false)">Tout deselectionner</button>
+      <button class="btn btn-sm btn-primary" onclick="mergeFromSelection()">Fusionner la selection</button>
+      <button class="btn btn-sm btn-danger" onclick="closeSelectionPanel()">Annuler</button>
     </div>
+    <div id="selectionStats" style="font-size:12px;margin:6px 0;font-weight:600;"></div>
+    <div class="grid-2">
+      <div>
+        <h3 id="selPanelATitle">Liste A</h3>
+        <div class="table-scroll" style="max-height:400px;">
+          <table><thead><tr><th style="width:30px;"><input type="checkbox" checked onchange="toggleListSelection('A',this.checked)"></th><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th></tr></thead>
+            <tbody id="selectionBodyA"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 id="selPanelBTitle">Liste B</h3>
+        <div class="table-scroll" style="max-height:400px;">
+          <table><thead><tr><th style="width:30px;"><input type="checkbox" checked onchange="toggleListSelection('B',this.checked)"></th><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th></tr></thead>
+            <tbody id="selectionBodyB"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Merged result -->
+  <div class="card">
+    <h2>Liste fusionnee</h2>
+    <div class="btn-group">
+      <button class="btn btn-primary btn-sm" onclick="openSelectionPanel()">Preparer la fusion (selection manuelle)</button>
+      <button class="btn btn-outline btn-sm" onclick="mergeLists()">Fusionner tout (auto)</button>
+      <button class="btn btn-outline btn-sm" onclick="autoFixParity()">Auto-corriger parite</button>
+      <button class="btn btn-outline btn-sm" onclick="validateMerge()">Valider la fusion</button>
+    </div>
+    <div id="parityStatus" style="margin-bottom:4px;"></div>
+    <div id="integrityBanner"></div>
+    <div class="table-scroll" style="max-height:500px;">
+      <table><thead><tr><th>Pos.</th><th>Nom Prenom</th><th>Sexe</th><th>Origine</th><th>EPCI</th><th>Statut</th><th></th></tr></thead>
+        <tbody id="mergedBody"></tbody>
+      </table>
+    </div>
+    <div id="mergedStats" style="font-size:12px;margin-top:6px;"></div>
   </div>
   <div class="card" id="parityDiag" style="display:none;">
     <h3>Diagnostic de parite</h3>
@@ -994,18 +1028,123 @@ function importCSV(list) {
 }
 
 // =====================================================================
-// MODULE 2: MERGE — REWRITTEN TO PRESERVE ALL CANDIDATES
+// MODULE 2: SELECTION PANEL FOR MANUAL MERGE
 // =====================================================================
-function mergeLists() {
-  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+let selectionState = {}; // { candidateId: true/false }
+
+function openSelectionPanel() {
   const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
   const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
-  const totalCandidates = allA.length + allB.length;
+  if (allA.length + allB.length === 0) return alert('Ajoutez des candidats dans les listes A et B d\'abord.');
 
-  if (totalCandidates === 0) return alert('Ajoutez des candidats dans les listes A et B avant de fusionner.');
+  // Initialize selection: all selected by default
+  selectionState = {};
+  [...allA, ...allB].forEach(c => { if (!c.id) c.id = genId(); selectionState[c.id] = true; });
 
   const listAName = document.getElementById('listAName').value || 'Liste A';
   const listBName = document.getElementById('listBName').value || 'Liste B';
+  document.getElementById('selPanelATitle').textContent = listAName + ' (' + allA.length + ')';
+  document.getElementById('selPanelBTitle').textContent = listBName + ' (' + allB.length + ')';
+
+  renderSelectionTable('A', allA);
+  renderSelectionTable('B', allB);
+  updateSelectionStats();
+  document.getElementById('selectionPanel').style.display = 'block';
+  document.getElementById('selectionPanel').scrollIntoView({behavior: 'smooth'});
+}
+
+function closeSelectionPanel() {
+  document.getElementById('selectionPanel').style.display = 'none';
+}
+
+function renderSelectionTable(list, candidates) {
+  const tbody = document.getElementById('selectionBody' + list);
+  tbody.innerHTML = '';
+  candidates.forEach((c, i) => {
+    const checked = selectionState[c.id] !== false;
+    const tr = document.createElement('tr');
+    tr.style.opacity = checked ? '1' : '0.4';
+    tr.innerHTML = `
+      <td><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCandidateSelection('${c.id}',this.checked,this)"></td>
+      <td>${i+1}</td>
+      <td>${esc(c.name)}</td>
+      <td><span class="badge-${c.gender.toLowerCase()}">${c.gender}</span></td>
+      <td>${c.epci ? 'Oui' : ''}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleCandidateSelection(id, checked, el) {
+  selectionState[id] = checked;
+  // Update row opacity
+  const tr = el.closest('tr');
+  if (tr) tr.style.opacity = checked ? '1' : '0.4';
+  updateSelectionStats();
+}
+
+function toggleListSelection(list, checked) {
+  const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
+  arr.filter(c => c.name && c.name.trim()).forEach(c => { selectionState[c.id] = checked; });
+  renderSelectionTable(list, arr.filter(c => c.name && c.name.trim()));
+  updateSelectionStats();
+}
+
+function selectAllCandidates(checked) {
+  for (const id in selectionState) selectionState[id] = checked;
+  const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
+  const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
+  renderSelectionTable('A', allA);
+  renderSelectionTable('B', allB);
+  updateSelectionStats();
+}
+
+function updateSelectionStats() {
+  const selected = Object.values(selectionState).filter(v => v).length;
+  const total = Object.keys(selectionState).length;
+  const listAName = document.getElementById('listAName').value || 'Liste A';
+  const listBName = document.getElementById('listBName').value || 'Liste B';
+  const selA = state.listA.candidates.filter(c => c.name && c.name.trim() && selectionState[c.id]).length;
+  const selB = state.listB.candidates.filter(c => c.name && c.name.trim() && selectionState[c.id]).length;
+  const fCount = [...state.listA.candidates, ...state.listB.candidates].filter(c => c.name && c.name.trim() && selectionState[c.id] && c.gender === 'F').length;
+  const hCount = selected - fCount;
+
+  document.getElementById('selectionStats').innerHTML = `${selected} / ${total} selectionne(s) | ${listAName}: ${selA} | ${listBName}: ${selB} | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount}`;
+}
+
+function mergeFromSelection() {
+  // Get only selected candidates
+  const selectedIds = new Set(Object.keys(selectionState).filter(id => selectionState[id]));
+  if (selectedIds.size === 0) return alert('Selectionnez au moins un candidat.');
+
+  const listAName = document.getElementById('listAName').value || 'Liste A';
+  const listBName = document.getElementById('listBName').value || 'Liste B';
+
+  const selectedA = state.listA.candidates.filter(c => c.name && c.name.trim() && selectedIds.has(c.id));
+  const selectedB = state.listB.candidates.filter(c => c.name && c.name.trim() && selectedIds.has(c.id));
+
+  // Close panel
+  document.getElementById('selectionPanel').style.display = 'none';
+
+  // Run merge with selected candidates only
+  mergeWithCandidates(selectedA, selectedB, listAName, listBName);
+}
+
+// =====================================================================
+// MODULE 2: MERGE — REWRITTEN TO PRESERVE ALL CANDIDATES
+// =====================================================================
+function mergeLists() {
+  const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
+  const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
+  if (allA.length + allB.length === 0) return alert('Ajoutez des candidats dans les listes A et B avant de fusionner.');
+
+  const listAName = document.getElementById('listAName').value || 'Liste A';
+  const listBName = document.getElementById('listBName').value || 'Liste B';
+  mergeWithCandidates(allA, allB, listAName, listBName);
+}
+
+function mergeWithCandidates(allA, allB, listAName, listBName) {
+  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+  const totalCandidates = allA.length + allB.length;
 
   // Determine ratio from Module 1
   const listAMatch = state.lists.find(l => l.name === listAName);
@@ -1017,26 +1156,22 @@ function mergeLists() {
     if (tot > 0) ratioA = sA / tot;
   }
 
-  // Prepare pools — each candidate gets tagged with origin, keeping original order
+  // Prepare pools
   const poolA = allA.map(c => ({...c, origin: listAName, used: false}));
   const poolB = allB.map(c => ({...c, origin: listBName, used: false}));
 
-  // Phase 1: Build ordered list for totalSeats positions with parity
+  // Phase 1: Build ordered list with parity
   const merged = [];
   const slotsToFill = Math.max(totalSeats, totalCandidates);
 
   for (let pos = 0; pos < slotsToFill; pos++) {
     const needGender = pos % 2 === 0 ? state.headGender : (state.headGender === 'F' ? 'H' : 'F');
     const isTitulaire = pos < totalSeats;
-
-    // How many from A should we have by now?
     const aDone = merged.filter(m => m.origin === listAName).length;
     const aTarget = Math.round(ratioA * (pos + 1));
     const preferA = aDone < aTarget;
 
     let candidate = null;
-
-    // Try preferred pool first with correct gender, then fallback pool, then any gender
     if (preferA) {
       candidate = pickFromPool(poolA, needGender) || pickFromPool(poolB, needGender) || pickFromPool(poolA, null) || pickFromPool(poolB, null);
     } else {
@@ -1053,11 +1188,9 @@ function mergeLists() {
     }
   }
 
-  // Phase 2: Append any remaining unused candidates as suppleants
-  const allPool = [...poolA, ...poolB];
-  const usedIds = new Set(merged.map(m => m.id));
-  allPool.forEach(c => {
-    if (!usedIds.has(c.id)) {
+  // Phase 2: Append any remaining unused as suppleants
+  [...poolA, ...poolB].forEach(c => {
+    if (!c.used) {
       merged.push({
         id: c.id, name: c.name, gender: c.gender,
         origin: c.origin, epci: c.epci,
@@ -1068,8 +1201,6 @@ function mergeLists() {
 
   state.merged = merged;
   state.mergeValidated = false;
-
-  // Integrity check
   checkMergeIntegrity(allA.length, allB.length, listAName, listBName);
   renderMergedList();
   renderDelegationTable();
