@@ -1737,13 +1737,18 @@ function renderPositionDistribution() {
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
 
   if (!state.results.seats || Object.keys(state.results.seats).length === 0) return;
-  const totalSeats = Object.values(state.results.seats).reduce((a, b) => a + b, 0);
+  const coalitionSeats = Object.values(state.results.seats).reduce((a, b) => a + b, 0);
+  // Use CGCT legal council size (from population) as the real full council
+  const cgctCouncil = parseInt(document.getElementById('dispCouncilSize').textContent) || 0;
+  const fullCouncil = cgctCouncil > coalitionSeats ? cgctCouncil : (parseInt(document.getElementById('totalSeats').value) || coalitionSeats);
+  const oppositionSeats = Math.max(0, fullCouncil - coalitionSeats);
 
   let totalAdjTheo = 0, totalAdjAdj = 0, totalDelTheo = 0, totalDelAdj = 0, totalSimple = 0;
 
   for (const name in state.results.seats) {
     const seats = state.results.seats[name];
-    const ratio = totalSeats > 0 ? seats / totalSeats : 0;
+    // Ratio based on coalition seats only (opposition doesn't get posts)
+    const ratio = coalitionSeats > 0 ? seats / coalitionSeats : 0;
     const adjTheo = Math.round(nbAdj * ratio);
     const delTheo = Math.round(nbDel * ratio);
 
@@ -1775,20 +1780,36 @@ function renderPositionDistribution() {
     tbody.appendChild(tr);
   }
 
-  // Totals row
+  // Opposition row (if any)
+  if (oppositionSeats > 0) {
+    const trOpp = document.createElement('tr');
+    trOpp.style.opacity = '0.6';
+    trOpp.style.fontStyle = 'italic';
+    trOpp.innerHTML = `
+      <td>Opposition</td>
+      <td><strong>${oppositionSeats}</strong></td>
+      <td style="text-align:center;">0</td><td style="text-align:center;">0</td><td></td>
+      <td style="text-align:center;">0</td><td style="text-align:center;">0</td><td></td>
+      <td style="text-align:center;">${oppositionSeats}</td>`;
+    tbody.appendChild(trOpp);
+  }
+
+  // Totals row (full council)
+  const grandTotal = coalitionSeats + oppositionSeats;
   const trTot = document.createElement('tr');
-  trTot.innerHTML = `<td><strong>TOTAL</strong></td><td><strong>${totalSeats}</strong></td>
+  trTot.innerHTML = `<td><strong>TOTAL</strong></td><td><strong>${grandTotal}</strong></td>
     <td style="text-align:center;opacity:0.6;">${totalAdjTheo}</td><td style="text-align:center;"><strong>${totalAdjAdj}</strong></td><td></td>
     <td style="text-align:center;opacity:0.6;">${totalDelTheo}</td><td style="text-align:center;"><strong>${totalDelAdj}</strong></td><td></td>
-    <td style="text-align:center;"><strong>${totalSimple}</strong></td>`;
+    <td style="text-align:center;"><strong>${totalSimple + oppositionSeats}</strong></td>`;
   tbody.appendChild(trTot);
 
-  document.getElementById('posDistTotals').innerHTML = `Total ajuste : ${totalAdjAdj} adj + ${totalDelAdj} del + ${totalSimple} simples = ${totalAdjAdj + totalDelAdj + totalSimple}`;
+  document.getElementById('posDistTotals').innerHTML = `Coalition : ${totalAdjAdj} adj + ${totalDelAdj} del + ${totalSimple} simples = ${coalitionSeats}` +
+    (oppositionSeats > 0 ? ` | Opposition : ${oppositionSeats} sieges | Conseil complet : ${grandTotal}` : '');
 
   const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
   const warn = document.getElementById('posDistWarning');
   if (totalAdjAdj > maxAdj) {
-    warn.innerHTML = `<span class="status-error">Attention : ${totalAdjAdj} adjoints depasse le plafond de ${maxAdj} (30% du conseil)</span>`;
+    warn.innerHTML = `<span class="status-error">Attention : ${totalAdjAdj} adjoints depasse le plafond de ${maxAdj} (30% du conseil de ${fullCouncil})</span>`;
   } else { warn.innerHTML = ''; }
 }
 
