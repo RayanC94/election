@@ -169,6 +169,9 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 .integrity-ok { background: #E8F5E9; border: 1px solid var(--vert); color: var(--vert); }
 .integrity-error { background: #FFEBEE; border: 1px solid var(--rouge); color: var(--rouge); }
 
+/* Dashboard */
+#dashboard .card { margin-bottom: 0; }
+
 /* Utility classes */
 .desc { font-size: 12px; color: var(--texte-light); margin-bottom: 12px; }
 .filter-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -189,9 +192,34 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 </head>
 <body>
 
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;">
+  <div class="header" style="justify-content:space-between;">
+    <div class="logo">OAD <span>|</span> Fusions Municipales 2026</div>
+  </div>
+  <div class="content" style="max-width:1000px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div>
+        <h2 style="font-size:1.6em;margin-bottom:4px;">Mes simulations</h2>
+        <p class="desc" style="margin-bottom:0;">Creez et gerez vos simulations de negociation. Chaque simulation est independante.</p>
+      </div>
+      <button class="btn btn-primary" onclick="dashNewSim()" style="font-size:14px;padding:10px 24px;">+ Nouvelle simulation</button>
+    </div>
+    <div id="dashGrid" class="scenario-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));"></div>
+    <div id="dashEmpty" style="text-align:center;padding:60px 20px;color:var(--texte-light);display:none;">
+      <div style="font-size:48px;margin-bottom:16px;">📋</div>
+      <p style="font-size:16px;margin-bottom:8px;">Aucune simulation</p>
+      <p class="desc">Cliquez sur "Nouvelle simulation" pour commencer.</p>
+    </div>
+  </div>
+</div>
+
+<!-- APP (hidden when dashboard is shown) -->
+<div id="app" style="display:none;">
+
 <!-- HEADER -->
 <div class="header">
-  <div class="logo">OAD <span>|</span> Fusions Municipales 2026</div>
+  <div class="logo" style="cursor:pointer;" onclick="goToDashboard()">OAD <span>|</span> Fusions Municipales 2026</div>
   <div class="header-config">
     <div class="field">
       <label>Commune</label>
@@ -215,6 +243,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     </div>
   </div>
   <div class="header-actions">
+    <button onclick="goToDashboard()" style="background:rgba(255,255,255,0.2);font-weight:600;">← Dashboard</button>
     <button onclick="startTimer()">Timer 36h</button>
     <button onclick="exportJSON()">Export JSON</button>
     <button onclick="importJSON()">Import JSON</button>
@@ -642,6 +671,8 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 </div>
 </div>
 
+</div><!-- /app -->
+
 <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="handleJSONImport(event)">
 <input type="file" id="csvFileInput" accept=".csv,.txt" style="display:none;">
 
@@ -728,14 +759,73 @@ let state = {
 function genId() { return 'c_' + (nextCandidateId++) + '_' + Date.now(); }
 
 // =====================================================================
-// INIT
+// DASHBOARD — Multi-simulation management
 // =====================================================================
-function init() {
+let currentSimId = null;
+
+function dashGetIndex() {
+  try { return JSON.parse(localStorage.getItem('oad_sim_index') || '[]'); } catch(e) { return []; }
+}
+function dashSaveIndex(idx) { localStorage.setItem('oad_sim_index', JSON.stringify(idx)); }
+
+function dashRender() {
+  const idx = dashGetIndex();
+  const grid = document.getElementById('dashGrid');
+  const empty = document.getElementById('dashEmpty');
+  if (idx.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = idx.map(sim => {
+    const date = sim.updatedAt ? new Date(sim.updatedAt).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    return `<div class="card" style="cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;border:2px solid transparent;"
+      onmouseenter="this.style.borderColor='var(--bleu)';this.style.transform='translateY(-2px)'"
+      onmouseleave="this.style.borderColor='transparent';this.style.transform='none'"
+      onclick="dashOpen('${esc(sim.id)}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <h2 style="margin-bottom:4px;font-size:1.1em;">${esc(sim.name)}</h2>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm" style="color:var(--texte-light);background:none;border:none;font-size:12px;padding:2px 6px;" onclick="event.stopPropagation();dashRename('${esc(sim.id)}')" title="Renommer">✎</button>
+          <button class="btn btn-sm" style="color:var(--texte-light);background:none;border:none;font-size:12px;padding:2px 6px;" onclick="event.stopPropagation();dashDuplicate('${esc(sim.id)}')" title="Dupliquer">⧉</button>
+          <button class="btn btn-sm" style="color:var(--rouge);background:none;border:none;font-size:16px;padding:2px 6px;" onclick="event.stopPropagation();dashDelete('${esc(sim.id)}')" title="Supprimer">✕</button>
+        </div>
+      </div>
+      <p class="desc" style="margin-bottom:8px;">${esc(sim.city || 'Commune non definie')}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        ${sim.seats ? `<span style="font-size:11px;padding:2px 8px;background:var(--bleu-light);border-radius:4px;font-weight:600;">${sim.seats} sieges</span>` : ''}
+        ${sim.listsCount ? `<span style="font-size:11px;padding:2px 8px;background:rgba(230,126,34,0.1);border-radius:4px;font-weight:600;">${sim.listsCount} listes</span>` : ''}
+        ${sim.mode ? `<span style="font-size:11px;padding:2px 8px;background:rgba(24,117,60,0.1);border-radius:4px;font-weight:600;">${sim.mode === 'avec_prime' ? 'Prime maj.' : 'Proportionnelle'}</span>` : ''}
+      </div>
+      <div style="font-size:11px;color:var(--texte-light);">${date ? 'Modifie le ' + date : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function dashNewSim() {
+  const name = prompt('Nom de la simulation :');
+  if (!name || !name.trim()) return;
+  const id = 'sim_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+  const idx = dashGetIndex();
+  idx.unshift({ id, name: name.trim(), createdAt: Date.now(), updatedAt: Date.now() });
+  dashSaveIndex(idx);
+  // Create empty state for this sim
+  localStorage.setItem('oad_sim_' + id, JSON.stringify({}));
+  dashOpen(id);
+}
+
+function dashOpen(id) {
+  currentSimId = id;
+  // Load sim data into oad_fusion_state
+  const data = localStorage.getItem('oad_sim_' + id);
+  if (data) localStorage.setItem('oad_fusion_state', data);
+  else localStorage.removeItem('oad_fusion_state');
+  // Show app, hide dashboard
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  // Re-init app
+  resetStateToDefaults();
   loadState();
   renderListsTable();
   recalculate();
   populateFusionSelects();
-  // Restore fusion mode radio
   const modeRadio = document.querySelector(`input[name="fusionMode"][value="${state.fusionMode || 'proportionnelle'}"]`);
   if (modeRadio) modeRadio.checked = true;
   onFusionModeChange();
@@ -750,6 +840,106 @@ function init() {
   if (state.timerEnd) startTimerDisplay();
   const memoEl = document.getElementById('memoNotes');
   if (memoEl) memoEl.value = state.memoNotes || '';
+  // Switch to first tab
+  switchTab(0);
+}
+
+function resetStateToDefaults() {
+  nextCandidateId = 1;
+  Object.assign(state, {
+    mode: 'avec_prime', primePercent: 50, headGender: 'F',
+    lists: [{name:'Liste 1',score:0,type:'votes'},{name:'Liste 2',score:0,type:'votes'},{name:'Liste 3',score:0,type:'votes'}],
+    results: {seats:{},ordered:[]}, scenarios: [],
+    listA: {name:'',candidates:[]}, listB: {name:'',candidates:[]},
+    merged: [], mergeValidated: false,
+    delegationAssignments: {}, delegationOverrides: {},
+    positionDist: {}, timerEnd: null, coalitionSeats: 0, coalitionScore: 55,
+    fusionLists: [], fusionMode: 'proportionnelle', fusionOrder: [],
+    fusionHeadGenders: {}, wsSavedSources: {}, memoNotes: '',
+  });
+  wsState.data = []; wsState.customCols = []; wsState.customData = {}; wsState.scenarios = [];
+  wsState.filters = { gender: new Set(), role: new Set(), origin: new Set() };
+}
+
+function goToDashboard() {
+  if (currentSimId) saveStateNow(); // triggers dashSyncSim()
+  currentSimId = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  dashRender();
+}
+
+function dashDelete(id) {
+  if (!confirm('Supprimer cette simulation ?')) return;
+  localStorage.removeItem('oad_sim_' + id);
+  const idx = dashGetIndex().filter(s => s.id !== id);
+  dashSaveIndex(idx);
+  dashRender();
+}
+
+function dashRename(id) {
+  const idx = dashGetIndex();
+  const sim = idx.find(s => s.id === id);
+  if (!sim) return;
+  const name = prompt('Nouveau nom :', sim.name);
+  if (!name || !name.trim()) return;
+  sim.name = name.trim();
+  dashSaveIndex(idx);
+  dashRender();
+}
+
+function dashDuplicate(id) {
+  const idx = dashGetIndex();
+  const sim = idx.find(s => s.id === id);
+  if (!sim) return;
+  const newId = 'sim_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+  const data = localStorage.getItem('oad_sim_' + id);
+  if (data) localStorage.setItem('oad_sim_' + newId, data);
+  idx.unshift({ ...sim, id: newId, name: sim.name + ' (copie)', createdAt: Date.now(), updatedAt: Date.now() });
+  dashSaveIndex(idx);
+  dashRender();
+}
+
+// Sync to sim slot is handled inside _doSaveState via dashSyncSim()
+function dashSyncSim() {
+  if (!currentSimId) return;
+  try {
+    const data = localStorage.getItem('oad_fusion_state');
+    if (data) localStorage.setItem('oad_sim_' + currentSimId, data);
+    const idx = dashGetIndex();
+    const sim = idx.find(s => s.id === currentSimId);
+    if (sim) {
+      sim.updatedAt = Date.now();
+      sim.city = document.getElementById('cityName')?.value || '';
+      sim.seats = document.getElementById('totalSeats')?.value || '';
+      sim.listsCount = state.lists?.length || 0;
+      sim.mode = state.mode;
+      dashSaveIndex(idx);
+    }
+  } catch(e) {}
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+function init() {
+  // Migrate: if old state exists but no sim index, create a sim from it
+  const oldState = localStorage.getItem('oad_fusion_state');
+  const idx = dashGetIndex();
+  if (oldState && idx.length === 0) {
+    try {
+      const s = JSON.parse(oldState);
+      const id = 'sim_migrated_' + Date.now();
+      const name = s.cityName || 'Ma simulation';
+      idx.push({ id, name, createdAt: Date.now(), updatedAt: Date.now(), city: s.cityName || '', seats: s.totalSeats || '', listsCount: s.lists?.length || 0, mode: s.mode || 'avec_prime' });
+      dashSaveIndex(idx);
+      localStorage.setItem('oad_sim_' + id, oldState);
+    } catch(e) {}
+  }
+  // Show dashboard
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('app').style.display = 'none';
+  dashRender();
 }
 
 // =====================================================================
@@ -1522,9 +1712,9 @@ function renderDelegationTable() {
   else if (sortVal === 'unassigned') items.sort((a, b) => (a.assignedId ? 1 : 0) - (b.assignedId ? 1 : 0));
 
   items.forEach(d => {
-    const loadBg = { heavy: '#E1000F', medium: '#E67E22', light: '#18753C' };
-    const typeBg = { adjoint: '#18753C', delegue: '#E67E22' };
-    const detachBg = { non_negociable: '#18753C', negociable: '#E67E22', non_requis: '#E1000F' };
+    const loadStyles = { heavy: {color:'var(--rouge)',bg:'rgba(225,0,15,0.08)'}, medium: {color:'var(--orange)',bg:'rgba(230,126,34,0.08)'}, light: {color:'var(--vert)',bg:'rgba(24,117,60,0.08)'} };
+    const typeStyles = { adjoint: {color:'var(--vert)',bg:'rgba(24,117,60,0.08)'}, delegue: {color:'var(--orange)',bg:'rgba(230,126,34,0.08)'} };
+    const detachStyles = { non_negociable: {color:'var(--vert)',bg:'rgba(24,117,60,0.08)'}, negociable: {color:'var(--orange)',bg:'rgba(230,126,34,0.08)'}, non_requis: {color:'var(--rouge)',bg:'rgba(225,0,15,0.08)'} };
 
     let opts = '<option value="">--</option>';
     allCandidates.forEach(c => {
@@ -1543,21 +1733,21 @@ function renderDelegationTable() {
     if (d.assignedId) tr.style.background = 'rgba(24,117,60,0.05)';
     tr.innerHTML = `
       <td><textarea onchange="updateDelField('${d.id}','label',this.value)" style="width:100%;min-height:28px;border:1px solid var(--gris-border);border-radius:4px;padding:4px 6px;font-size:12px;font-weight:600;resize:vertical;font-family:inherit;">${esc(displayLabel)}</textarea></td>
-      <td><select onchange="updateDelegation('${d.id}','type',this.value)" style="width:90px;background:${typeBg[d.assignedType] || '#18753C'};color:#fff;border:none;border-radius:4px;padding:4px 6px;font-weight:600;">
-        <option value="adjoint" ${d.assignedType==='adjoint'?'selected':''} style="background:#fff;color:#000;">Adjoint</option>
-        <option value="delegue" ${d.assignedType==='delegue'?'selected':''} style="background:#fff;color:#000;">Delegue</option>
+      <td><select onchange="updateDelegation('${d.id}','type',this.value)" style="padding:2px 4px;border:2px solid ${(typeStyles[d.assignedType]||typeStyles.adjoint).color};border-radius:6px;background:${(typeStyles[d.assignedType]||typeStyles.adjoint).bg};color:${(typeStyles[d.assignedType]||typeStyles.adjoint).color};font-weight:600;font-size:11px;">
+        <option value="adjoint" ${d.assignedType==='adjoint'?'selected':''}>Adjoint</option>
+        <option value="delegue" ${d.assignedType==='delegue'?'selected':''}>Delegue</option>
       </select></td>
-      <td><select onchange="updateDelField('${d.id}','timeLoad',this.value)" style="width:100px;background:${loadBg[d.timeLoad] || '#666'};color:#fff;border:none;border-radius:4px;padding:4px 6px;font-weight:600;">
-        <option value="heavy" ${d.timeLoad==='heavy'?'selected':''} style="background:#fff;color:#000;">Lourde</option>
-        <option value="medium" ${d.timeLoad==='medium'?'selected':''} style="background:#fff;color:#000;">Moyenne</option>
-        <option value="light" ${d.timeLoad==='light'?'selected':''} style="background:#fff;color:#000;">Legere</option>
+      <td><select onchange="updateDelField('${d.id}','timeLoad',this.value)" style="padding:2px 4px;border:2px solid ${(loadStyles[d.timeLoad]||loadStyles.medium).color};border-radius:6px;background:${(loadStyles[d.timeLoad]||loadStyles.medium).bg};color:${(loadStyles[d.timeLoad]||loadStyles.medium).color};font-weight:600;font-size:11px;">
+        <option value="heavy" ${d.timeLoad==='heavy'?'selected':''}>Lourde</option>
+        <option value="medium" ${d.timeLoad==='medium'?'selected':''}>Moyenne</option>
+        <option value="light" ${d.timeLoad==='light'?'selected':''}>Legere</option>
       </select></td>
       <td><input type="number" value="${d.hoursPerWeek}" min="0" max="40" style="width:50px;" onchange="updateDelField('${d.id}','hoursPerWeek',parseInt(this.value)||0)"></td>
       <td><select onchange="updateDelegation('${d.id}','candidateId',this.value)" style="width:200px;">${opts}</select></td>
-      <td><select onchange="updateDelField('${d.id}','detachment',this.value)" style="width:130px;background:${detachBg[detachVal] || '#666'};color:#fff;border:none;border-radius:4px;padding:4px 6px;font-weight:600;">
-        <option value="non_negociable" ${detachVal==='non_negociable'?'selected':''} style="background:#fff;color:#000;">Non negociable</option>
-        <option value="negociable" ${detachVal==='negociable'?'selected':''} style="background:#fff;color:#000;">Negociable</option>
-        <option value="non_requis" ${detachVal==='non_requis'?'selected':''} style="background:#fff;color:#000;">Non requis</option>
+      <td><select onchange="updateDelField('${d.id}','detachment',this.value)" style="padding:2px 4px;border:2px solid ${(detachStyles[detachVal]||detachStyles.non_requis).color};border-radius:6px;background:${(detachStyles[detachVal]||detachStyles.non_requis).bg};color:${(detachStyles[detachVal]||detachStyles.non_requis).color};font-weight:600;font-size:11px;">
+        <option value="non_negociable" ${detachVal==='non_negociable'?'selected':''}>Non negociable</option>
+        <option value="negociable" ${detachVal==='negociable'?'selected':''}>Negociable</option>
+        <option value="non_requis" ${detachVal==='non_requis'?'selected':''}>Non requis</option>
       </select></td>`;
     tbody.appendChild(tr);
   });
@@ -1747,6 +1937,7 @@ function _doSaveState() {
       wsCustomData: wsState.customData,
       wsScenarios: wsState.scenarios,
     }));
+    dashSyncSim();
   } catch (e) {}
 }
 
