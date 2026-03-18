@@ -18,6 +18,7 @@
   --orange: #E67E22;
   --rose: #FF69B4;
   --bleu-genre: #4169E1;
+  --bleu-light: rgba(106, 106, 244, 0.1);
   --shadow: 0 2px 8px rgba(0,0,0,0.08);
   --radius: 8px;
 }
@@ -111,7 +112,7 @@ tr.drag-over { border-top: 2px solid var(--bleu); }
 
 .nego-summary { background: #f0f4ff; border: 1px solid var(--bleu-clair); border-radius: var(--radius); padding: 16px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
 
-.table-scroll { overflow-x: auto; max-height: 500px; overflow-y: auto; }
+.table-scroll { overflow-x: auto; max-height: 600px; overflow-y: auto; }
 
 .mode-toggle { display: flex; border: 2px solid var(--bleu); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
 .mode-toggle button { flex: 1; padding: 8px 12px; border: none; background: var(--blanc); color: var(--bleu); font-weight: 600; }
@@ -167,6 +168,16 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 .integrity-banner { padding: 10px; border-radius: var(--radius); margin: 8px 0; font-size: 13px; }
 .integrity-ok { background: #E8F5E9; border: 1px solid var(--vert); color: var(--vert); }
 .integrity-error { background: #FFEBEE; border: 1px solid var(--rouge); color: var(--rouge); }
+
+/* Utility classes */
+.desc { font-size: 12px; color: var(--texte-light); margin-bottom: 12px; }
+.filter-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.sort-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.bar-label { font-size: 12px; font-weight: 600; }
+.btn-filter { border-width: 2px; border-style: solid; background: transparent; font-size: 11px; }
+.bar-sep { display: inline-block; width: 1px; height: 20px; background: var(--gris-border); margin: 0 2px; vertical-align: middle; }
+.memo-content { font-size: 12px; line-height: 1.7; }
+.memo-tip { margin-top: 8px; padding: 8px; background: var(--bleu-light); border-radius: 6px; }
 
 @media print {
   .header, .tabs, .btn, .btn-group, .header-actions, .timer-bar { display: none !important; }
@@ -258,10 +269,10 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
           <button class="btn btn-primary btn-sm" onclick="addList()">+ Ajouter une liste</button>
           <button class="btn btn-outline btn-sm" onclick="recalculate()">Recalculer</button>
         </div>
-        <p style="font-size:11px;color:var(--texte-light);margin-top:6px;">Seuils : 10% pour se maintenir, 5% pour fusionner</p>
+        <p class="desc" style="margin-top:6px;margin-bottom:0;">Seuils : 10% pour se maintenir, 5% pour fusionner</p>
       </div>
       <div class="card">
-        <h3>Score minimum pour +1 siege</h3>
+        <h2>Score minimum pour +1 siege</h2>
         <div class="table-scroll">
           <table><thead><tr><th>Liste</th><th>Sieges actuels</th><th>Score pour +1</th><th>Score pour +2</th></tr></thead>
             <tbody id="minScoreBody"></tbody>
@@ -269,7 +280,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         </div>
       </div>
       <div class="card">
-        <h3>Score 2nd tour & sieges coalition</h3>
+        <h2>Score 2nd tour & sieges coalition</h2>
         <div style="margin-bottom:8px;">
           <label>Score de votre coalition au 2nd tour (%)</label>
           <input type="number" id="coalitionScore" value="55" min="0" max="100" step="0.1" style="width:100px;" oninput="calcCoalitionSeats()">
@@ -340,7 +351,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
   <!-- Configuration de la fusion -->
   <div class="card">
     <h2>Fusion des listes</h2>
-    <p style="font-size:12px;color:var(--texte-light);margin-bottom:12px;">Cochez les listes a fusionner. La repartition est calculee sur les <strong id="fusionCoalitionLabel">0</strong> sieges de la coalition (Module 1).</p>
+    <p class="desc">Cochez les listes a fusionner. La repartition est calculee sur les <strong id="fusionCoalitionLabel">0</strong> sieges de la coalition (Module 1).</p>
     <!-- Checkboxes des listes + sexe tête de liste -->
     <div id="fusionListChecks" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;"></div>
     <!-- Scores résumé -->
@@ -390,11 +401,11 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 <div class="module" id="module3">
   <div class="card">
     <h2>Espace de travail politique</h2>
-    <p style="font-size:12px;color:var(--texte-light);margin-bottom:12px;">Selectionnez une liste pour analyser et preparer votre strategie de negociation. Ajoutez des colonnes personnalisees, filtrez, triez, et simulez les postes.</p>
+    <p class="desc">Selectionnez une liste pour analyser et preparer votre strategie de negociation. Ajoutez des colonnes personnalisees, filtrez, triez, et simulez les postes.</p>
 
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+    <div class="filter-bar" style="gap:8px;margin-bottom:12px;">
       <div>
-        <label style="font-size:12px;font-weight:600;">Source :</label>
+        <label class="bar-label">Source :</label>
         <select id="ws-source" onchange="wsLoadSource()" style="padding:6px 10px;border:1px solid var(--gris-border);border-radius:4px;min-width:200px;">
           <option value="">— Choisir —</option>
           <option value="current" selected>Liste active</option>
@@ -413,25 +424,25 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     </div>
 
     <!-- Workspace filters -->
-    <div style="display:flex;gap:4px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-size:12px;font-weight:600;">Filtres :</span>
-      <button class="btn btn-sm ws-filter" data-group="gender" data-val="F" onclick="wsToggleFilter(this)" style="border:2px solid var(--rose);color:var(--rose);background:transparent;">F</button>
-      <button class="btn btn-sm ws-filter" data-group="gender" data-val="H" onclick="wsToggleFilter(this)" style="border:2px solid var(--bleu-genre);color:var(--bleu-genre);background:transparent;">H</button>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
-      <button class="btn btn-sm ws-filter" data-group="role" data-val="maire" onclick="wsToggleFilter(this)" style="border:2px solid var(--bleu);color:var(--bleu);background:transparent;">Maire</button>
-      <button class="btn btn-sm ws-filter" data-group="role" data-val="adjoint" onclick="wsToggleFilter(this)" style="border:2px solid var(--vert);color:var(--vert);background:transparent;">Adj</button>
-      <button class="btn btn-sm ws-filter" data-group="role" data-val="delegue" onclick="wsToggleFilter(this)" style="border:2px solid var(--orange);color:var(--orange);background:transparent;">Del</button>
-      <button class="btn btn-sm ws-filter" data-group="role" data-val="simple" onclick="wsToggleFilter(this)" style="border:2px solid var(--texte-light);color:var(--texte-light);background:transparent;">Cons</button>
-      <button class="btn btn-sm ws-filter" data-group="role" data-val="suppleant" onclick="wsToggleFilter(this)" style="border:2px solid #999;color:#999;background:transparent;">Supp</button>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
+    <div class="filter-bar">
+      <span class="bar-label">Filtres :</span>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="gender" data-val="F" onclick="wsToggleFilter(this)" style="border-color:var(--rose);color:var(--rose);">F</button>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="gender" data-val="H" onclick="wsToggleFilter(this)" style="border-color:var(--bleu-genre);color:var(--bleu-genre);">H</button>
+      <span class="bar-sep"></span>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="role" data-val="maire" onclick="wsToggleFilter(this)" style="border-color:var(--bleu);color:var(--bleu);">Maire</button>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="role" data-val="adjoint" onclick="wsToggleFilter(this)" style="border-color:var(--vert);color:var(--vert);">Adj</button>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="role" data-val="delegue" onclick="wsToggleFilter(this)" style="border-color:var(--orange);color:var(--orange);">Del</button>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="role" data-val="simple" onclick="wsToggleFilter(this)" style="border-color:var(--texte-light);color:var(--texte-light);">Cons</button>
+      <button class="btn btn-sm btn-filter ws-filter" data-group="role" data-val="suppleant" onclick="wsToggleFilter(this)" style="border-color:#999;color:#999;">Supp</button>
+      <span class="bar-sep"></span>
       <span id="ws-filter-origin-btns"></span>
-      <button class="btn btn-sm btn-outline" onclick="wsClearFilters()" style="font-size:11px;">Reinitialiser</button>
-      <span style="margin-left:auto;font-size:12px;font-weight:600;" id="ws-filter-count"></span>
+      <button class="btn btn-sm btn-outline" onclick="wsClearFilters()">Reinitialiser</button>
+      <span style="margin-left:auto;" class="bar-label" id="ws-filter-count"></span>
     </div>
 
     <!-- Sort -->
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-      <span style="font-size:12px;font-weight:600;">Trier par :</span>
+    <div class="sort-bar">
+      <span class="bar-label">Trier par :</span>
       <select id="ws-sort" onchange="wsRender()" style="padding:4px 8px;border:1px solid var(--gris-border);border-radius:4px;">
         <option value="position">Position</option>
         <option value="name">Nom</option>
@@ -439,7 +450,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         <option value="origin">Origine</option>
         <option value="elig">Role</option>
       </select>
-      <button class="btn btn-sm btn-outline" id="ws-sort-dir" onclick="wsToggleSortDir()" style="font-size:11px;">↑ Asc</button>
+      <button class="btn btn-sm btn-outline" id="ws-sort-dir" onclick="wsToggleSortDir()">↑ Asc</button>
     </div>
 
     <!-- Simulation bar -->
@@ -449,7 +460,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     </div>
 
     <!-- Main table -->
-    <div class="table-scroll" style="max-height:600px;">
+    <div class="table-scroll">
       <table id="ws-table">
         <thead><tr id="ws-thead"></tr></thead>
         <tbody id="ws-tbody"></tbody>
@@ -461,7 +472,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
   <!-- Scenario cards -->
   <div class="card">
     <h2>Scenarios de negociation</h2>
-    <p style="font-size:12px;color:var(--texte-light);margin-bottom:8px;">Comparez differentes hypotheses de repartition des postes pour votre liste.</p>
+    <p class="desc">Comparez differentes hypotheses de repartition des postes pour votre liste.</p>
     <div class="btn-group">
       <button class="btn btn-sm btn-primary" onclick="wsAddScenario()">+ Scenario</button>
     </div>
@@ -474,25 +485,25 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
   <!-- Attribution des délégations — pleine largeur avec filtres -->
   <div class="card">
     <h2>Attribution des delegations</h2>
-    <p style="font-size:12px;color:var(--texte-light);margin-bottom:12px;">Attribuez les delegations aux elus. Importez vos candidats via CSV dans l'Espace Politique pour les voir apparaitre ici.</p>
+    <p class="desc">Attribuez les delegations aux elus. Importez vos candidats via CSV dans l'Espace Politique pour les voir apparaitre ici.</p>
 
     <!-- Filtres -->
-    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
-      <span style="font-size:12px;font-weight:600;">Filtres :</span>
-      <button class="btn btn-sm del-filter" data-group="load" data-val="heavy" onclick="delToggleFilter(this)" style="border:2px solid var(--rouge);color:var(--rouge);background:transparent;font-size:11px;">Lourde</button>
-      <button class="btn btn-sm del-filter" data-group="load" data-val="medium" onclick="delToggleFilter(this)" style="border:2px solid var(--orange);color:var(--orange);background:transparent;font-size:11px;">Moyenne</button>
-      <button class="btn btn-sm del-filter" data-group="load" data-val="light" onclick="delToggleFilter(this)" style="border:2px solid var(--vert);color:var(--vert);background:transparent;font-size:11px;">Legere</button>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
-      <button class="btn btn-sm del-filter" data-group="assigned" data-val="yes" onclick="delToggleFilter(this)" style="border:2px solid var(--bleu);color:var(--bleu);background:transparent;font-size:11px;">Attribue</button>
-      <button class="btn btn-sm del-filter" data-group="assigned" data-val="no" onclick="delToggleFilter(this)" style="border:2px solid #999;color:#999;background:transparent;font-size:11px;">Non attribue</button>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
-      <button class="btn btn-sm btn-outline" onclick="delClearFilters()" style="font-size:11px;">Reinitialiser</button>
-      <span style="margin-left:auto;font-size:12px;font-weight:600;" id="del-filter-count"></span>
+    <div class="filter-bar">
+      <span class="bar-label">Filtres :</span>
+      <button class="btn btn-sm btn-filter del-filter" data-group="load" data-val="heavy" onclick="delToggleFilter(this)" style="border-color:var(--rouge);color:var(--rouge);">Lourde</button>
+      <button class="btn btn-sm btn-filter del-filter" data-group="load" data-val="medium" onclick="delToggleFilter(this)" style="border-color:var(--orange);color:var(--orange);">Moyenne</button>
+      <button class="btn btn-sm btn-filter del-filter" data-group="load" data-val="light" onclick="delToggleFilter(this)" style="border-color:var(--vert);color:var(--vert);">Legere</button>
+      <span class="bar-sep"></span>
+      <button class="btn btn-sm btn-filter del-filter" data-group="assigned" data-val="yes" onclick="delToggleFilter(this)" style="border-color:var(--bleu);color:var(--bleu);">Attribue</button>
+      <button class="btn btn-sm btn-filter del-filter" data-group="assigned" data-val="no" onclick="delToggleFilter(this)" style="border-color:#999;color:#999;">Non attribue</button>
+      <span class="bar-sep"></span>
+      <button class="btn btn-sm btn-outline" onclick="delClearFilters()">Reinitialiser</button>
+      <span style="margin-left:auto;" class="bar-label" id="del-filter-count"></span>
     </div>
 
     <!-- Tri -->
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-      <span style="font-size:12px;font-weight:600;">Trier par :</span>
+    <div class="sort-bar">
+      <span class="bar-label">Trier par :</span>
       <select id="del-sort" onchange="renderDelegationTable()" style="padding:4px 8px;border:1px solid var(--gris-border);border-radius:4px;font-size:12px;">
         <option value="default">Ordre par defaut</option>
         <option value="charge_desc">Charge (lourde d'abord)</option>
@@ -506,7 +517,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     <!-- Stats rapides -->
     <div id="del-stats" style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap;"></div>
 
-    <div class="table-scroll" style="max-height:600px;">
+    <div class="table-scroll">
       <table>
         <thead><tr><th>Delegation</th><th>Type poste</th><th>Charge</th><th>h/sem</th><th>Attribue a</th><th>Detachement</th></tr></thead>
         <tbody id="delegationBody"></tbody>
@@ -521,7 +532,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
   <div class="grid-2">
     <div>
       <div class="card">
-        <h3>Conformite legale</h3>
+        <h2>Conformite legale</h2>
         <ul class="checklist" id="checklist"></ul>
       </div>
     </div>
@@ -544,11 +555,11 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     <div>
       <div class="card">
         <h2>Conseil territorial (EPT / Metropole)</h2>
-        <div style="font-size:13px;line-height:1.7;">
+        <div class="memo-content">
           <p><strong>Le maire siege d'office</strong> au conseil territorial — il n'y a pas besoin de negocier ce poste.</p>
           <p><strong>En cas de defaite :</strong> l'opposition n'obtient qu'<strong>1 seul siege</strong> au territoire, et c'est <strong>le maire qui designe</strong> qui l'occupe.</p>
           <p><strong>Le 1er poste de delegue au territoire est le seul remunere.</strong> Les autres postes n'apportent qu'<strong>1 voix pour elire le president du territoire</strong> — ce qui reste strategiquement important.</p>
-          <p style="margin-top:8px;padding:8px;background:var(--bleu-light);border-radius:6px;">
+          <p class="memo-tip">
             <strong>Point de negociation :</strong> Le nombre de sieges au territoire est proportionnel aux resultats. Concentrez-vous sur le 1er poste delegue (remunere) et sur le nombre total de voix pour peser dans l'election du president.
           </p>
         </div>
@@ -556,11 +567,11 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 
       <div class="card">
         <h2>Repartition Adjoints / Delegues</h2>
-        <div style="font-size:13px;line-height:1.7;">
+        <div class="memo-content">
           <p><strong>Adjoints :</strong> Nommes par arrete du maire. Plafond legal = 30% de l'effectif du conseil. Ils ont une <strong>delegation de fonction</strong> (signature, decisions) et percoivent une <strong>indemnite</strong>.</p>
           <p><strong>Delegues :</strong> Conseillers municipaux avec une delegation thematique. Pas d'indemnite specifique sauf si prevue. Leur delegation est <strong>revocable</strong> par le maire.</p>
           <p><strong>Conseillers simples :</strong> Pas de delegation, mais participent aux votes et commissions. Un poste de simple conseiller n'a pas de valeur de negociation forte.</p>
-          <p style="margin-top:8px;padding:8px;background:var(--bleu-light);border-radius:6px;">
+          <p class="memo-tip">
             <strong>Strategie :</strong> Negociez le maximum de postes d'adjoints — ce sont les seuls qui donnent un vrai pouvoir executif et une remuneration. Un poste de delegue sans moyen budgetaire est souvent symbolique.
           </p>
         </div>
@@ -569,7 +580,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
     <div>
       <div class="card">
         <h2>Delegations strategiques (position de force)</h2>
-        <div style="font-size:13px;line-height:1.7;">
+        <div class="memo-content">
           <p>Certaines delegations conferent un <strong>pouvoir reel</strong> et une visibilite politique :</p>
           <ul style="margin:8px 0;padding-left:20px;">
             <li><strong>Finances / Budget</strong> — Controle des arbitrages budgetaires. Position cle.</li>
@@ -579,7 +590,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
             <li><strong>Education / Petite enfance</strong> — Budget important, contact direct citoyens.</li>
             <li><strong>Travaux / Voirie</strong> — Budget d'investissement, impact visible sur le terrain.</li>
           </ul>
-          <p style="padding:8px;background:var(--bleu-light);border-radius:6px;">
+          <p class="memo-tip">
             <strong>A retenir :</strong> Une delegation "lourde" avec un vrai budget vaut plus que trois delegations legeres. Privilegiez la qualite a la quantite.
           </p>
         </div>
@@ -587,7 +598,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 
       <div class="card">
         <h2>Delegations d'ancrage local</h2>
-        <div style="font-size:13px;line-height:1.7;">
+        <div class="memo-content">
           <p>Ces delegations renforcent le <strong>lien avec les habitants</strong> et preparent l'avenir electoral :</p>
           <ul style="margin:8px 0;padding-left:20px;">
             <li><strong>Vie associative</strong> — Contact avec le tissu associatif, subventions.</li>
@@ -603,7 +614,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 
   <div class="card" style="background:linear-gradient(135deg,#000091 0%,#6A6AF4 100%);color:#fff;">
     <h2 style="color:#fff;">Conseils pour un conseil reussi</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13px;line-height:1.7;">
+    <div class="memo-content" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;">
       <div>
         <h3 style="color:#fff;margin-bottom:4px;">Prenez votre temps</h3>
         <p>Ne vous precipitez pas. Chaque concession doit etre murie. Celui qui signe trop vite regrette toujours.</p>
@@ -625,8 +636,8 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 
   <div class="card">
     <h2>Notes personnelles</h2>
-    <p style="font-size:12px;color:var(--texte-light);margin-bottom:8px;">Espace libre pour vos notes de negociation. Sauvegarde automatique.</p>
-    <textarea id="memoNotes" style="width:100%;min-height:200px;padding:12px;border:1px solid var(--gris-border);border-radius:6px;font-family:inherit;font-size:13px;line-height:1.6;resize:vertical;" placeholder="Notez ici vos observations, vos lignes rouges, les concessions acceptables, les points a ne pas lacher..." oninput="state.memoNotes=this.value;saveState();"></textarea>
+    <p class="desc">Espace libre pour vos notes de negociation. Sauvegarde automatique.</p>
+    <textarea id="memoNotes" style="width:100%;min-height:200px;padding:12px;border:1px solid var(--gris-border);border-radius:6px;font-family:inherit;font-size:12px;line-height:1.6;resize:vertical;" placeholder="Notez ici vos observations, vos lignes rouges, les concessions acceptables, les points a ne pas lacher..." oninput="state.memoNotes=this.value;saveState();"></textarea>
   </div>
 </div>
 </div>
@@ -1966,10 +1977,10 @@ function wsBuildOriginBtns() {
   origins.forEach((name, ci) => {
     const color = colors[ci % colors.length];
     const btn = document.createElement('button');
-    btn.className = 'btn btn-sm ws-filter';
+    btn.className = 'btn btn-sm btn-filter ws-filter';
     btn.dataset.group = 'origin'; btn.dataset.val = name;
     btn.onclick = () => wsToggleFilter(btn);
-    btn.style.cssText = `border:2px solid ${color};color:${color};background:transparent;font-size:11px;`;
+    btn.style.cssText = `border-color:${color};color:${color};`;
     btn.textContent = name;
     container.appendChild(btn);
   });
