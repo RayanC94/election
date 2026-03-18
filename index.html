@@ -6,7 +6,7 @@
 <title>OAD - Outil d'Aide à la Décision | Fusions Municipales 2026</title>
 <style>
 :root {
-  --bleu: #000091;
+  --bleu: #590063;
   --bleu-clair: #6a6af4;
   --rouge: #E1000F;
   --gris-bg: #F5F5F5;
@@ -143,6 +143,26 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 .ecart-small { color: var(--orange); }
 .ecart-big { color: var(--rouge); font-weight: 700; }
 
+/* Fusion visuelle — barres colorées */
+.fusion-container { max-height: 600px; overflow-y: auto; border: 1px solid var(--gris-border); border-radius: var(--radius); }
+.fusion-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-bottom: 1px solid #eee; cursor: grab; transition: background 0.15s; user-select: none; }
+.fusion-row:last-child { border-bottom: none; }
+.fusion-row:hover { background: #eef2ff; }
+.fusion-row.dragging { opacity: 0.3; }
+.fusion-row.drag-over { border-top: 3px solid var(--bleu); padding-top: 2px; }
+.fusion-row.suppleant { opacity: 0.5; background: #f5f5f5; }
+.fusion-pos { width: 32px; text-align: center; font-weight: 700; font-size: 13px; color: var(--texte); flex-shrink: 0; }
+.fusion-bar { height: 36px; border-radius: 6px; flex: 1; display: flex; align-items: center; padding: 0 14px; color: var(--blanc); font-weight: 600; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.25); min-width: 80px; transition: transform 0.1s; }
+.fusion-bar:active { transform: scale(0.98); }
+.fusion-badge { font-size: 11px; font-weight: 700; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.fusion-badge-f { background: var(--rose); color: #fff; }
+.fusion-badge-h { background: var(--bleu-genre); color: #fff; }
+.fusion-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 12px; }
+.fusion-stat { background: #f8f9fa; border-radius: var(--radius); padding: 10px; text-align: center; }
+.fusion-stat .val { font-size: 22px; font-weight: 700; color: var(--bleu); }
+.fusion-stat .lbl { font-size: 11px; color: var(--texte-light); margin-top: 2px; }
+.fusion-separator { padding: 8px 10px; font-size: 12px; font-weight: 600; color: var(--texte-light); background: #f0f0f0; border-bottom: 1px solid #ddd; }
+
 /* Integrity banner */
 .integrity-banner { padding: 10px; border-radius: var(--radius); margin: 8px 0; font-size: 13px; }
 .integrity-ok { background: #E8F5E9; border: 1px solid var(--vert); color: var(--vert); }
@@ -196,8 +216,8 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab(0)">1. Calculatrice Electorale</button>
-  <button class="tab" onclick="switchTab(1)">2. Editeur de Liste & Parite</button>
-  <button class="tab" onclick="switchTab(2)">3. Matrice de Negociation</button>
+  <button class="tab" onclick="switchTab(1)">2. Fusion Visuelle</button>
+  <button class="tab" onclick="switchTab(2)">3. Postes & Delegations</button>
   <button class="tab" onclick="switchTab(3)">4. Espace Politique</button>
 </div>
 
@@ -218,7 +238,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
           <input type="range" id="primeSlider" min="0" max="50" value="50" style="width:100%;" oninput="onPrimeChange()">
         </div>
         <div style="margin-bottom:12px;">
-          <label>Sexe tete de liste du 2d tour : </label>
+          <label>Sexe tête de liste du 2d tour : </label>
           <select id="headGender" onchange="recalculate()">
             <option value="F">Femme</option>
             <option value="H">Homme</option>
@@ -248,12 +268,12 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         </div>
       </div>
       <div class="card">
-        <h3>Simulateur de perte (opposition)</h3>
+        <h3>Score 2nd tour & sieges coalition</h3>
         <div style="margin-bottom:8px;">
-          <label>Score projete du vainqueur au 2nd tour (%)</label>
-          <input type="number" id="lossWinnerScore" value="55" min="0" max="100" step="0.1" style="width:100px;" oninput="simulateLoss()">
+          <label>Score de votre coalition au 2nd tour (%)</label>
+          <input type="number" id="coalitionScore" value="55" min="0" max="100" step="0.1" style="width:100px;" oninput="calcCoalitionSeats()">
         </div>
-        <div id="lossResult" class="card alert-orange" style="display:none;"></div>
+        <div id="coalitionResult" class="card alert-green" style="display:none;"></div>
       </div>
     </div>
     <div>
@@ -267,173 +287,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         </div>
       </div>
       <div class="card">
-        <h3>Liste ordonnee - Conseil Municipal</h3>
-        <div class="table-scroll" style="max-height:400px;">
-          <table><thead><tr><th>Pos.</th><th>Liste d'origine</th><th>Sexe requis</th><th>Zone EPCI</th></tr></thead>
-            <tbody id="orderedMunicipal"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Comparaison de scenarios</h3>
-        <div class="btn-group">
-          <button class="btn btn-outline btn-sm" onclick="saveScenario()">Sauvegarder ce scenario</button>
-          <button class="btn btn-sm btn-danger" onclick="clearScenarios()">Effacer tous</button>
-        </div>
-        <div class="scenario-grid" id="scenarioGrid"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== MODULE 2 ==================== -->
-<div class="module" id="module2">
-  <div class="grid-2">
-    <div class="card">
-      <h2>Liste A (hote)</h2>
-      <input type="text" id="listAName" placeholder="Nom de la liste A" style="width:100%;padding:6px;margin-bottom:8px;border:1px solid var(--gris-border);border-radius:4px;" oninput="saveState()">
-      <div class="btn-group">
-        <button class="btn btn-outline btn-sm" onclick="importCSV('A')">Importer CSV</button>
-        <button class="btn btn-primary btn-sm" onclick="addCandidate('A')">+ Candidat</button>
-      </div>
-      <div class="table-scroll" style="max-height:350px;">
-        <table><thead><tr><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
-          <tbody id="listABody"></tbody>
-        </table>
-      </div>
-      <div id="listAStats" style="font-size:12px;margin-top:6px;"></div>
-    </div>
-    <div class="card">
-      <h2>Liste B (fusion)</h2>
-      <input type="text" id="listBName" placeholder="Nom de la liste B" style="width:100%;padding:6px;margin-bottom:8px;border:1px solid var(--gris-border);border-radius:4px;" oninput="saveState()">
-      <div class="btn-group">
-        <button class="btn btn-outline btn-sm" onclick="importCSV('B')">Importer CSV</button>
-        <button class="btn btn-primary btn-sm" onclick="addCandidate('B')">+ Candidat</button>
-      </div>
-      <div class="table-scroll" style="max-height:350px;">
-        <table><thead><tr><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th><th></th></tr></thead>
-          <tbody id="listBBody"></tbody>
-        </table>
-      </div>
-      <div id="listBStats" style="font-size:12px;margin-top:6px;"></div>
-    </div>
-  </div>
-
-  <!-- Selection panel for manual merge -->
-  <div class="card" id="selectionPanel" style="display:none;">
-    <h2>Selection des candidats pour la fusion</h2>
-    <p style="font-size:12px;color:var(--texte-light);margin-bottom:8px;">Cochez les candidats a inclure dans la liste fusionnee. Decochez ceux que vous ne souhaitez pas retenir.</p>
-    <div class="btn-group">
-      <button class="btn btn-sm btn-outline" onclick="selectAllCandidates(true)">Tout selectionner</button>
-      <button class="btn btn-sm btn-outline" onclick="selectAllCandidates(false)">Tout deselectionner</button>
-      <button class="btn btn-sm btn-primary" onclick="mergeFromSelection()">Fusionner la selection</button>
-      <button class="btn btn-sm btn-danger" onclick="closeSelectionPanel()">Annuler</button>
-    </div>
-    <div id="selectionStats" style="font-size:12px;margin:6px 0;font-weight:600;"></div>
-    <div class="grid-2">
-      <div>
-        <h3 id="selPanelATitle">Liste A</h3>
-        <div class="table-scroll" style="max-height:400px;">
-          <table><thead><tr><th style="width:30px;"><input type="checkbox" checked onchange="toggleListSelection('A',this.checked)"></th><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th></tr></thead>
-            <tbody id="selectionBodyA"></tbody>
-          </table>
-        </div>
-      </div>
-      <div>
-        <h3 id="selPanelBTitle">Liste B</h3>
-        <div class="table-scroll" style="max-height:400px;">
-          <table><thead><tr><th style="width:30px;"><input type="checkbox" checked onchange="toggleListSelection('B',this.checked)"></th><th>#</th><th>Nom Prenom</th><th>Sexe</th><th>EPCI</th></tr></thead>
-            <tbody id="selectionBodyB"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Merged result -->
-  <div class="card">
-    <h2>Liste fusionnee</h2>
-    <div class="btn-group">
-      <button class="btn btn-primary btn-sm" onclick="openSelectionPanel()">Preparer la fusion (selection manuelle)</button>
-      <button class="btn btn-outline btn-sm" onclick="mergeLists()">Fusionner tout (auto)</button>
-      <button class="btn btn-outline btn-sm" onclick="autoFixParity()">Auto-corriger parite</button>
-      <button class="btn btn-outline btn-sm" onclick="validateMerge()">Valider la fusion</button>
-    </div>
-    <div id="parityStatus" style="margin-bottom:4px;"></div>
-    <div id="integrityBanner"></div>
-    <!-- Cumulative Filters -->
-    <div style="display:flex;gap:4px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-size:12px;font-weight:600;">Genre :</span>
-      <button class="btn btn-sm filter-btn" data-group="gender" data-val="F" onclick="toggleMergedFilter(this)" style="border:2px solid var(--rose);color:var(--rose);background:transparent;">F</button>
-      <button class="btn btn-sm filter-btn" data-group="gender" data-val="H" onclick="toggleMergedFilter(this)" style="border:2px solid var(--bleu-genre);color:var(--bleu-genre);background:transparent;">H</button>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 4px;"></span>
-      <span style="font-size:12px;font-weight:600;">Poste :</span>
-      <button class="btn btn-sm filter-btn" data-group="elig" data-val="maire" onclick="toggleMergedFilter(this)" style="border:2px solid var(--bleu);color:var(--bleu);background:transparent;">Maire</button>
-      <button class="btn btn-sm filter-btn" data-group="elig" data-val="adjoint" onclick="toggleMergedFilter(this)" style="border:2px solid var(--vert);color:var(--vert);background:transparent;">Adjoint</button>
-      <button class="btn btn-sm filter-btn" data-group="elig" data-val="delegue" onclick="toggleMergedFilter(this)" style="border:2px solid var(--orange);color:var(--orange);background:transparent;">Delegue</button>
-      <button class="btn btn-sm filter-btn" data-group="elig" data-val="simple" onclick="toggleMergedFilter(this)" style="border:2px solid var(--texte-light);color:var(--texte-light);background:transparent;">Conseiller</button>
-      <button class="btn btn-sm filter-btn" data-group="elig" data-val="suppleant" onclick="toggleMergedFilter(this)" style="border:2px solid #999;color:#999;background:transparent;">Suppleant</button>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 4px;"></span>
-      <span style="font-size:12px;font-weight:600;">Liste :</span>
-      <span id="filterListBtns"></span>
-      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 4px;"></span>
-      <button class="btn btn-sm btn-outline" onclick="clearMergedFilters()" style="font-size:11px;">Reinitialiser</button>
-    </div>
-    <div id="activeFiltersSummary" style="font-size:11px;color:var(--texte-light);margin-bottom:6px;"></div>
-    <div class="table-scroll" style="max-height:500px;">
-      <table><thead><tr><th>Pos.</th><th>Nom Prenom</th><th>Sexe</th><th>Origine</th><th>Eligibilite</th><th>EPCI</th><th>Statut</th><th></th></tr></thead>
-        <tbody id="mergedBody"></tbody>
-      </table>
-    </div>
-    <div id="mergedStats" style="font-size:12px;margin-top:6px;"></div>
-  </div>
-  <div class="card" id="parityDiag" style="display:none;">
-    <h3>Diagnostic de parite</h3>
-    <div id="parityDetails"></div>
-  </div>
-</div>
-
-<!-- ==================== MODULE 3 ==================== -->
-<div class="module" id="module3">
-  <div class="grid-2">
-    <div>
-      <!-- Guide -->
-      <details class="guide card">
-        <summary>Comment ca marche ? (Guide d'utilisation)</summary>
-        <div class="step">
-          <strong>Etape 1 — Configurer la commune</strong>
-          Renseignez la population dans l'en-tete. L'outil calcule automatiquement l'effectif du conseil, le plafond d'adjoints, et l'indemnite max du maire (bareme CGCT).
-        </div>
-        <div class="step">
-          <strong>Etape 2 — Definir les postes</strong>
-          Indiquez le nombre d'adjoints effectivement designes (ceux avec une delegation du maire). Ce nombre determine l'enveloppe globale. Ajoutez aussi les conseillers delegues.
-        </div>
-        <div class="step">
-          <strong>Etape 3 — Comprendre l'enveloppe</strong>
-          Enveloppe = indemnite max du maire + somme des indemnites max de chaque adjoint avec delegation. C'est un plafond. Le maire peut prendre moins que le max. Les adjoints peuvent etre en-dessous du bareme. L'economie peut etre redistribuee aux delegues. Dans les communes &lt; 100 000 hab, des conseillers sans delegation peuvent percevoir jusqu'a 6% de l'indice brut terminal si le conseil le decide.
-        </div>
-        <div class="step">
-          <strong>Etape 4 — Simuler la repartition</strong>
-          Ajustez les montants de chaque categorie. La jauge indique en temps reel si vous restez dans l'enveloppe legale (vert = OK, rouge = depassement).
-        </div>
-        <div class="step">
-          <strong>Etape 5 — Repartir entre groupes</strong>
-          Dans "Repartition des postes par liste", la proportion theorique est auto-calculee. Ajustez manuellement. L'ecart theorique/ajuste est affiche pour transparence.
-        </div>
-        <div class="legal-alert" style="margin-top:8px;">
-          <strong>Points de vigilance juridiques :</strong><br>
-          - Seuls les adjoints avec delegation effective comptent dans le calcul de l'enveloppe<br>
-          - Un adjoint de quartier sans delegation n'ouvre pas droit aux memes indemnites<br>
-          - L'enveloppe ne peut pas etre depassee, meme si le conseil le vote<br>
-          - Les conseillers delegues ne sont indemnises que s'ils ont recu une delegation effective du maire
-        </div>
-      </details>
-
-      <!-- Allowance calculator -->
-      <div class="card">
-        <h2>Enveloppe indemnitaire</h2>
-
-        <!-- Composition politique auto-calculée -->
+        <h2>Configuration des postes</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;background:#f8f9fa;padding:10px;border-radius:6px;">
           <div>
             <label style="font-size:11px;opacity:0.7;">Effectif legal du conseil</label>
@@ -448,78 +302,20 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
             <div style="font-size:18px;font-weight:700;color:var(--orange);" id="dispDeleguesEst">—</div>
           </div>
         </div>
-
-        <div class="legal-alert" id="dgclWarning" style="display:none;">
-          L'indemnisation des conseillers delegues depend d'une delegation effective du maire et du respect de l'enveloppe indemnitaire globale. Il ne s'agit pas d'un droit automatique.
-        </div>
-
-        <!-- Mayor & adjoint allowances: max (readonly) + actual (editable) -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+        <input type="hidden" id="maxAdjoints" value="0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <div>
-            <label style="font-size:11px;opacity:0.7;">Indemnite max maire (bareme)</label>
-            <input type="number" id="mayorAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
-          </div>
-          <div>
-            <label style="font-size:11px;">Indemnite reelle maire (euros/mois)</label>
-            <input type="number" id="mayorActual" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
-          </div>
-          <div>
-            <label style="font-size:11px;opacity:0.7;">Indemnite max adjoint (bareme)</label>
-            <input type="number" id="adjointMaxAllowance" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
-          </div>
-          <div>
-            <label style="font-size:11px;">Indemnite reelle par adjoint (euros/mois)</label>
-            <input type="number" id="adjointActual" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
-          </div>
-        </div>
-
-        <!-- 4 niveaux d'adjoints -->
-        <h3>Gestion des adjoints</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-          <div>
-            <label style="font-size:11px;">Plafond legal (30%)</label>
-            <input type="number" id="maxAdjoints" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
-          </div>
-          <div>
-            <label style="font-size:11px;">Effectivement designes</label>
+            <label style="font-size:11px;">Adjoints designes</label>
             <input type="number" id="nbAdjointsDesignes" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="onAdjointsChange()">
           </div>
           <div>
-            <label style="font-size:11px;">Postes negocies</label>
-            <input type="number" id="nbAdjointsNegocies" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="onAdjointsChange()">
-          </div>
-          <div>
-            <label style="font-size:11px;">Avec delegation effective</label>
-            <input type="number" id="nbAdjointsDelegation" value="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;background:#f0f0f0;" readonly>
+            <label style="font-size:11px;">Conseillers delegues</label>
+            <input type="number" id="nbDelegues" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="onAdjointsChange()">
           </div>
         </div>
+        <input type="hidden" id="nbAdjointsDelegation" value="0">
         <div id="adjointAlerts"></div>
-
-        <div class="legal-alert">
-          <strong>Attention :</strong> Un adjoint de quartier ne beneficie pas des memes effets indemnitaires qu'un adjoint avec delegation effective. La DGCL rappelle qu'un adjoint ne peut etre regarde comme exercant effectivement ses fonctions que s'il a recu une delegation.
-        </div>
-
-        <!-- Other positions -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
-          <div>
-            <label style="font-size:12px;">Nb conseillers delegues</label>
-            <input type="number" id="nbDelegues" value="0" min="0" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
-          </div>
-          <div>
-            <label style="font-size:12px;">Indemnite par delegue (euros/mois)</label>
-            <input type="number" id="delegueAllowance" value="750" style="width:100%;padding:6px;border:1px solid var(--gris-border);border-radius:4px;" oninput="calcAllowances()">
-          </div>
-        </div>
-
-        <!-- Envelope calculation -->
-        <h3>Calcul de l'enveloppe (formule DGCL)</h3>
-        <div id="enveloppeDetail" style="margin:8px 0;"></div>
-        <div class="gauge" id="enveloppeGauge"><div class="gauge-fill gauge-ok" id="enveloppeGaugeFill" style="width:0%;">0%</div></div>
-        <div id="enveloppeAlerts"></div>
-        <div id="allowanceSummary" class="card alert-green" style="margin-top:8px;"></div>
       </div>
-
-      <!-- Position distribution by list -->
       <div class="card">
         <h2>Repartition des postes par liste</h2>
         <div class="btn-group">
@@ -527,7 +323,7 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         </div>
         <div class="table-scroll">
           <table>
-            <thead><tr><th>Liste</th><th>Sieges</th><th>Adj. theorique</th><th>Adj. ajuste</th><th>Ecart</th><th>Del. theorique</th><th>Del. ajuste</th><th>Ecart</th><th>Simples</th></tr></thead>
+            <thead><tr><th>Liste</th><th>Sieges</th><th>Adjoints</th><th>Delegues</th><th>Simples</th></tr></thead>
             <tbody id="posDistBody"></tbody>
           </table>
         </div>
@@ -535,41 +331,117 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         <div id="posDistWarning" style="font-size:12px;margin-top:4px;"></div>
       </div>
     </div>
+  </div>
+</div>
 
+<!-- ==================== MODULE 2 ==================== -->
+<div class="module" id="module2">
+  <!-- Configuration de la fusion -->
+  <div class="card">
+    <h2>Fusion des listes</h2>
+    <p style="font-size:12px;color:var(--texte-light);margin-bottom:12px;">Cochez les listes a fusionner. La repartition est calculee sur les <strong id="fusionCoalitionLabel">0</strong> sieges de la coalition (Module 1).</p>
+    <!-- Checkboxes des listes + sexe tête de liste -->
+    <div id="fusionListChecks" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;"></div>
+    <!-- Scores résumé -->
+    <div id="fusionInfo" style="display:none;margin-bottom:12px;">
+      <div id="fusionInfoBars" style="display:flex;gap:2px;height:32px;border-radius:6px;overflow:hidden;margin-bottom:8px;"></div>
+      <div style="text-align:center;font-size:12px;color:var(--texte-light);">
+        Mode calcul : <strong id="fusionModeLabel"></strong> |
+        Sieges coalition : <strong id="fusionTotalSeats"></strong>
+      </div>
+    </div>
+    <!-- Mode de fusion -->
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px;">Mode de fusion</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:10px;border:2px solid var(--gris-border);border-radius:8px;cursor:pointer;font-size:12px;" id="fusionModeProportionnelle">
+          <input type="radio" name="fusionMode" value="proportionnelle" checked onchange="onFusionModeChange()">
+          <div>
+            <strong>Fusion parfaitement proportionnelle</strong><br>
+            <span style="opacity:0.7;">Au risque de devoir changer l'ordre des candidats des listes originales</span>
+          </div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:10px;border:2px solid var(--gris-border);border-radius:8px;cursor:pointer;font-size:12px;" id="fusionModeOrdre">
+          <input type="radio" name="fusionMode" value="ordre" onchange="onFusionModeChange()">
+          <div>
+            <strong>Conserver l'ordre des candidats</strong><br>
+            <span style="opacity:0.7;">Au risque de perdre legerement en proportionnalite</span>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary btn-sm" onclick="buildFusionBars()">Calculer la fusion</button>
+      <button class="btn btn-outline btn-sm" onclick="resetFusion()">Reinitialiser</button>
+    </div>
+  </div>
+
+  <!-- Barres visuelles de fusion -->
+  <div class="card" id="fusionResultCard" style="display:none;">
+    <h2>Liste fusionnee</h2>
+    <div id="fusionStatsTop" class="fusion-stats" style="margin-bottom:12px;"></div>
+    <div class="fusion-container" id="fusionBarsContainer"></div>
+    <div id="fusionStatsBottom" style="font-size:12px;margin-top:8px;color:var(--texte-light);"></div>
+  </div>
+</div>
+
+<!-- ==================== MODULE 3 ==================== -->
+<div class="module" id="module3">
+  <!-- Attribution des délégations — pleine largeur avec filtres -->
+  <div class="card">
+    <h2>Attribution des delegations</h2>
+    <p style="font-size:12px;color:var(--texte-light);margin-bottom:12px;">Attribuez les delegations aux elus. Importez vos candidats via CSV dans le Module 4 pour les voir apparaitre ici.</p>
+
+    <!-- Filtres -->
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+      <span style="font-size:12px;font-weight:600;">Filtres :</span>
+      <button class="btn btn-sm del-filter" data-group="load" data-val="heavy" onclick="delToggleFilter(this)" style="border:2px solid var(--rouge);color:var(--rouge);background:transparent;font-size:11px;">Lourde</button>
+      <button class="btn btn-sm del-filter" data-group="load" data-val="medium" onclick="delToggleFilter(this)" style="border:2px solid var(--orange);color:var(--orange);background:transparent;font-size:11px;">Moyenne</button>
+      <button class="btn btn-sm del-filter" data-group="load" data-val="light" onclick="delToggleFilter(this)" style="border:2px solid var(--vert);color:var(--vert);background:transparent;font-size:11px;">Legere</button>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
+      <button class="btn btn-sm del-filter" data-group="assigned" data-val="yes" onclick="delToggleFilter(this)" style="border:2px solid var(--bleu);color:var(--bleu);background:transparent;font-size:11px;">Attribue</button>
+      <button class="btn btn-sm del-filter" data-group="assigned" data-val="no" onclick="delToggleFilter(this)" style="border:2px solid #999;color:#999;background:transparent;font-size:11px;">Non attribue</button>
+      <span style="width:1px;height:20px;background:var(--gris-border);margin:0 2px;"></span>
+      <button class="btn btn-sm btn-outline" onclick="delClearFilters()" style="font-size:11px;">Reinitialiser</button>
+      <span style="margin-left:auto;font-size:12px;font-weight:600;" id="del-filter-count"></span>
+    </div>
+
+    <!-- Tri -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+      <span style="font-size:12px;font-weight:600;">Trier par :</span>
+      <select id="del-sort" onchange="renderDelegationTable()" style="padding:4px 8px;border:1px solid var(--gris-border);border-radius:4px;font-size:12px;">
+        <option value="default">Ordre par defaut</option>
+        <option value="charge_desc">Charge (lourde d'abord)</option>
+        <option value="charge_asc">Charge (legere d'abord)</option>
+        <option value="alpha">Alphabetique</option>
+        <option value="assigned">Attribue d'abord</option>
+        <option value="unassigned">Non attribue d'abord</option>
+      </select>
+    </div>
+
+    <!-- Stats rapides -->
+    <div id="del-stats" style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap;"></div>
+
+    <div class="table-scroll" style="max-height:600px;">
+      <table>
+        <thead><tr><th>Delegation</th><th>Type poste</th><th>Charge</th><th>h/sem</th><th>Attribue a</th><th>Detachement</th></tr></thead>
+        <tbody id="delegationBody"></tbody>
+      </table>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-outline btn-sm" onclick="addCustomDelegation()">+ Delegation personnalisee</button>
+    </div>
+  </div>
+
+  <!-- Conformité + Synthèse -->
+  <div class="grid-2">
     <div>
-      <!-- Delegation matrix -->
-      <div class="card">
-        <h2>Attribution des delegations</h2>
-        <div class="table-scroll" style="max-height:500px;">
-          <table>
-            <thead><tr><th>Delegation</th><th>Type poste</th><th>Charge</th><th>h/sem</th><th>Attribue a</th><th>Detachement</th></tr></thead>
-            <tbody id="delegationBody"></tbody>
-          </table>
-        </div>
-        <div class="btn-group">
-          <button class="btn btn-outline btn-sm" onclick="addCustomDelegation()">+ Delegation personnalisee</button>
-        </div>
-      </div>
-
-      <!-- Postes revendicables par groupe -->
-      <div class="card">
-        <h2>Postes revendicables par groupe</h2>
-        <p style="font-size:11px;color:var(--texte-light);margin-bottom:8px;">Simulation indicative basee sur le poids electoral. Ne constitue pas un droit legal automatique.</p>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Groupe</th><th>Poids electoral</th><th colspan="2">Droit legal</th><th colspan="2">Simulation politique</th><th>Indemnisable est.</th></tr></thead>
-            <tbody id="claimableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Legal compliance -->
       <div class="card">
         <h3>Conformite legale</h3>
         <ul class="checklist" id="checklist"></ul>
       </div>
-
-      <!-- Negotiation summary -->
+    </div>
+    <div>
       <div class="card">
         <h2>Synthese de negociation</h2>
         <div class="btn-group">
@@ -593,15 +465,17 @@ details.guide .step strong { display: block; margin-bottom: 2px; }
         <label style="font-size:12px;font-weight:600;">Source :</label>
         <select id="ws-source" onchange="wsLoadSource()" style="padding:6px 10px;border:1px solid var(--gris-border);border-radius:4px;min-width:200px;">
           <option value="">— Choisir —</option>
-          <option value="merged">Liste fusionnee</option>
-          <option value="listA">Liste A</option>
-          <option value="listB">Liste B</option>
+          <option value="merged">Liste fusionnee (Module 2)</option>
+          <option value="current">Liste active</option>
         </select>
+        <button class="btn btn-sm btn-outline" onclick="wsSaveAsSource()" style="font-size:11px;">Enregistrer comme source</button>
       </div>
       <div class="btn-group" style="margin:0;">
         <button class="btn btn-sm btn-primary" onclick="wsAdd()">+ Candidat</button>
         <button class="btn btn-sm btn-outline" onclick="wsAddColumn()">+ Colonne</button>
         <button class="btn btn-sm btn-outline" onclick="wsAutoRoles()">Roles auto (par position)</button>
+        <button class="btn btn-sm btn-outline" onclick="wsDownloadTemplate()">Modele CSV</button>
+        <button class="btn btn-sm btn-outline" onclick="wsImportCSV()">Importer CSV</button>
         <button class="btn btn-sm btn-outline" onclick="wsExportCSV()">Exporter CSV</button>
         <button class="btn btn-sm btn-outline" onclick="wsPrint()">Imprimer</button>
       </div>
@@ -740,6 +614,11 @@ let state = {
   delegationAssignments: {}, // { delegId: { candidateId:'', type:'adjoint'|'delegue' } }
   positionDist: {},
   timerEnd: null,
+  coalitionSeats: 0,
+  coalitionScore: 55,
+  fusionLists: [],  // array of selected list names for fusion
+  fusionMode: 'proportionnelle', // 'proportionnelle' or 'ordre'
+  fusionOrder: [],
 };
 
 function genId() { return 'c_' + (nextCandidateId++) + '_' + Date.now(); }
@@ -751,14 +630,19 @@ function init() {
   loadState();
   renderListsTable();
   recalculate();
-  renderCandidateList('A');
-  renderCandidateList('B');
-  renderMergedList();
+  populateFusionSelects();
+  // Restore fusion mode radio
+  const modeRadio = document.querySelector(`input[name="fusionMode"][value="${state.fusionMode || 'proportionnelle'}"]`);
+  if (modeRadio) modeRadio.checked = true;
+  onFusionModeChange();
+  onFusionSelectChange();
+  renderFusionBars();
   renderDelegationTable();
   calcAllowances();
   updateChecklist();
   renderScenarios();
-  renderClaimablePositions();
+  wsPopulateSourceDropdown();
+  if (wsState.data && wsState.data.length > 0) { wsBuildOriginBtns(); wsRender(); }
   if (state.timerEnd) startTimerDisplay();
 }
 
@@ -768,13 +652,9 @@ function init() {
 function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   document.querySelectorAll('.module').forEach((m,i) => m.classList.toggle('active', i===idx));
-  if (idx === 2) {
-    renderDelegationTable();
-    calcAllowances();
-    updateChecklist();
-    renderClaimablePositions();
-  }
-  if (idx === 3) { wsLoadSource(); }
+  if (idx === 0) { calcAllowances(); }
+  if (idx === 2) { renderDelegationTable(); updateChecklist(); }
+  if (idx === 3) { wsBuildOriginBtns(); wsRender(); }
 }
 
 // =====================================================================
@@ -806,26 +686,14 @@ function onPopulationChange() {
   const pop = parseInt(document.getElementById('cityPop').value) || 0;
   const cs = COUNCIL_SIZES.find(c => pop >= c.min && pop <= c.max);
   if (cs) document.getElementById('totalSeats').value = cs.seats;
-  const ma = MAYOR_ALLOWANCES.find(m => pop >= m.min && pop <= m.max);
-  if (ma) {
-    document.getElementById('mayorAllowance').value = ma.amount.toFixed(2);
-    document.getElementById('mayorActual').value = ma.amount.toFixed(2);
-  }
-  const aa = ADJOINT_ALLOWANCES.find(a => pop >= a.min && pop <= a.max);
-  if (aa) {
-    document.getElementById('adjointMaxAllowance').value = aa.amount.toFixed(2);
-    document.getElementById('adjointActual').value = aa.amount.toFixed(2);
-  }
   const maxAdj = cs ? Math.floor(cs.seats * 0.3) : 0;
   document.getElementById('maxAdjoints').value = maxAdj;
 
   // Display composition
   document.getElementById('dispCouncilSize').textContent = cs ? cs.seats : '—';
   document.getElementById('dispMaxAdjoints').textContent = maxAdj;
-  // Delegues envisageables: estimate as remaining majority seats minus adjoints
   const delegEst = cs ? Math.max(0, Math.floor(cs.seats * 0.15)) : 0;
   document.getElementById('dispDeleguesEst').textContent = '~' + delegEst;
-  document.getElementById('dgclWarning').style.display = pop > 0 ? 'block' : 'none';
 
   recalculate(); calcAllowances(); saveState();
 }
@@ -940,13 +808,16 @@ function recalculate() {
   const prime = state.mode === 'avec_prime' ? state.primePercent : 0;
   const result = allocateSeats(state.lists, totalSeats, prime, state.mode);
   state.results = result;
+  state.positionDist = {}; // Reset so répartition recalculates from new seat counts
   renderListsTable();
   renderSummary(result, totalSeats);
   renderSeatChart(result, totalSeats);
   renderOrderedList(result, totalSeats);
   calcMinScores(totalSeats, prime);
-  simulateLoss();
+  calcCoalitionSeats();
+  calcAllowances();
   updateChecklist();
+  populateFusionSelects();
 }
 
 // =====================================================================
@@ -987,7 +858,7 @@ function renderSeatChart(result, totalSeats) {
 }
 
 function renderOrderedList(result, totalSeats) {
-  const tbody = document.getElementById('orderedMunicipal'); tbody.innerHTML = '';
+  const tbody = document.getElementById('orderedMunicipal'); if (!tbody) return; tbody.innerHTML = '';
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const flagZone = Math.ceil(totalSeats * 3 / 5);
   result.ordered.forEach((o, i) => {
@@ -1033,22 +904,22 @@ function findMinScore(listIdx, totalSeats, primePercent, targetSeats) {
   return found;
 }
 
-function simulateLoss() {
-  const winnerScore = parseFloat(document.getElementById('lossWinnerScore').value) || 0;
+function calcCoalitionSeats() {
+  const coalScore = parseFloat(document.getElementById('coalitionScore').value) || 0;
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const div = document.getElementById('lossResult');
-  if (winnerScore <= 0 || totalSeats <= 0) { div.style.display = 'none'; return; }
-  const ourScore = 100 - winnerScore;
-  const simLists = [{name:'Vainqueur',score:winnerScore,type:'pct'},{name:'Notre coalition',score:ourScore,type:'pct'}];
+  const div = document.getElementById('coalitionResult');
+  if (coalScore <= 0 || totalSeats <= 0) { div.style.display = 'none'; state.coalitionSeats = totalSeats; return; }
+  const oppScore = 100 - coalScore;
+  const simLists = [{name:'Coalition',score:coalScore,type:'pct'},{name:'Opposition',score:oppScore,type:'pct'}];
   const simResult = allocateSeats(simLists, totalSeats, 50, 'avec_prime');
-  const oppSeats = simResult.seats['Notre coalition'] || 0;
-  const pctCouncil = (oppSeats / totalSeats * 100).toFixed(1);
-  let cls = 'alert-red', msg = 'Poids faible en opposition';
-  if (pctCouncil >= 33) { cls = 'alert-green'; msg = 'Minorite de blocage potentielle (>33%)'; }
-  else if (pctCouncil >= 20) { cls = 'alert-orange'; msg = 'Opposition significative'; }
-  div.className = 'card ' + cls; div.style.display = 'block';
-  div.innerHTML = `<strong>En cas de defaite face a un vainqueur a ${winnerScore}% :</strong><br>
-    Sieges en opposition : <strong>${oppSeats}</strong> sur ${totalSeats} (${pctCouncil}%)<br><em>${msg}</em>`;
+  const coalSeats = simResult.seats['Coalition'] || 0;
+  const oppSeats = simResult.seats['Opposition'] || 0;
+  state.coalitionSeats = coalSeats;
+  div.className = 'card alert-green'; div.style.display = 'block';
+  div.innerHTML = `<strong>Coalition a ${coalScore}% :</strong><br>
+    Sieges coalition : <strong>${coalSeats}</strong> sur ${totalSeats} | Opposition : <strong>${oppSeats}</strong> sieges<br>
+    <em>Les ${coalSeats} sieges sont a repartir entre les listes fusionnees (Module 2)</em>`;
+  saveState();
 }
 
 function saveScenario() {
@@ -1060,7 +931,7 @@ function saveScenario() {
 }
 function clearScenarios() { state.scenarios = []; renderScenarios(); saveState(); }
 function renderScenarios() {
-  const grid = document.getElementById('scenarioGrid'); grid.innerHTML = '';
+  const grid = document.getElementById('scenarioGrid'); if (!grid) return; grid.innerHTML = '';
   state.scenarios.forEach(sc => {
     const div = document.createElement('div'); div.className = 'scenario-card';
     let rows = '';
@@ -1073,402 +944,264 @@ function renderScenarios() {
 }
 
 // =====================================================================
-// MODULE 2: CANDIDATE MANAGEMENT
+// MODULE 2: FUSION VISUELLE — BARRES COLORÉES (N LISTES)
 // =====================================================================
-function addCandidate(list) {
-  const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
-  arr.push({id: genId(), name: '', gender: 'F', epci: false});
-  renderCandidateList(list); saveState();
+
+function getListColor(listName) {
+  const idx = state.lists.findIndex(l => l.name === listName);
+  return LIST_COLORS[idx >= 0 ? idx % LIST_COLORS.length : 0];
 }
 
-function removeCandidate(list, idx) {
-  const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
-  arr.splice(idx, 1);
-  renderCandidateList(list); saveState();
+// Populate checkboxes from Module 1 lists
+function populateFusionSelects() {
+  const container = document.getElementById('fusionListChecks');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!state.fusionHeadGenders) state.fusionHeadGenders = {};
+  state.lists.forEach((l, idx) => {
+    if (!l.name) return;
+    const color = LIST_COLORS[idx % LIST_COLORS.length];
+    const checked = state.fusionLists.includes(l.name) ? 'checked' : '';
+    const hg = state.fusionHeadGenders[l.name] || 'H';
+    container.innerHTML += `<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:2px solid ${color};border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;background:${checked ? color + '15' : 'transparent'};">
+      <input type="checkbox" value="${esc(l.name)}" ${checked} onchange="onFusionListToggle(this)">
+      <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${color};"></span>
+      ${esc(l.name)}
+      <select onclick="event.stopPropagation()" onchange="state.fusionHeadGenders['${esc(l.name)}']=this.value;saveState();" style="font-size:11px;padding:2px 4px;border:1px solid ${color};border-radius:4px;margin-left:4px;">
+        <option value="H" ${hg==='H'?'selected':''}>H</option>
+        <option value="F" ${hg==='F'?'selected':''}>F</option>
+      </select>
+    </label>`;
+  });
+  // Update coalition seats label
+  const lbl = document.getElementById('fusionCoalitionLabel');
+  if (lbl) lbl.textContent = state.coalitionSeats || parseInt(document.getElementById('totalSeats').value) || 0;
+  onFusionSelectChange();
 }
 
-function renderCandidateList(list) {
-  const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
-  const tbody = document.getElementById('list' + list + 'Body');
-  tbody.innerHTML = '';
-  let fCount = 0, hCount = 0;
-  arr.forEach((c, i) => {
-    if (!c.id) c.id = genId();
-    if (c.gender === 'F') fCount++; else hCount++;
-    const tr = document.createElement('tr');
-    tr.draggable = true;
-    tr.ondragstart = (e) => { e.dataTransfer.setData('text', list + ':' + i); tr.classList.add('dragging'); };
-    tr.ondragend = () => tr.classList.remove('dragging');
-    tr.ondragover = (e) => { e.preventDefault(); tr.classList.add('drag-over'); };
-    tr.ondragleave = () => tr.classList.remove('drag-over');
-    tr.ondrop = (e) => {
-      e.preventDefault(); tr.classList.remove('drag-over');
-      const [srcList, srcIdx] = e.dataTransfer.getData('text').split(':');
-      if (srcList === list) {
-        const item = arr.splice(parseInt(srcIdx), 1)[0];
-        arr.splice(i, 0, item);
-        renderCandidateList(list); saveState();
+function onFusionListToggle(cb) {
+  const name = cb.value;
+  if (cb.checked) {
+    if (!state.fusionLists.includes(name)) state.fusionLists.push(name);
+  } else {
+    state.fusionLists = state.fusionLists.filter(n => n !== name);
+  }
+  // Update visual highlight on label
+  const label = cb.closest('label');
+  const color = getListColor(name);
+  label.style.background = cb.checked ? color + '15' : 'transparent';
+  onFusionSelectChange();
+  saveState();
+}
+
+function onFusionModeChange() {
+  const mode = document.querySelector('input[name="fusionMode"]:checked')?.value || 'proportionnelle';
+  state.fusionMode = mode;
+  // Visual highlight on selected mode
+  document.getElementById('fusionModeProportionnelle').style.borderColor = mode === 'proportionnelle' ? 'var(--bleu)' : 'var(--gris-border)';
+  document.getElementById('fusionModeOrdre').style.borderColor = mode === 'ordre' ? 'var(--bleu)' : 'var(--gris-border)';
+  saveState();
+}
+
+function onFusionSelectChange() {
+  const infoDiv = document.getElementById('fusionInfo');
+  const selected = state.fusionLists;
+  if (selected.length < 2) { infoDiv.style.display = 'none'; return; }
+
+  // Build proportional bar summary
+  const scores = selected.map(name => {
+    const l = state.lists.find(x => x.name === name);
+    return { name, score: parseFloat(l?.score) || 0, color: getListColor(name) };
+  });
+  const totalScore = scores.reduce((s, x) => s + x.score, 0);
+  let barsHtml = '';
+  scores.forEach(s => {
+    const pct = totalScore > 0 ? (s.score / totalScore * 100) : (100 / scores.length);
+    barsHtml += `<div style="width:${pct}%;background:${s.color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:30px;" title="${esc(s.name)}: ${pct.toFixed(1)}%">${pct.toFixed(0)}%</div>`;
+  });
+  document.getElementById('fusionInfoBars').innerHTML = barsHtml;
+
+  const coalSeats = state.coalitionSeats || parseInt(document.getElementById('totalSeats').value) || 0;
+  document.getElementById('fusionModeLabel').textContent = state.mode === 'avec_prime' ? 'Prime majoritaire (' + state.primePercent + '%)' : 'Proportionnelle integrale';
+  document.getElementById('fusionTotalSeats').textContent = coalSeats;
+  infoDiv.style.display = 'block';
+  saveState();
+}
+
+function buildFusionBars() {
+  const selected = state.fusionLists;
+  if (selected.length < 2) return alert('Cochez au moins 2 listes a fusionner.');
+  if (!state.results || !state.results.ordered || state.results.ordered.length === 0) return alert('Calculez d\'abord la repartition des sieges dans le Module 1.');
+
+  const coalSeats = state.coalitionSeats || parseInt(document.getElementById('totalSeats').value) || 0;
+  if (coalSeats <= 0) return alert('Nombre de sieges coalition invalide.');
+
+  // Get scores for selected lists only
+  const fusionListData = selected.map(name => {
+    const l = state.lists.find(x => x.name === name);
+    return { name, score: parseFloat(l?.score) || 0, type: 'pct' };
+  });
+
+  // Re-allocate seats among selected lists using D'Hondt on coalition seats
+  // Use the SAME mode as Module 1 (prime majoritaire or integrale)
+  const fusionPrime = state.mode === 'avec_prime' ? state.primePercent : 0;
+  const fusionResult = allocateSeats(fusionListData, coalSeats, fusionPrime, state.mode);
+
+  // Track per-list position counters for gender alternation based on each list's head gender
+  const hg = state.fusionHeadGenders || {};
+  const listCounters = {};
+  selected.forEach(name => { listCounters[name] = 0; });
+
+  function getGenderForList(listName) {
+    const headG = hg[listName] || 'H';
+    const count = listCounters[listName]++;
+    return count % 2 === 0 ? headG : (headG === 'H' ? 'F' : 'H');
+  }
+
+  if (state.fusionMode === 'proportionnelle') {
+    // Perfectly proportional: D'Hondt interleaving (alternating by highest average)
+    state.fusionOrder = fusionResult.ordered.map((o, i) => ({
+      position: i + 1,
+      list: o.list,
+      color: getListColor(o.list),
+      gender: getGenderForList(o.list)
+    }));
+  } else {
+    // Preserve order: each list fills its block of seats in order, then interleave blocks
+    const blocks = {};
+    selected.forEach(name => { blocks[name] = fusionResult.seats[name] || 0; });
+    const order = [];
+    const remaining = { ...blocks };
+    for (let pos = 0; pos < coalSeats; pos++) {
+      let best = null, bestRatio = -1;
+      for (const name of selected) {
+        if (remaining[name] <= 0) continue;
+        const ratio = remaining[name] / (blocks[name] || 1);
+        if (ratio > bestRatio) { bestRatio = ratio; best = name; }
       }
-    };
-    tr.innerHTML = `<td>${i+1}</td>
-      <td><input type="text" value="${esc(c.name)}" placeholder="Nom Prenom" onchange="updateCandidate('${list}',${i},'name',this.value)"></td>
-      <td><select onchange="updateCandidate('${list}',${i},'gender',this.value)">
-        <option value="F" ${c.gender==='F'?'selected':''}>F</option><option value="H" ${c.gender==='H'?'selected':''}>H</option></select></td>
-      <td><input type="checkbox" ${c.epci?'checked':''} onchange="updateCandidate('${list}',${i},'epci',this.checked)"></td>
-      <td><button class="btn btn-sm btn-danger" onclick="removeCandidate('${list}',${i})">x</button></td>`;
-    tbody.appendChild(tr);
-  });
-  document.getElementById('list' + list + 'Stats').innerHTML = `${arr.length} candidat(es) | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount}`;
-}
-
-function updateCandidate(list, idx, field, value) {
-  const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
-  arr[idx][field] = value;
-  renderCandidateList(list); saveState();
-}
-
-function importCSV(list) {
-  const input = document.getElementById('csvFileInput');
-  input.onchange = (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const lines = ev.target.result.split('\n').filter(l => l.trim());
-      const candidates = [];
-      lines.forEach((line, i) => {
-        if (i === 0 && (line.toLowerCase().includes('nom') || line.toLowerCase().includes('name'))) return;
-        const parts = line.split(/[;,\t]/);
-        if (parts.length >= 2) {
-          candidates.push({
-            id: genId(),
-            name: (parts[0] + ' ' + (parts[1] || '')).trim(),
-            gender: (parts[2] || 'F').trim().toUpperCase().startsWith('H') ? 'H' : 'F',
-            epci: (parts[3] || '').trim() === '1' || (parts[3] || '').toLowerCase().trim() === 'oui'
-          });
-        }
-      });
-      if (list === 'A') state.listA.candidates = candidates;
-      else state.listB.candidates = candidates;
-      renderCandidateList(list); saveState();
-    };
-    reader.readAsText(file); input.value = '';
-  };
-  input.click();
-}
-
-// =====================================================================
-// MODULE 2: SELECTION PANEL FOR MANUAL MERGE
-// =====================================================================
-let selectionState = {}; // { candidateId: true/false }
-
-function openSelectionPanel() {
-  const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
-  const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
-  if (allA.length + allB.length === 0) return alert('Ajoutez des candidats dans les listes A et B d\'abord.');
-
-  // Initialize selection: all selected by default
-  selectionState = {};
-  [...allA, ...allB].forEach(c => { if (!c.id) c.id = genId(); selectionState[c.id] = true; });
-
-  const listAName = document.getElementById('listAName').value || 'Liste A';
-  const listBName = document.getElementById('listBName').value || 'Liste B';
-  document.getElementById('selPanelATitle').textContent = listAName + ' (' + allA.length + ')';
-  document.getElementById('selPanelBTitle').textContent = listBName + ' (' + allB.length + ')';
-
-  renderSelectionTable('A', allA);
-  renderSelectionTable('B', allB);
-  updateSelectionStats();
-  document.getElementById('selectionPanel').style.display = 'block';
-  document.getElementById('selectionPanel').scrollIntoView({behavior: 'smooth'});
-}
-
-function closeSelectionPanel() {
-  document.getElementById('selectionPanel').style.display = 'none';
-}
-
-function renderSelectionTable(list, candidates) {
-  const tbody = document.getElementById('selectionBody' + list);
-  tbody.innerHTML = '';
-  candidates.forEach((c, i) => {
-    const checked = selectionState[c.id] !== false;
-    const tr = document.createElement('tr');
-    tr.style.opacity = checked ? '1' : '0.4';
-    tr.innerHTML = `
-      <td><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCandidateSelection('${c.id}',this.checked,this)"></td>
-      <td>${i+1}</td>
-      <td>${esc(c.name)}</td>
-      <td><span class="badge-${c.gender.toLowerCase()}">${c.gender}</span></td>
-      <td>${c.epci ? 'Oui' : ''}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function toggleCandidateSelection(id, checked, el) {
-  selectionState[id] = checked;
-  // Update row opacity
-  const tr = el.closest('tr');
-  if (tr) tr.style.opacity = checked ? '1' : '0.4';
-  updateSelectionStats();
-}
-
-function toggleListSelection(list, checked) {
-  const arr = list === 'A' ? state.listA.candidates : state.listB.candidates;
-  arr.filter(c => c.name && c.name.trim()).forEach(c => { selectionState[c.id] = checked; });
-  renderSelectionTable(list, arr.filter(c => c.name && c.name.trim()));
-  updateSelectionStats();
-}
-
-function selectAllCandidates(checked) {
-  for (const id in selectionState) selectionState[id] = checked;
-  const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
-  const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
-  renderSelectionTable('A', allA);
-  renderSelectionTable('B', allB);
-  updateSelectionStats();
-}
-
-function updateSelectionStats() {
-  const selected = Object.values(selectionState).filter(v => v).length;
-  const total = Object.keys(selectionState).length;
-  const listAName = document.getElementById('listAName').value || 'Liste A';
-  const listBName = document.getElementById('listBName').value || 'Liste B';
-  const selA = state.listA.candidates.filter(c => c.name && c.name.trim() && selectionState[c.id]).length;
-  const selB = state.listB.candidates.filter(c => c.name && c.name.trim() && selectionState[c.id]).length;
-  const fCount = [...state.listA.candidates, ...state.listB.candidates].filter(c => c.name && c.name.trim() && selectionState[c.id] && c.gender === 'F').length;
-  const hCount = selected - fCount;
-
-  document.getElementById('selectionStats').innerHTML = `${selected} / ${total} selectionne(s) | ${listAName}: ${selA} | ${listBName}: ${selB} | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount}`;
-}
-
-function mergeFromSelection() {
-  // Get only selected candidates
-  const selectedIds = new Set(Object.keys(selectionState).filter(id => selectionState[id]));
-  if (selectedIds.size === 0) return alert('Selectionnez au moins un candidat.');
-
-  const listAName = document.getElementById('listAName').value || 'Liste A';
-  const listBName = document.getElementById('listBName').value || 'Liste B';
-
-  const selectedA = state.listA.candidates.filter(c => c.name && c.name.trim() && selectedIds.has(c.id));
-  const selectedB = state.listB.candidates.filter(c => c.name && c.name.trim() && selectedIds.has(c.id));
-
-  // Close panel
-  document.getElementById('selectionPanel').style.display = 'none';
-
-  // Run merge with selected candidates only
-  mergeWithCandidates(selectedA, selectedB, listAName, listBName);
-}
-
-// =====================================================================
-// MODULE 2: MERGE — REWRITTEN TO PRESERVE ALL CANDIDATES
-// =====================================================================
-function mergeLists() {
-  const allA = state.listA.candidates.filter(c => c.name && c.name.trim());
-  const allB = state.listB.candidates.filter(c => c.name && c.name.trim());
-  if (allA.length + allB.length === 0) return alert('Ajoutez des candidats dans les listes A et B avant de fusionner.');
-
-  const listAName = document.getElementById('listAName').value || 'Liste A';
-  const listBName = document.getElementById('listBName').value || 'Liste B';
-  mergeWithCandidates(allA, allB, listAName, listBName);
-}
-
-function mergeWithCandidates(allA, allB, listAName, listBName) {
-  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const totalCandidates = allA.length + allB.length;
-
-  // Determine ratio from Module 1
-  const listAMatch = state.lists.find(l => l.name === listAName);
-  const listBMatch = state.lists.find(l => l.name === listBName);
-  let ratioA = 0.5;
-  if (listAMatch && listBMatch) {
-    const sA = parseFloat(listAMatch.score) || 0, sB = parseFloat(listBMatch.score) || 0;
-    const tot = sA + sB;
-    if (tot > 0) ratioA = sA / tot;
+      if (best) {
+        order.push(best);
+        remaining[best]--;
+      }
+    }
+    state.fusionOrder = order.map((listName, i) => ({
+      position: i + 1,
+      list: listName,
+      color: getListColor(listName),
+      gender: getGenderForList(listName)
+    }));
   }
 
-  // Prepare pools
-  const poolA = allA.map(c => ({...c, origin: listAName, used: false}));
-  const poolB = allB.map(c => ({...c, origin: listBName, used: false}));
+  // Build state.merged for Module 3 compatibility
+  state.merged = state.fusionOrder.map((f, i) => ({
+    id: genId(), name: '', gender: f.gender, origin: f.list,
+    epci: false, position: i + 1, isTitulaire: i < coalSeats
+  }));
 
-  // Phase 1: Build ordered list with parity
-  const merged = [];
-  const slotsToFill = Math.max(totalSeats, totalCandidates);
-
-  for (let pos = 0; pos < slotsToFill; pos++) {
-    const needGender = pos % 2 === 0 ? state.headGender : (state.headGender === 'F' ? 'H' : 'F');
-    const isTitulaire = pos < totalSeats;
-    const aDone = merged.filter(m => m.origin === listAName).length;
-    const aTarget = Math.round(ratioA * (pos + 1));
-    const preferA = aDone < aTarget;
-
-    let candidate = null;
-    if (preferA) {
-      candidate = pickFromPool(poolA, needGender) || pickFromPool(poolB, needGender) || pickFromPool(poolA, null) || pickFromPool(poolB, null);
-    } else {
-      candidate = pickFromPool(poolB, needGender) || pickFromPool(poolA, needGender) || pickFromPool(poolB, null) || pickFromPool(poolA, null);
-    }
-
-    if (candidate) {
-      candidate.used = true;
-      merged.push({
-        id: candidate.id, name: candidate.name, gender: candidate.gender,
-        origin: candidate.origin, epci: candidate.epci,
-        position: pos + 1, isTitulaire: isTitulaire
-      });
-    }
-  }
-
-  // Phase 2: Append any remaining unused as suppleants
-  [...poolA, ...poolB].forEach(c => {
-    if (!c.used) {
-      merged.push({
-        id: c.id, name: c.name, gender: c.gender,
-        origin: c.origin, epci: c.epci,
-        position: merged.length + 1, isTitulaire: false
-      });
-    }
-  });
-
-  state.merged = merged;
-  state.mergeValidated = false;
-  checkMergeIntegrity(allA.length, allB.length, listAName, listBName);
-  renderMergedList();
+  renderFusionBars();
   renderDelegationTable();
   saveState();
 }
 
-function pickFromPool(pool, gender) {
-  for (let i = 0; i < pool.length; i++) {
-    if (!pool[i].used && (gender === null || pool[i].gender === gender)) {
-      return pool[i];
-    }
-  }
-  return null;
-}
+function renderFusionBars() {
+  const container = document.getElementById('fusionBarsContainer');
+  const resultCard = document.getElementById('fusionResultCard');
+  if (!state.fusionOrder || state.fusionOrder.length === 0) { resultCard.style.display = 'none'; return; }
+  resultCard.style.display = 'block';
 
-function checkMergeIntegrity(countA, countB, nameA, nameB) {
-  const banner = document.getElementById('integrityBanner');
-  const totalExpected = countA + countB;
-  const totalMerged = state.merged.length;
-  const mergedFromA = state.merged.filter(m => m.origin === nameA).length;
-  const mergedFromB = state.merged.filter(m => m.origin === nameB).length;
+  const coalSeats = state.coalitionSeats || parseInt(document.getElementById('totalSeats').value) || 0;
+  const selected = state.fusionLists;
 
-  // Check for duplicates
-  const names = state.merged.map(m => m.name.toLowerCase().trim());
-  const dupes = names.filter((n, i) => n && names.indexOf(n) !== i);
+  // Compute stats per list
+  const totalScoreSum = selected.reduce((s, name) => {
+    const l = state.lists.find(x => x.name === name);
+    return s + (parseFloat(l?.score) || 0);
+  }, 0);
 
+  let statsHtml = `<div class="fusion-stat"><div class="val">${state.fusionOrder.length}</div><div class="lbl">Sieges coalition</div></div>`;
+  let bottomParts = [];
+
+  selected.forEach(name => {
+    const seats = state.fusionOrder.filter(f => f.list === name).length;
+    const l = state.lists.find(x => x.name === name);
+    const score = parseFloat(l?.score) || 0;
+    const ideal = totalScoreSum > 0 ? Math.round(state.fusionOrder.length * score / totalScoreSum) : 0;
+    const dev = seats - ideal;
+    const color = getListColor(name);
+    statsHtml += `<div class="fusion-stat"><div class="val" style="color:${color};">${seats}</div><div class="lbl">${esc(name)} (${dev >= 0 ? '+' : ''}${dev})</div></div>`;
+    bottomParts.push(`${seats} ${name}`);
+  });
+
+  // Total deviation
+  let totalDev = 0;
+  selected.forEach(name => {
+    const seats = state.fusionOrder.filter(f => f.list === name).length;
+    const l = state.lists.find(x => x.name === name);
+    const score = parseFloat(l?.score) || 0;
+    const ideal = totalScoreSum > 0 ? Math.round(state.fusionOrder.length * score / totalScoreSum) : 0;
+    totalDev += Math.abs(seats - ideal);
+  });
+  statsHtml += `<div class="fusion-stat"><div class="val">${totalDev}</div><div class="lbl">Dev. totale</div></div>`;
+  document.getElementById('fusionStatsTop').innerHTML = statsHtml;
+
+  // Render bars
   let html = '';
-  if (totalMerged === totalExpected && dupes.length === 0) {
-    html = `<div class="integrity-banner integrity-ok">Integrite OK : ${totalMerged} candidat(es) (${mergedFromA} de ${esc(nameA)}, ${mergedFromB} de ${esc(nameB)}). Tous les candidats sont presents.</div>`;
-  } else {
-    html = `<div class="integrity-banner integrity-error">`;
-    if (totalMerged !== totalExpected) {
-      const missing = totalExpected - totalMerged;
-      html += `ATTENTION : ${missing} candidat(s) manquant(s) ! Attendu: ${totalExpected}, obtenu: ${totalMerged}.<br>`;
-      // Find missing
-      const allOriginal = [...state.listA.candidates, ...state.listB.candidates].filter(c => c.name && c.name.trim());
-      const mergedIds = new Set(state.merged.map(m => m.id));
-      const missingList = allOriginal.filter(c => !mergedIds.has(c.id));
-      if (missingList.length > 0) {
-        html += 'Manquants : ' + missingList.map(c => esc(c.name)).join(', ') + '<br>';
-      }
-    }
-    if (dupes.length > 0) {
-      html += `Doublons detectes : ${[...new Set(dupes)].join(', ')}`;
-    }
-    html += `</div>`;
-  }
-  banner.innerHTML = html;
-}
-
-function validateMerge() {
-  if (state.merged.length === 0) return alert('Fusionnez d\'abord les listes.');
-  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const titulaires = state.merged.filter(m => m.isTitulaire).length;
-  const suppleants = state.merged.filter(m => !m.isTitulaire).length;
-  const violations = checkParity(state.merged.filter(m => m.isTitulaire));
-
-  let msg = `Validation de la fusion :\n\n`;
-  msg += `- Titulaires : ${titulaires} / ${totalSeats} sieges\n`;
-  msg += `- Suppleants : ${suppleants}\n`;
-  msg += `- Total : ${state.merged.length}\n`;
-  msg += `- Violations de parite : ${violations.count}\n\n`;
-  msg += violations.count > 0 ? 'ATTENTION : des violations de parite persistent !' : 'Parite respectee.';
-  msg += '\n\nValider cette fusion ?';
-
-  if (confirm(msg)) {
-    state.mergeValidated = true;
-    saveState();
-    alert('Fusion validee.');
-  }
-}
-
-// Cumulative filter state: { gender: Set, elig: Set, origin: Set }
-const mergedFilters = { gender: new Set(), elig: new Set(), origin: new Set() };
-
-function toggleMergedFilter(btn) {
-  const group = btn.dataset.group;
-  const val = btn.dataset.val;
-  if (mergedFilters[group].has(val)) {
-    mergedFilters[group].delete(val);
-    btn.style.background = 'transparent';
-  } else {
-    mergedFilters[group].add(val);
-    const cs = getComputedStyle(document.documentElement);
-    btn.style.background = btn.style.borderColor;
-    btn.style.color = 'var(--blanc)';
-  }
-  updateFilterBtnStyles();
-  renderMergedList();
-}
-
-function updateFilterBtnStyles() {
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    const active = mergedFilters[btn.dataset.group]?.has(btn.dataset.val);
-    if (active) { btn.style.color = 'var(--blanc)'; btn.style.background = btn.style.borderColor; }
-    else { btn.style.background = 'transparent'; btn.style.color = btn.style.borderColor; }
+  state.fusionOrder.forEach((f, i) => {
+    const cls = 'fusion-row';
+    html += `<div class="${cls}" draggable="true" data-idx="${i}"
+      ondragstart="onFusionDragStart(event,${i})"
+      ondragend="onFusionDragEnd(event)"
+      ondragover="onFusionDragOver(event)"
+      ondragleave="onFusionDragLeave(event)"
+      ondrop="onFusionDrop(event,${i})">
+      <span class="fusion-pos">${f.position}</span>
+      <div class="fusion-bar" style="background:${f.color};">${esc(f.list)}</div>
+      <span class="fusion-badge fusion-badge-${f.gender.toLowerCase()}">${f.gender}</span>
+    </div>`;
   });
-  // Summary
-  const parts = [];
-  if (mergedFilters.gender.size) parts.push('Genre: ' + [...mergedFilters.gender].join(', '));
-  if (mergedFilters.elig.size) parts.push('Poste: ' + [...mergedFilters.elig].join(', '));
-  if (mergedFilters.origin.size) parts.push('Liste: ' + [...mergedFilters.origin].join(', '));
-  const el = document.getElementById('activeFiltersSummary');
-  if (el) el.textContent = parts.length ? 'Filtres actifs : ' + parts.join(' | ') : '';
+  container.innerHTML = html;
+
+  document.getElementById('fusionStatsBottom').textContent = bottomParts.join(' + ') + ` = ${state.fusionOrder.length} total`;
 }
 
-function clearMergedFilters() {
-  mergedFilters.gender.clear(); mergedFilters.elig.clear(); mergedFilters.origin.clear();
-  updateFilterBtnStyles();
-  renderMergedList();
+// Drag-and-drop for fusion bars
+function onFusionDragStart(e, idx) {
+  e.dataTransfer.setData('text/plain', idx.toString());
+  e.target.classList.add('dragging');
+}
+function onFusionDragEnd(e) { e.target.classList.remove('dragging'); }
+function onFusionDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onFusionDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function onFusionDrop(e, destIdx) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  const srcIdx = parseInt(e.dataTransfer.getData('text/plain'));
+  if (isNaN(srcIdx) || srcIdx === destIdx) return;
+
+  const item = state.fusionOrder.splice(srcIdx, 1)[0];
+  state.fusionOrder.splice(destIdx, 0, item);
+  state.fusionOrder.forEach((f, i) => f.position = i + 1);
+
+  // Sync state.merged
+  const coalSeats = state.coalitionSeats || parseInt(document.getElementById('totalSeats').value) || 0;
+  state.merged = state.fusionOrder.map((f, i) => ({
+    id: genId(), name: '', gender: f.gender, origin: f.list,
+    epci: false, position: i + 1, isTitulaire: i < coalSeats
+  }));
+
+  renderFusionBars();
+  saveState();
 }
 
-function buildListFilterBtns() {
-  const container = document.getElementById('filterListBtns');
-  if (!container) return;
-  container.innerHTML = '';
-  const origins = new Set(state.merged.map(c => c.origin).filter(Boolean));
-  const colors = ['#8B5CF6','#06B6D4','#F59E0B','#EC4899','#10B981'];
-  let ci = 0;
-  origins.forEach(name => {
-    const color = colors[ci++ % colors.length];
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-sm filter-btn';
-    btn.dataset.group = 'origin';
-    btn.dataset.val = name;
-    btn.onclick = () => toggleMergedFilter(btn);
-    btn.style.cssText = `border:2px solid ${color};color:${color};background:transparent;`;
-    btn.textContent = name;
-    container.appendChild(btn);
-  });
+function resetFusion() {
+  state.fusionOrder = [];
+  state.fusionLists = [];
+  document.getElementById('fusionInfo').style.display = 'none';
+  document.getElementById('fusionResultCard').style.display = 'none';
+  populateFusionSelects();
+  saveState();
 }
 
-function passesFilters(c, elig) {
-  if (mergedFilters.gender.size && !mergedFilters.gender.has(c.gender)) return false;
-  if (mergedFilters.elig.size && !mergedFilters.elig.has(elig.type)) return false;
-  if (mergedFilters.origin.size && !mergedFilters.origin.has(c.origin)) return false;
-  return true;
-}
-
+// Utility: kept for Module 3 compatibility
 function getPositionEligibility(position, totalSeats) {
   const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
@@ -1479,143 +1212,17 @@ function getPositionEligibility(position, totalSeats) {
   return {type: 'simple', label: 'Conseiller', color: 'var(--texte-light)', bg: 'transparent'};
 }
 
-function renderMergedList() {
-  const tbody = document.getElementById('mergedBody'); tbody.innerHTML = '';
-  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
-  const flagZone = Math.ceil(totalSeats * 3 / 5);
-  const violations = checkParity(state.merged);
-  let fCount = 0, hCount = 0, epciCount = 0, filteredCount = 0;
-  const hasFilters = mergedFilters.gender.size || mergedFilters.elig.size || mergedFilters.origin.size;
-
-  // Build list filter buttons if needed
-  buildListFilterBtns();
-
-  state.merged.forEach((c, i) => {
-    if (c.gender === 'F') fCount++; else hCount++;
-    if (c.epci) epciCount++;
-    const elig = getPositionEligibility(c.position, totalSeats);
-
-    // Cumulative filter: AND between groups, OR within group
-    if (!passesFilters(c, elig)) return;
-    filteredCount++;
-
-    const isViolation = violations.positions.includes(i);
-    const inZone = (c.position <= flagZone);
-    const epciOk = !c.epci || inZone;
-    const isSuppleant = c.isTitulaire === false;
-    const tr = document.createElement('tr');
-    if (isViolation) tr.classList.add('parity-error');
-    if (inZone && epciSeats > 0 && !isSuppleant) tr.classList.add('epci-zone');
-    if (isSuppleant) tr.classList.add('suppliant-row');
-
-    tr.draggable = true;
-    tr.ondragstart = (e) => { e.dataTransfer.setData('text', 'merged:' + i); tr.classList.add('dragging'); };
-    tr.ondragend = () => tr.classList.remove('dragging');
-    tr.ondragover = (e) => { e.preventDefault(); tr.classList.add('drag-over'); };
-    tr.ondragleave = () => tr.classList.remove('drag-over');
-    tr.ondrop = (e) => {
-      e.preventDefault(); tr.classList.remove('drag-over');
-      const data = e.dataTransfer.getData('text');
-      if (data.startsWith('merged:')) {
-        const srcIdx = parseInt(data.split(':')[1]);
-        const item = state.merged.splice(srcIdx, 1)[0];
-        state.merged.splice(i, 0, item);
-        state.merged.forEach((m, idx) => { m.position = idx + 1; m.isTitulaire = idx < totalSeats; });
-        renderMergedList(); saveState();
-      }
-    };
-
-    let statusHtml = '';
-    if (isSuppleant) statusHtml = '<span class="status-warn">Suppleant</span>';
-    else if (isViolation) statusHtml = '<span class="status-error">Parite!</span>';
-    else statusHtml = '<span class="status-ok">OK</span>';
-
-    const eligHtml = `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:${elig.color};background:${elig.bg};border:1px solid ${elig.color};">${elig.label}</span>`;
-
-    tr.innerHTML = `<td>${c.position}</td>
-      <td><input type="text" value="${esc(c.name)}" style="width:100%;min-width:120px;" onchange="editMergedCandidate(${i},'name',this.value)"></td>
-      <td><select onchange="editMergedCandidate(${i},'gender',this.value)" style="width:50px;">
-        <option value="F" ${c.gender==='F'?'selected':''}>F</option><option value="H" ${c.gender==='H'?'selected':''}>H</option></select></td>
-      <td>${esc(c.origin || '')}</td>
-      <td>${eligHtml}</td>
-      <td>${c.epci ? (epciOk ? '<span class="status-ok">OK</span>' : '<span class="status-error">Hors zone!</span>') : '<input type="checkbox" onchange="editMergedCandidate('+i+',\'epci\',this.checked)">'}</td>
-      <td>${statusHtml}</td>
-      <td><button class="btn btn-sm btn-danger" onclick="removeMergedCandidate(${i})">x</button></td>`;
-    tbody.appendChild(tr);
-  });
-
-  const titCount = state.merged.filter(m => m.isTitulaire !== false).length;
-  const supCount = state.merged.filter(m => m.isTitulaire === false).length;
-  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
-  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
-  let statsHtml = `${state.merged.length} total | ${titCount} titulaires | ${supCount} suppleant(s) | <span class="badge-f">F</span> ${fCount} | <span class="badge-h">H</span> ${hCount} | EPCI: ${epciCount}`;
-  if (hasFilters) statsHtml += ` | <em>Filtre : ${filteredCount} affiche(s)</em>`;
-  if (nbAdj > 0 || nbDel > 0) statsHtml += `<br><span style="font-size:11px;opacity:0.7;">Postes : 1 maire + ${nbAdj} adjoint(s) + ${nbDel} delegue(s) + ${Math.max(0, totalSeats - 1 - nbAdj - nbDel)} simple(s)</span>`;
-  document.getElementById('mergedStats').innerHTML = statsHtml;
-
-  const diagDiv = document.getElementById('parityDiag');
-  const detailsDiv = document.getElementById('parityDetails');
-  const statusDiv = document.getElementById('parityStatus');
-
-  if (violations.count > 0) {
-    diagDiv.style.display = 'block';
-    statusDiv.innerHTML = `<span class="status-error">${violations.count} violation(s) de parite</span>`;
-    let html = '<ul>';
-    violations.details.forEach(v => html += `<li class="status-error">Position ${v.pos}: ${esc(v.name1)} (${v.g1}) suivi de ${esc(v.name2)} (${v.g2})</li>`);
-    html += '</ul>';
-    detailsDiv.innerHTML = html;
-  } else if (state.merged.length > 0) {
-    diagDiv.style.display = 'none';
-    statusDiv.innerHTML = '<span class="status-ok">Parite respectee</span>';
-  } else { diagDiv.style.display = 'none'; statusDiv.innerHTML = ''; }
-}
-
-function editMergedCandidate(idx, field, value) {
-  state.merged[idx][field] = value;
-  renderMergedList(); renderDelegationTable(); saveState();
-}
-
-function removeMergedCandidate(idx) {
-  state.merged.splice(idx, 1);
-  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  state.merged.forEach((m, i) => { m.position = i + 1; m.isTitulaire = i < totalSeats; });
-  renderMergedList(); renderDelegationTable(); saveState();
-}
-
 function checkParity(list) {
   const violations = {count: 0, positions: [], details: []};
   for (let i = 0; i < list.length - 1; i++) {
     if (list[i].gender === list[i+1].gender) {
       violations.count++;
       violations.positions.push(i); violations.positions.push(i+1);
-      violations.details.push({pos: i + 1, name1: list[i].name, g1: list[i].gender, name2: list[i+1].name, g2: list[i+1].gender});
+      violations.details.push({pos: i + 1, name1: list[i].name || list[i].list || '', g1: list[i].gender, name2: list[i+1].name || list[i+1].list || '', g2: list[i+1].gender});
     }
   }
   violations.positions = [...new Set(violations.positions)];
   return violations;
-}
-
-function autoFixParity() {
-  if (state.merged.length === 0) return;
-  for (let iter = 0; iter < 200; iter++) {
-    let swapped = false;
-    for (let i = 0; i < state.merged.length - 1; i++) {
-      if (state.merged[i].gender === state.merged[i+1].gender) {
-        const needGender = state.merged[i].gender === 'F' ? 'H' : 'F';
-        for (let j = i + 2; j < state.merged.length; j++) {
-          if (state.merged[j].gender === needGender) {
-            [state.merged[i+1], state.merged[j]] = [state.merged[j], state.merged[i+1]];
-            state.merged.forEach((m, idx) => m.position = idx + 1);
-            swapped = true; break;
-          }
-        }
-        if (swapped) break;
-      }
-    }
-    if (!swapped) break;
-  }
-  renderMergedList(); saveState();
 }
 
 // =====================================================================
@@ -1624,17 +1231,12 @@ function autoFixParity() {
 function onAdjointsChange() {
   const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
   const designes = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
-  const negocies = parseInt(document.getElementById('nbAdjointsNegocies').value) || 0;
   const alerts = document.getElementById('adjointAlerts');
   let html = '';
 
   if (designes > maxAdj) {
     html += `<div class="card alert-orange" style="padding:8px;margin:4px 0;font-size:12px;">
       <strong>Depassement du plafond legal :</strong> ${designes} adjoints designes > ${maxAdj} plafond (30%). Cette configuration depasse le cadre legal strict des adjoints au sens du CGCT.</div>`;
-  }
-  if (negocies > 0 && negocies > designes) {
-    html += `<div class="card alert-blue" style="padding:8px;margin:4px 0;font-size:12px;">
-      <strong>Simulation politique elargie :</strong> ${negocies} postes negocies (vs ${designes} designes). Les postes supplementaires relevent de la negociation politique, pas du droit legal.</div>`;
   }
   alerts.innerHTML = html;
 
@@ -1651,79 +1253,9 @@ function onAdjointsChange() {
 }
 
 // =====================================================================
-// MODULE 3: ALLOWANCES (DGCL FORMULA)
+// MODULE 3: POSITION RECALC
 // =====================================================================
 function calcAllowances() {
-  const pop = parseInt(document.getElementById('cityPop').value) || 0;
-  const mayorMax = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjMax = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
-  const mayorActual = parseFloat(document.getElementById('mayorActual').value) || 0;
-  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
-  const nbAdjDesignes = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
-  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
-  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const nbCons = Math.max(0, totalSeats - 1 - nbAdjDesignes - nbDel);
-
-  // Clamp actual values to max
-  if (mayorActual > mayorMax && mayorMax > 0) document.getElementById('mayorActual').value = mayorMax.toFixed(2);
-  if (adjActualPer > adjMax && adjMax > 0) document.getElementById('adjointActual').value = adjMax.toFixed(2);
-  const clampedMayor = Math.min(mayorActual, mayorMax || mayorActual);
-  const clampedAdj = Math.min(adjActualPer, adjMax || adjActualPer);
-
-  // DGCL formula: envelope = mayor max + sum of adjoint max for each designated adjoint with delegation
-  const enveloppeGlobale = mayorMax + (nbAdjDesignes * adjMax);
-
-  // Actual distribution (what we plan to spend)
-  const adjActualTotal = nbAdjDesignes * clampedAdj;
-  const delActual = nbDel * delAllow;
-  const totalDistributed = clampedMayor + adjActualTotal + delActual;
-  const pctUsed = enveloppeGlobale > 0 ? (totalDistributed / enveloppeGlobale * 100) : 0;
-  const remaining = enveloppeGlobale - totalDistributed;
-
-  // Envelope detail
-  const detailDiv = document.getElementById('enveloppeDetail');
-  detailDiv.innerHTML = `
-    <div style="font-size:12px;line-height:1.8;">
-      <strong>Plafond global :</strong> ${enveloppeGlobale.toFixed(2)} euros/mois<br>
-      = Maire max (${mayorMax.toFixed(2)} euros) + ${nbAdjDesignes} adjoint(s) x ${adjMax.toFixed(2)} euros<br>
-      <strong>Distribue :</strong> ${totalDistributed.toFixed(2)} euros/mois (${pctUsed.toFixed(0)}% de l'enveloppe)<br>
-      = Maire (${clampedMayor.toFixed(2)}) + ${nbAdjDesignes} adj x ${clampedAdj.toFixed(2)} (${adjActualTotal.toFixed(2)}) + ${nbDel} del x ${delAllow.toFixed(2)} (${delActual.toFixed(2)})<br>
-      <strong>${remaining >= 0 ? 'Marge restante' : 'Depassement'} :</strong> <span style="color:${remaining >= 0 ? 'var(--vert)' : 'var(--rouge)'};">${Math.abs(remaining).toFixed(2)} euros/mois</span>
-    </div>`;
-
-  // Gauge
-  const gaugeFill = document.getElementById('enveloppeGaugeFill');
-  const pctDisplay = Math.min(pctUsed, 100);
-  gaugeFill.style.width = pctDisplay + '%';
-  gaugeFill.textContent = pctUsed.toFixed(0) + '%';
-  gaugeFill.className = 'gauge-fill ' + (pctUsed > 100 ? 'gauge-over' : pctUsed > 85 ? 'gauge-warn' : 'gauge-ok');
-
-  // Alerts
-  const alertsDiv = document.getElementById('enveloppeAlerts');
-  let alertHtml = '';
-  if (totalDistributed > enveloppeGlobale) {
-    alertHtml += `<div class="card alert-red" style="padding:8px;margin:4px 0;font-size:12px;">
-      <strong>Enveloppe depassee de ${(totalDistributed - enveloppeGlobale).toFixed(2)} euros !</strong> La repartition proposee excede le plafond legal.</div>`;
-  }
-  if (pop >= 100000) {
-    alertHtml += `<div class="card alert-orange" style="padding:8px;margin:4px 0;font-size:12px;">
-      Commune > 100 000 hab : les conseillers municipaux sans delegation ne peuvent pas etre indemnises sur l'enveloppe globale.</div>`;
-  }
-  alertsDiv.innerHTML = alertHtml;
-
-  // Summary
-  const summary = document.getElementById('allowanceSummary');
-  summary.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-      <div><p style="font-size:11px;opacity:0.7;">Cout mensuel total</p><p><strong>${totalDistributed.toFixed(2)} euros</strong></p></div>
-      <div><p style="font-size:11px;opacity:0.7;">Cout annuel total</p><p><strong>${(totalDistributed * 12).toFixed(2)} euros</strong></p></div>
-      <div><p style="font-size:11px;opacity:0.7;">Simples conseillers</p><p><strong>${nbCons}</strong></p></div>
-    </div>
-    <div style="margin-top:8px;font-size:11px;color:var(--texte-light);">
-      Maire: ${clampedMayor.toFixed(0)}e | ${nbAdjDesignes} adj: ${adjActualTotal.toFixed(0)}e | ${nbDel} del: ${delActual.toFixed(0)}e
-    </div>`;
-
   renderPositionDistribution();
   saveState();
 }
@@ -1737,45 +1269,48 @@ function renderPositionDistribution() {
   const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
 
   if (!state.results.seats || Object.keys(state.results.seats).length === 0) return;
-  const coalitionSeats = Object.values(state.results.seats).reduce((a, b) => a + b, 0);
-  // Use CGCT legal council size (from population) as the real full council
-  const cgctCouncil = parseInt(document.getElementById('dispCouncilSize').textContent) || 0;
-  const fullCouncil = cgctCouncil > coalitionSeats ? cgctCouncil : (parseInt(document.getElementById('totalSeats').value) || coalitionSeats);
+  const fullCouncil = parseInt(document.getElementById('totalSeats').value) || 0;
+  const coalitionSeats = state.coalitionSeats > 0 ? state.coalitionSeats : fullCouncil;
   const oppositionSeats = Math.max(0, fullCouncil - coalitionSeats);
 
-  let totalAdjTheo = 0, totalAdjAdj = 0, totalDelTheo = 0, totalDelAdj = 0, totalSimple = 0;
+  let totalAdjAdj = 0, totalDelAdj = 0, totalSimple = 0;
 
-  for (const name in state.results.seats) {
-    const seats = state.results.seats[name];
-    // Ratio based on coalition seats only (opposition doesn't get posts)
-    const ratio = coalitionSeats > 0 ? seats / coalitionSeats : 0;
+  // If fusion has been computed, use fusion seat counts; otherwise fall back to Module 1
+  const fusionSeatCounts = {};
+  if (state.fusionOrder && state.fusionOrder.length > 0) {
+    state.fusionOrder.forEach(f => { fusionSeatCounts[f.list] = (fusionSeatCounts[f.list] || 0) + 1; });
+  }
+  const seatSource = Object.keys(fusionSeatCounts).length > 0 ? fusionSeatCounts : state.results.seats;
+  const seatTotal = Object.values(seatSource).reduce((a, b) => a + b, 0);
+
+  // Clean positionDist: remove entries for lists that no longer exist
+  for (const name in state.positionDist) {
+    if (!(name in seatSource)) delete state.positionDist[name];
+  }
+
+  for (const name in seatSource) {
+    const seats = seatSource[name];
+    const ratio = seatTotal > 0 ? seats / seatTotal : 0;
     const adjTheo = Math.round(nbAdj * ratio);
     const delTheo = Math.round(nbDel * ratio);
 
-    // Get adjusted values from state or default to theoretical
     if (!state.positionDist[name]) state.positionDist[name] = {};
     const dist = state.positionDist[name];
     if (dist.adjAdj === undefined) dist.adjAdj = adjTheo;
     if (dist.delAdj === undefined) dist.delAdj = delTheo;
 
-    const adjEcart = dist.adjAdj - adjTheo;
-    const delEcart = dist.delAdj - delTheo;
     const simpleCount = Math.max(0, seats - dist.adjAdj - dist.delAdj);
 
-    totalAdjTheo += adjTheo; totalAdjAdj += dist.adjAdj;
-    totalDelTheo += delTheo; totalDelAdj += dist.delAdj;
+    totalAdjAdj += dist.adjAdj;
+    totalDelAdj += dist.delAdj;
     totalSimple += simpleCount;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${esc(name)}</td>
       <td><strong>${seats}</strong></td>
-      <td style="text-align:center;opacity:0.6;">${adjTheo}</td>
       <td><input type="number" value="${dist.adjAdj}" min="0" style="width:50px;" onchange="state.positionDist['${esc(name)}'].adjAdj=parseInt(this.value)||0;renderPositionDistribution();saveState();"></td>
-      <td class="${ecartClass(adjEcart)}" style="text-align:center;">${adjEcart > 0 ? '+' : ''}${adjEcart}</td>
-      <td style="text-align:center;opacity:0.6;">${delTheo}</td>
       <td><input type="number" value="${dist.delAdj}" min="0" style="width:50px;" onchange="state.positionDist['${esc(name)}'].delAdj=parseInt(this.value)||0;renderPositionDistribution();saveState();"></td>
-      <td class="${ecartClass(delEcart)}" style="text-align:center;">${delEcart > 0 ? '+' : ''}${delEcart}</td>
       <td style="text-align:center;">${simpleCount}</td>`;
     tbody.appendChild(tr);
   }
@@ -1788,8 +1323,8 @@ function renderPositionDistribution() {
     trOpp.innerHTML = `
       <td>Opposition</td>
       <td><strong>${oppositionSeats}</strong></td>
-      <td style="text-align:center;">0</td><td style="text-align:center;">0</td><td></td>
-      <td style="text-align:center;">0</td><td style="text-align:center;">0</td><td></td>
+      <td style="text-align:center;">0</td>
+      <td style="text-align:center;">0</td>
       <td style="text-align:center;">${oppositionSeats}</td>`;
     tbody.appendChild(trOpp);
   }
@@ -1798,8 +1333,8 @@ function renderPositionDistribution() {
   const grandTotal = coalitionSeats + oppositionSeats;
   const trTot = document.createElement('tr');
   trTot.innerHTML = `<td><strong>TOTAL</strong></td><td><strong>${grandTotal}</strong></td>
-    <td style="text-align:center;opacity:0.6;">${totalAdjTheo}</td><td style="text-align:center;"><strong>${totalAdjAdj}</strong></td><td></td>
-    <td style="text-align:center;opacity:0.6;">${totalDelTheo}</td><td style="text-align:center;"><strong>${totalDelAdj}</strong></td><td></td>
+    <td style="text-align:center;"><strong>${totalAdjAdj}</strong></td>
+    <td style="text-align:center;"><strong>${totalDelAdj}</strong></td>
     <td style="text-align:center;"><strong>${totalSimple + oppositionSeats}</strong></td>`;
   tbody.appendChild(trTot);
 
@@ -1825,41 +1360,115 @@ function autoDistributePositions() {
 }
 
 // =====================================================================
-// MODULE 3: DELEGATIONS — FIXED
+// MODULE 3: DELEGATIONS — WITH FILTERS & SORT
 // =====================================================================
+const delFilters = { load: new Set(), assigned: new Set() };
+
+function delToggleFilter(btn) {
+  const group = btn.dataset.group, val = btn.dataset.val;
+  if (delFilters[group].has(val)) {
+    delFilters[group].delete(val);
+    btn.style.background = 'transparent';
+  } else {
+    delFilters[group].add(val);
+    btn.style.background = btn.style.color; btn.style.color = '#fff';
+  }
+  renderDelegationTable();
+}
+
+function delClearFilters() {
+  delFilters.load.clear(); delFilters.assigned.clear();
+  document.querySelectorAll('.del-filter').forEach(b => { b.style.background = 'transparent'; b.style.color = b.style.borderColor; });
+  renderDelegationTable();
+}
+
 function renderDelegationTable() {
   const tbody = document.getElementById('delegationBody'); tbody.innerHTML = '';
-
-  // Build candidate options with unique IDs
   const candidates = state.merged.filter(c => c.name && c.name !== '(vacant)');
 
-  DELEGATION_CATALOG.forEach(d => {
-    const loadClass = d.timeLoad === 'heavy' ? 'load-heavy' : (d.timeLoad === 'medium' ? 'load-medium' : 'load-light');
-    const loadLabel = d.timeLoad === 'heavy' ? 'Lourde' : (d.timeLoad === 'medium' ? 'Moyenne' : 'Legere');
-    const assignment = state.delegationAssignments[d.id] || {};
-    const assignedId = assignment.candidateId || '';
-    const assignedType = assignment.type || 'adjoint';
+  // Also pull from wsState if Module 4 has imported data
+  const wsCandidates = (typeof wsState !== 'undefined' && wsState.data) ? wsState.data.filter(c => c.name && c.name.trim()) : [];
+  const allCandidates = candidates.length > 0 ? candidates : wsCandidates;
 
-    // Build select options dynamically
+  // Build filtered + sorted list
+  let items = DELEGATION_CATALOG.map(d => {
+    const assignment = state.delegationAssignments[d.id] || {};
+    return { ...d, assignedId: assignment.candidateId || '', assignedType: assignment.type || 'adjoint' };
+  });
+
+  // Apply filters
+  if (delFilters.load.size > 0) items = items.filter(d => delFilters.load.has(d.timeLoad));
+  if (delFilters.assigned.size > 0) {
+    items = items.filter(d => {
+      const isAssigned = !!d.assignedId;
+      return (delFilters.assigned.has('yes') && isAssigned) || (delFilters.assigned.has('no') && !isAssigned);
+    });
+  }
+
+  // Apply sort
+  const sortVal = document.getElementById('del-sort')?.value || 'default';
+  const loadOrder = { heavy: 3, medium: 2, light: 1 };
+  if (sortVal === 'charge_desc') items.sort((a, b) => loadOrder[b.timeLoad] - loadOrder[a.timeLoad]);
+  else if (sortVal === 'charge_asc') items.sort((a, b) => loadOrder[a.timeLoad] - loadOrder[b.timeLoad]);
+  else if (sortVal === 'alpha') items.sort((a, b) => a.label.localeCompare(b.label));
+  else if (sortVal === 'assigned') items.sort((a, b) => (b.assignedId ? 1 : 0) - (a.assignedId ? 1 : 0));
+  else if (sortVal === 'unassigned') items.sort((a, b) => (a.assignedId ? 1 : 0) - (b.assignedId ? 1 : 0));
+
+  items.forEach(d => {
+    const loadBg = { heavy: '#E1000F', medium: '#E67E22', light: '#18753C' };
+    const typeBg = { adjoint: '#18753C', delegue: '#E67E22' };
+    const detachBg = { non_negociable: '#18753C', negociable: '#E67E22', non_requis: '#E1000F' };
+
     let opts = '<option value="">--</option>';
-    candidates.forEach(c => {
-      const sel = c.id === assignedId ? ' selected' : '';
+    allCandidates.forEach(c => {
+      const sel = c.id === d.assignedId ? ' selected' : '';
       opts += `<option value="${esc(c.id)}"${sel}>${esc(c.name)} (${esc(c.origin || '?')})</option>`;
     });
 
+    const detachOverride = state.delegationOverrides?.[d.id]?.detachment;
+    const detachVal = detachOverride !== undefined ? detachOverride : (d.needsDetachment ? 'non_negociable' : 'non_requis');
+
+    // Editable delegation label from overrides
+    const labelOverride = state.delegationOverrides?.[d.id]?.label;
+    const displayLabel = labelOverride !== undefined ? labelOverride : d.label;
+
     const tr = document.createElement('tr');
+    if (d.assignedId) tr.style.background = 'rgba(24,117,60,0.05)';
     tr.innerHTML = `
-      <td>${d.label}</td>
-      <td><select onchange="updateDelegation('${d.id}','type',this.value)" style="width:90px;">
-        <option value="adjoint" ${assignedType==='adjoint'?'selected':''}>Adjoint</option>
-        <option value="delegue" ${assignedType==='delegue'?'selected':''}>Delegue</option>
+      <td><textarea onchange="updateDelField('${d.id}','label',this.value)" style="width:100%;min-height:28px;border:1px solid var(--gris-border);border-radius:4px;padding:4px 6px;font-size:12px;font-weight:600;resize:vertical;font-family:inherit;">${esc(displayLabel)}</textarea></td>
+      <td><select onchange="updateDelegation('${d.id}','type',this.value)" style="width:90px;background:${typeBg[d.assignedType] || '#18753C'};color:#fff;border:none;border-radius:4px;padding:4px 6px;font-weight:600;">
+        <option value="adjoint" ${d.assignedType==='adjoint'?'selected':''} style="background:#fff;color:#000;">Adjoint</option>
+        <option value="delegue" ${d.assignedType==='delegue'?'selected':''} style="background:#fff;color:#000;">Delegue</option>
       </select></td>
-      <td><span class="${loadClass}">${loadLabel}</span></td>
-      <td>${d.hoursPerWeek}h</td>
-      <td><select onchange="updateDelegation('${d.id}','candidateId',this.value)" style="width:180px;">${opts}</select></td>
-      <td>${d.needsDetachment ? '<span class="status-warn">Recommande</span>' : '<span class="status-ok">Non requis</span>'}</td>`;
+      <td><select onchange="updateDelField('${d.id}','timeLoad',this.value)" style="width:100px;background:${loadBg[d.timeLoad] || '#666'};color:#fff;border:none;border-radius:4px;padding:4px 6px;font-weight:600;">
+        <option value="heavy" ${d.timeLoad==='heavy'?'selected':''} style="background:#fff;color:#000;">Lourde</option>
+        <option value="medium" ${d.timeLoad==='medium'?'selected':''} style="background:#fff;color:#000;">Moyenne</option>
+        <option value="light" ${d.timeLoad==='light'?'selected':''} style="background:#fff;color:#000;">Legere</option>
+      </select></td>
+      <td><input type="number" value="${d.hoursPerWeek}" min="0" max="40" style="width:50px;" onchange="updateDelField('${d.id}','hoursPerWeek',parseInt(this.value)||0)"></td>
+      <td><select onchange="updateDelegation('${d.id}','candidateId',this.value)" style="width:200px;">${opts}</select></td>
+      <td><select onchange="updateDelField('${d.id}','detachment',this.value)" style="width:130px;background:${detachBg[detachVal] || '#666'};color:#fff;border:none;border-radius:4px;padding:4px 6px;font-weight:600;">
+        <option value="non_negociable" ${detachVal==='non_negociable'?'selected':''} style="background:#fff;color:#000;">Non negociable</option>
+        <option value="negociable" ${detachVal==='negociable'?'selected':''} style="background:#fff;color:#000;">Negociable</option>
+        <option value="non_requis" ${detachVal==='non_requis'?'selected':''} style="background:#fff;color:#000;">Non requis</option>
+      </select></td>`;
     tbody.appendChild(tr);
   });
+
+  // Stats
+  const total = DELEGATION_CATALOG.length;
+  const assigned = DELEGATION_CATALOG.filter(d => state.delegationAssignments[d.id]?.candidateId).length;
+  const totalHours = DELEGATION_CATALOG.reduce((s, d) => s + d.hoursPerWeek, 0);
+  const assignedHours = DELEGATION_CATALOG.filter(d => state.delegationAssignments[d.id]?.candidateId).reduce((s, d) => s + d.hoursPerWeek, 0);
+  const statsEl = document.getElementById('del-stats');
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <span style="font-size:12px;padding:4px 8px;background:#f0f0f0;border-radius:4px;"><strong>${assigned}</strong>/${total} attribuees</span>
+      <span style="font-size:12px;padding:4px 8px;background:#f0f0f0;border-radius:4px;"><strong>${assignedHours}</strong>/${totalHours}h couvertes</span>
+      <span style="font-size:12px;padding:4px 8px;background:${assigned === total ? 'rgba(24,117,60,0.1)' : 'rgba(230,126,34,0.1)'};border-radius:4px;color:${assigned === total ? 'var(--vert)' : 'var(--orange)'};">${assigned === total ? 'Complet' : (total - assigned) + ' restante(s)'}</span>`;
+  }
+  const fcEl = document.getElementById('del-filter-count');
+  if (fcEl) fcEl.textContent = items.length + '/' + total + ' affichee(s)';
 }
 
 function updateDelegation(delId, field, value) {
@@ -1868,6 +1477,20 @@ function updateDelegation(delId, field, value) {
   // Clean up empty assignments
   if (!state.delegationAssignments[delId].candidateId) delete state.delegationAssignments[delId];
   onAdjointsChange(); // recounts delegation-based adjoints
+  saveState();
+}
+
+function updateDelField(delId, field, value) {
+  const item = DELEGATION_CATALOG.find(d => d.id === delId);
+  if (!item) return;
+  if (field === 'detachment' || field === 'label') {
+    if (!state.delegationOverrides) state.delegationOverrides = {};
+    if (!state.delegationOverrides[delId]) state.delegationOverrides[delId] = {};
+    state.delegationOverrides[delId][field] = value;
+  } else {
+    item[field] = value;
+  }
+  renderDelegationTable();
   saveState();
 }
 
@@ -1882,48 +1505,6 @@ function addCustomDelegation() {
 }
 
 // =====================================================================
-// MODULE 3: CLAIMABLE POSITIONS
-// =====================================================================
-function renderClaimablePositions() {
-  const tbody = document.getElementById('claimableBody'); tbody.innerHTML = '';
-  if (!state.results.seats || Object.keys(state.results.seats).length === 0) return;
-
-  const totalSeats = Object.values(state.results.seats).reduce((a, b) => a + b, 0);
-  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
-  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
-  const adjMaxAllow = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
-  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-  const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
-
-  for (const name in state.results.seats) {
-    const seats = state.results.seats[name];
-    const ratio = totalSeats > 0 ? seats / totalSeats : 0;
-    const pctLabel = (ratio * 100).toFixed(1) + '%';
-
-    // Legal: max adjoints this group can have = min(proportional share, legal max)
-    const adjLegal = Math.min(Math.round(maxAdj * ratio), maxAdj);
-    const delLegal = Math.round(nbDel * ratio);
-
-    // Political simulation: proportional to electoral weight
-    const adjPol = Math.round(nbAdj * ratio);
-    const delPol = Math.round(nbDel * ratio);
-
-    // Estimated allowance
-    const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || adjMaxAllow;
-    const estAllowance = (adjPol * adjActualPer) + (delPol * delAllow);
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${esc(name)}</strong></td>
-      <td>${pctLabel}</td>
-      <td>${adjLegal} adj.</td><td>${delLegal} del.</td>
-      <td>${adjPol} adj.</td><td>${delPol} del.</td>
-      <td><strong>${estAllowance.toFixed(0)} e/mois</strong></td>`;
-    tbody.appendChild(tr);
-  }
-}
-
-// =====================================================================
 // MODULE 3: LEGAL CHECKLIST
 // =====================================================================
 function updateChecklist() {
@@ -1934,25 +1515,13 @@ function updateChecklist() {
   const maxAdj = parseInt(document.getElementById('maxAdjoints').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
 
-  // Envelope check
-  const mayorMax = parseFloat(document.getElementById('mayorAllowance').value) || 0;
-  const adjMax = parseFloat(document.getElementById('adjointMaxAllowance').value) || 0;
-  const mayorActual = parseFloat(document.getElementById('mayorActual').value) || 0;
-  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
-  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
-  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-  const envelope = mayorMax + (nbAdj * adjMax);
-  const distributed = Math.min(mayorActual, mayorMax || mayorActual) + (nbAdj * Math.min(adjActualPer, adjMax || adjActualPer)) + (nbDel * delAllow);
-
   const checks = [
     { label: 'Taille du conseil conforme a la population', ok: pop === 0 || (COUNCIL_SIZES.find(c => pop >= c.min && pop <= c.max)?.seats === totalSeats) },
-    { label: 'Parite respectee sur la liste fusionnee', ok: state.merged.length === 0 || checkParity(state.merged).count === 0 },
+    { label: 'Parite respectee sur la liste fusionnee', ok: state.fusionOrder.length === 0 || checkParity(state.fusionOrder).count === 0 },
     { label: 'Plafond adjoints (30% du conseil)', ok: nbAdj <= maxAdj || maxAdj === 0 },
     { label: 'Prime majoritaire correcte', ok: state.mode === 'integrale' || (document.getElementById('isPLM').checked ? state.primePercent === 25 : state.primePercent === 50) },
-    { label: 'Flechage EPCI dans les 3/5 premiers', ok: (() => { if (epciSeats === 0 || state.merged.length === 0) return true; const z = Math.ceil(totalSeats*3/5); return state.merged.filter(c => c.epci && c.position > z).length === 0; })() },
     { label: 'Au moins 2 listes pour une fusion', ok: state.lists.filter(l => (parseFloat(l.score)||0) > 0).length >= 2 },
-    { label: 'Enveloppe indemnitaire respectee', ok: distributed <= envelope || envelope === 0 },
-    { label: 'Integrite de la liste fusionnee', ok: state.merged.length === 0 || state.mergeValidated || (() => { const a = state.listA.candidates.filter(c=>c.name&&c.name.trim()).length; const b = state.listB.candidates.filter(c=>c.name&&c.name.trim()).length; return state.merged.length >= a + b; })() }
+    { label: 'Fusion calculee', ok: state.fusionOrder.length > 0 }
   ];
 
   checks.forEach(c => {
@@ -1967,29 +1536,38 @@ function updateChecklist() {
 // =====================================================================
 function generateNegotiationSummary() {
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
-  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
-  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
+  const coalSeats = state.coalitionSeats > 0 ? state.coalitionSeats : totalSeats;
+  const oppSeats = totalSeats - coalSeats;
+  const nbAdj = parseInt(document.getElementById('nbAdjointsDesignes').value) || 0;
+  const nbDel = parseInt(document.getElementById('nbDelegues').value) || 0;
   const epciSeats = parseInt(document.getElementById('epciSeats').value) || 0;
   const cityName = document.getElementById('cityName').value || '[Commune]';
 
   let text = `SYNTHESE DE NEGOCIATION — ${cityName}\n`;
   text += `${'='.repeat(50)}\n\n`;
-  text += `Conseil municipal : ${totalSeats} sieges\n`;
+  text += `Conseil municipal : ${totalSeats} sieges (coalition: ${coalSeats}, opposition: ${oppSeats})\n`;
+  text += `Adjoints designes : ${nbAdj} | Conseillers delegues : ${nbDel}\n`;
   if (epciSeats > 0) text += `Conseil communautaire (EPCI) : ${epciSeats} sieges\n`;
   text += `\n`;
 
+  // Use fusion seats if available
+  const fusionSeatCounts = {};
+  if (state.fusionOrder && state.fusionOrder.length > 0) {
+    state.fusionOrder.forEach(f => { fusionSeatCounts[f.list] = (fusionSeatCounts[f.list] || 0) + 1; });
+  }
+  const seatSource = Object.keys(fusionSeatCounts).length > 0 ? fusionSeatCounts : state.results.seats;
   const normalized = normalizeScores(state.lists);
 
-  for (const name in state.results.seats) {
-    const seats = state.results.seats[name];
+  for (const name in seatSource) {
+    const seats = seatSource[name];
     const nl = normalized.find(l => l.name === name);
     const pct = nl ? nl.normalizedScore.toFixed(1) : '?';
     const dist = state.positionDist[name] || {adjAdj: 0, delAdj: 0};
 
     text += `> ${name} (${pct}% des voix)\n`;
-    text += `  -> ${seats} siege(s) au conseil municipal (${(seats/totalSeats*100).toFixed(1)}%)\n`;
-    if (dist.adjAdj > 0) text += `  -> ${dist.adjAdj} poste(s) d'adjoint(e) (indemnite : ${adjActualPer.toFixed(0)}e/mois chacun)\n`;
-    if (dist.delAdj > 0) text += `  -> ${dist.delAdj} poste(s) de conseiller(ere) delegue(e) (indemnite : ${delAllow.toFixed(0)}e/mois chacun)\n`;
+    text += `  -> ${seats} siege(s) dans la coalition (${coalSeats > 0 ? (seats/coalSeats*100).toFixed(1) : 0}%)\n`;
+    if (dist.adjAdj > 0) text += `  -> ${dist.adjAdj} poste(s) d'adjoint(e)\n`;
+    if (dist.delAdj > 0) text += `  -> ${dist.delAdj} poste(s) de conseiller(ere) delegue(e)\n`;
     const simples = seats - (dist.adjAdj||0) - (dist.delAdj||0);
     if (simples > 0) text += `  -> ${simples} conseiller(ere)(s) simple(s)\n`;
 
@@ -1998,17 +1576,11 @@ function generateNegotiationSummary() {
     for (const dId in state.delegationAssignments) {
       const a = state.delegationAssignments[dId];
       if (a && a.candidateId) {
-        const mc = state.merged.find(m => m.id === a.candidateId && m.origin === name);
-        if (mc) {
-          const del = DELEGATION_CATALOG.find(d => d.id === dId);
-          if (del) delegations.push(del.label);
-        }
+        const del = DELEGATION_CATALOG.find(d => d.id === dId);
+        if (del) delegations.push(del.label);
       }
     }
     if (delegations.length > 0) text += `  -> Delegations : ${delegations.join(', ')}\n`;
-
-    const monthlyEnvelope = ((dist.adjAdj||0) * adjMaxAllow) + ((dist.delAdj||0) * delAllow);
-    if (monthlyEnvelope > 0) text += `  -> Enveloppe indemnitaire mensuelle : ${monthlyEnvelope.toFixed(0)}e\n`;
     text += `\n`;
   }
 
@@ -2044,7 +1616,13 @@ function startTimerDisplay() {
 // =====================================================================
 // STATE PERSISTENCE
 // =====================================================================
+let _saveTimeout = null;
 function saveState() {
+  if (_saveTimeout) return; // debounce: coalesce rapid calls
+  _saveTimeout = setTimeout(() => { _saveTimeout = null; _doSaveState(); }, 50);
+}
+function saveStateNow() { if (_saveTimeout) { clearTimeout(_saveTimeout); _saveTimeout = null; } _doSaveState(); }
+function _doSaveState() {
   state.headGender = document.getElementById('headGender')?.value || 'F';
   try {
     localStorage.setItem('oad_fusion_state', JSON.stringify({
@@ -2054,14 +1632,9 @@ function saveState() {
       totalSeats: document.getElementById('totalSeats').value,
       epciSeats: document.getElementById('epciSeats').value,
       isPLM: document.getElementById('isPLM').checked,
+      coalitionScore: document.getElementById('coalitionScore').value,
       nbAdjointsDesignes: document.getElementById('nbAdjointsDesignes').value,
-      nbAdjointsNegocies: document.getElementById('nbAdjointsNegocies').value,
-      mayorActual: document.getElementById('mayorActual').value,
-      adjointActual: document.getElementById('adjointActual').value,
       nbDelegues: document.getElementById('nbDelegues').value,
-      delegueAllowance: document.getElementById('delegueAllowance').value,
-      listAName: document.getElementById('listAName').value,
-      listBName: document.getElementById('listBName').value,
       wsData: wsState.data,
       wsCustomCols: wsState.customCols,
       wsCustomData: wsState.customData,
@@ -2083,13 +1656,18 @@ function loadState() {
         listB: s.listB || state.listB, merged: s.merged || [],
         mergeValidated: s.mergeValidated || false,
         delegationAssignments: s.delegationAssignments || {},
+        delegationOverrides: s.delegationOverrides || {},
         positionDist: s.positionDist || {}, timerEnd: s.timerEnd || null,
+        coalitionSeats: s.coalitionSeats || 0,
+        coalitionScore: s.coalitionScore || 55,
+        fusionLists: s.fusionLists || (s.fusionListA && s.fusionListB ? [s.fusionListA, s.fusionListB] : []),
+        fusionMode: s.fusionMode || 'proportionnelle',
+        fusionOrder: s.fusionOrder || [],
+        fusionHeadGenders: s.fusionHeadGenders || {},
+        wsSavedSources: s.wsSavedSources || {},
       });
       const fields = {cityName:'cityName',cityPop:'cityPop',totalSeats:'totalSeats',epciSeats:'epciSeats',
-        nbAdjointsDesignes:'nbAdjointsDesignes',nbAdjointsNegocies:'nbAdjointsNegocies',
-        mayorActual:'mayorActual',adjointActual:'adjointActual',
-        nbDelegues:'nbDelegues',delegueAllowance:'delegueAllowance',
-        listAName:'listAName',listBName:'listBName'};
+        coalitionScore:'coalitionScore',nbAdjointsDesignes:'nbAdjointsDesignes',nbDelegues:'nbDelegues'};
       for (const k in fields) { if (s[k] !== undefined && s[k] !== null) { const el = document.getElementById(fields[k]); if (el) el.value = s[k]; } }
       if (s.isPLM) document.getElementById('isPLM').checked = s.isPLM;
       document.getElementById('headGender').value = state.headGender;
@@ -2104,9 +1682,6 @@ function loadState() {
       });
       // Trigger population display
       if (s.cityPop) onPopulationChange();
-      // Restore actual allowances AFTER onPopulationChange (which sets them to max)
-      if (s.mayorActual !== undefined) document.getElementById('mayorActual').value = s.mayorActual;
-      if (s.adjointActual !== undefined) document.getElementById('adjointActual').value = s.adjointActual;
       // Restore workspace state
       if (s.wsData) wsState.data = s.wsData;
       if (s.wsCustomCols) wsState.customCols = s.wsCustomCols;
@@ -2180,24 +1755,109 @@ const wsState = {
 function wsLoadSource() {
   const src = document.getElementById('ws-source').value;
   if (!src) { wsState.data = []; wsRender(); return; }
+  if (src === 'current') { wsBuildOriginBtns(); wsRender(); wsRenderSimulation(); return; }
   const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
   let candidates = [];
   if (src === 'merged') candidates = state.merged;
-  else if (src === 'listA') candidates = (state.listA.candidates || []).map((c, i) => ({...c, position: i + 1, origin: state.listA.name || 'Liste A', isTitulaire: true}));
-  else if (src === 'listB') candidates = (state.listB.candidates || []).map((c, i) => ({...c, position: i + 1, origin: state.listB.name || 'Liste B', isTitulaire: true}));
-  // Deep copy + assign default role from position
-  wsState.data = candidates.filter(c => c.name && c.name.trim()).map(c => {
+  else if (state.wsSavedSources && state.wsSavedSources[src]) candidates = state.wsSavedSources[src];
+
+  wsState.data = candidates.map(c => {
     const copy = {...c};
     if (!copy.id) copy.id = 'ws_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
     if (!copy.role) {
       const elig = getPositionEligibility(copy.position, totalSeats);
-      copy.role = elig.type; // maire, adjoint, delegue, simple, suppleant
+      copy.role = elig.type;
     }
     return copy;
   });
   wsBuildOriginBtns();
   wsRender();
   wsRenderSimulation();
+}
+
+function wsSaveAsSource() {
+  if (wsState.data.length === 0) return alert('Aucune donnee a enregistrer.');
+  const name = prompt('Nom de cette liste :', 'Import ' + new Date().toLocaleDateString('fr'));
+  if (!name) return;
+  if (!state.wsSavedSources) state.wsSavedSources = {};
+  state.wsSavedSources[name] = wsState.data.map(c => ({...c}));
+  wsPopulateSourceDropdown();
+  document.getElementById('ws-source').value = name;
+  saveState();
+}
+
+function wsPopulateSourceDropdown() {
+  const sel = document.getElementById('ws-source');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Choisir —</option><option value="merged">Liste fusionnee (Module 2)</option><option value="current">Liste active</option>';
+  if (state.wsSavedSources) {
+    for (const name in state.wsSavedSources) {
+      sel.innerHTML += `<option value="${esc(name)}">${esc(name)} (${state.wsSavedSources[name].length})</option>`;
+    }
+  }
+  if (current) sel.value = current;
+}
+
+function wsDownloadTemplate() {
+  const totalSeats = parseInt(document.getElementById('totalSeats').value) || 43;
+  const header = 'Nom;Prenom;Genre;Liste;EPCI';
+  const rows = [header];
+  for (let i = 1; i <= totalSeats; i++) {
+    const gender = i % 2 === 0 ? 'F' : 'H';
+    rows.push(`;;${gender};;`);
+  }
+  const blob = new Blob([rows.join('\n')], {type: 'text/csv;charset=utf-8;'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'modele_candidats.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function wsImportCSV() {
+  const input = document.getElementById('csvFileInput');
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const lines = ev.target.result.split('\n').filter(l => l.trim());
+      const candidates = [];
+      const totalSeats = parseInt(document.getElementById('totalSeats').value) || 0;
+      lines.forEach((line, i) => {
+        if (i === 0 && (line.toLowerCase().includes('nom') || line.toLowerCase().includes('name'))) return;
+        const parts = line.split(/[;,\t]/);
+        if (parts.length >= 2) {
+          const pos = candidates.length + 1;
+          const name = (parts[0] + ' ' + (parts[1] || '')).trim();
+          const gender = (parts[2] || 'F').trim().toUpperCase().startsWith('H') ? 'H' : 'F';
+          const origin = (parts[3] || '').trim();
+          const epci = (parts[4] || '').trim() === '1' || (parts[4] || '').toLowerCase().trim() === 'oui';
+          const elig = getPositionEligibility(pos, totalSeats);
+          candidates.push({
+            id: 'ws_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            name, gender, origin, epci,
+            position: pos, isTitulaire: pos <= totalSeats, role: elig.type
+          });
+        }
+      });
+      wsState.data = candidates;
+      // Also update state.merged for Module 3 delegation dropdowns
+      state.merged = candidates.map(c => ({...c}));
+      // Auto-save as a named source
+      const sourceName = file.name.replace(/\.(csv|xlsx?)$/i, '');
+      if (!state.wsSavedSources) state.wsSavedSources = {};
+      state.wsSavedSources[sourceName] = candidates.map(c => ({...c}));
+      wsPopulateSourceDropdown();
+      document.getElementById('ws-source').value = sourceName;
+      wsBuildOriginBtns();
+      wsRender();
+      wsRenderSimulation();
+      renderDelegationTable();
+      saveState();
+    };
+    reader.readAsText(file); input.value = '';
+  };
+  input.click();
 }
 
 function wsBuildOriginBtns() {
@@ -2280,11 +1940,16 @@ const ROLE_STYLES = {
   suppleant: {label:'Suppleant', color:'#999',              bg:'rgba(153,153,153,0.1)'},
 };
 
+function wsSyncMerged() {
+  state.merged = wsState.data.map(c => ({...c}));
+  saveState();
+}
+
 function wsEdit(idx, field, value) {
   if (!wsState.data[idx]) return;
   wsState.data[idx][field] = value;
   if (field === 'role') { wsRender(); wsRenderSimulation(); }
-  saveState();
+  wsSyncMerged();
 }
 
 function wsMove(idx, dir) {
@@ -2295,13 +1960,13 @@ function wsMove(idx, dir) {
   wsState.data[target] = tmp;
   // Reassign positions
   wsState.data.forEach((c, i) => c.position = i + 1);
-  wsRender(); wsRenderSimulation(); saveState();
+  wsRender(); wsRenderSimulation(); wsSyncMerged();
 }
 
 function wsRemove(idx) {
   wsState.data.splice(idx, 1);
   wsState.data.forEach((c, i) => c.position = i + 1);
-  wsRender(); wsRenderSimulation(); saveState();
+  wsRender(); wsRenderSimulation(); wsSyncMerged();
 }
 
 function wsAdd() {
@@ -2312,7 +1977,7 @@ function wsAdd() {
     id: 'ws_' + Date.now(), name, gender, origin: '', epci: false,
     role: 'simple', position: wsState.data.length + 1, isTitulaire: true,
   });
-  wsRender(); wsRenderSimulation(); saveState();
+  wsRender(); wsRenderSimulation(); wsSyncMerged();
 }
 
 function wsDuplicate(idx) {
@@ -2321,7 +1986,7 @@ function wsDuplicate(idx) {
   const copy = {...src, id: 'ws_' + Date.now(), position: wsState.data.length + 1};
   wsState.data.push(copy);
   wsState.data.forEach((c, i) => c.position = i + 1);
-  wsRender(); wsRenderSimulation(); saveState();
+  wsRender(); wsRenderSimulation(); wsSyncMerged();
 }
 
 function wsRender() {
@@ -2391,7 +2056,7 @@ function wsRender() {
         const destIdx = srcIdx < i ? i : i;
         wsState.data.splice(destIdx, 0, item);
         wsState.data.forEach((m, idx) => m.position = idx + 1);
-        wsRender(); wsRenderSimulation(); saveState();
+        wsRender(); wsRenderSimulation(); wsSyncMerged();
       }
     };
 
@@ -2462,21 +2127,16 @@ function wsRenderSimulation() {
     byOrigin[o][c.role || 'simple']++;
   });
 
-  const adjPer = parseFloat(document.getElementById('adjointActual')?.value) || 0;
-  const delPer = parseFloat(document.getElementById('delegueAllowance')?.value) || 0;
-
   let html = '';
   for (const origin in byOrigin) {
     const b = byOrigin[origin];
-    const cost = b.adjoint * adjPer + b.delegue * delPer;
     html += `<div class="card" style="padding:10px;margin:0;">
       <strong>${esc(origin)}</strong> <span style="font-size:11px;opacity:0.6;">(${b.total})</span><br>
       <span style="font-size:12px;line-height:1.8;">
         ${b.maire ? '<span style="color:var(--bleu);font-weight:600;">1 Maire</span><br>' : ''}
         <span style="color:var(--vert);font-weight:600;">${b.adjoint} Adjoint(s)</span> |
         <span style="color:var(--orange);font-weight:600;">${b.delegue} Delegue(s)</span><br>
-        ${b.simple} Conseiller(s)${b.suppleant ? ' | ' + b.suppleant + ' Supp' : ''}<br>
-        <strong>Cout : ${cost.toFixed(0)} e/mois</strong>
+        ${b.simple} Conseiller(s)${b.suppleant ? ' | ' + b.suppleant + ' Supp' : ''}
       </span>
     </div>`;
   }
@@ -2489,7 +2149,7 @@ function wsAutoRoles() {
     const elig = getPositionEligibility(c.position, totalSeats);
     c.role = elig.type;
   });
-  wsRender(); wsRenderSimulation(); saveState();
+  wsRender(); wsRenderSimulation(); wsSyncMerged();
 }
 
 function wsExportCSV() {
@@ -2520,9 +2180,7 @@ function wsAddScenario() {
   const adj = parseInt(prompt('Nb adjoints pour notre groupe :', '3')) || 0;
   const del = parseInt(prompt('Nb delegues pour notre groupe :', '2')) || 0;
   const notes = prompt('Notes :', '') || '';
-  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
-  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-  wsState.scenarios.push({name, adj, del, notes, cost: adj * adjActualPer + del * delAllow});
+  wsState.scenarios.push({name, adj, del, notes});
   wsRenderScenarios();
   saveState();
 }
@@ -2537,20 +2195,15 @@ function wsRenderScenarios() {
   const container = document.getElementById('ws-scenarios');
   if (!container) return;
   container.innerHTML = '';
-  const adjActualPer = parseFloat(document.getElementById('adjointActual').value) || 0;
-  const delAllow = parseFloat(document.getElementById('delegueAllowance').value) || 0;
-
   wsState.scenarios.forEach((sc, idx) => {
-    const cost = sc.adj * adjActualPer + sc.del * delAllow;
     container.innerHTML += `<div class="scenario-card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <strong>${esc(sc.name)}</strong>
         <button class="btn btn-sm btn-danger" onclick="wsRemoveScenario(${idx})">x</button>
       </div>
       <div style="margin-top:8px;font-size:12px;line-height:1.8;">
-        <span style="color:var(--vert);font-weight:600;">${sc.adj} adjoint(s)</span> x ${adjActualPer.toFixed(0)}e = ${(sc.adj * adjActualPer).toFixed(0)}e/mois<br>
-        <span style="color:var(--orange);font-weight:600;">${sc.del} delegue(s)</span> x ${delAllow.toFixed(0)}e = ${(sc.del * delAllow).toFixed(0)}e/mois<br>
-        <strong>Cout total : ${cost.toFixed(0)} e/mois (${(cost * 12).toFixed(0)} e/an)</strong>
+        <span style="color:var(--vert);font-weight:600;">${sc.adj} adjoint(s)</span> |
+        <span style="color:var(--orange);font-weight:600;">${sc.del} delegue(s)</span>
         ${sc.notes ? '<br><em style="opacity:0.7;">' + esc(sc.notes) + '</em>' : ''}
       </div>
     </div>`;
